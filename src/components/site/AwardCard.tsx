@@ -30,7 +30,7 @@ export function AwardCard({ award }: { award: AwardItinerary }) {
   const grade = gradeCpp(cpp, award.cabin);
   const confidence = confidenceFor(award);
   const fare = fareEstimateAud(award.from, award.to, award.cabin);
-  const balance = program?.balance ?? 0;
+  const balance = 0;
   const shortfall = Math.max(0, award.miles - balance);
   const fastest = shortfall > 0 ? transfersFor(award.programId)[0] : undefined;
   const transferTooSlow = !!fastest && fastest.etaMin > 60 && confidence.ageMin < 30;

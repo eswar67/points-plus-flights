@@ -41,9 +41,9 @@ function airlineBookingUrl(programId: string, a: AwardItinerary): { href: string
   }
 }
 
-export function buildPlaybook(a: AwardItinerary): Playbook {
+export function buildPlaybook(a: AwardItinerary, balances: Record<string, number> = {}): Playbook {
   const program = PROGRAMS.find((p) => p.id === a.programId);
-  const balance = program?.balance ?? 0;
+  const balance = balances[a.programId] ?? 0;
   const shortfall = Math.max(0, a.miles - balance);
   const steps: PlaybookStep[] = [];
   const conf = confidenceFor(a);
