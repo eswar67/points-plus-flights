@@ -1,5 +1,6 @@
 import type { AwardItinerary } from "@/server/awards/types";
 import { PROGRAMS } from "./programs";
+import { confidenceFor, transfersFor } from "./intelligence";
 
 export type PlaybookStep = {
   kind: "transfer" | "book" | "wait" | "verify";
@@ -16,29 +17,7 @@ export type Playbook = {
   totalMiles: number;
   bookingProgramId: string;
   steps: PlaybookStep[];
-};
-
-// Bank transfer partners → program (1:1 unless noted). Used to suggest top-ups.
-const TRANSFER_PARTNERS: Record<string, { bank: string; ratio: string; etaMin: number; href: string }[]> = {
-  qantas:    [{ bank: "Amex MR (AU)", ratio: "1:1", etaMin: 1440, href: "https://www.americanexpress.com/au/rewards/membership-rewards/transfer-points" }],
-  velocity:  [{ bank: "Amex MR (AU)", ratio: "1:1", etaMin: 1440, href: "https://www.americanexpress.com/au/rewards/membership-rewards/transfer-points" }],
-  krisflyer: [
-    { bank: "Amex MR",   ratio: "1:1", etaMin: 60,   href: "https://global.americanexpress.com/rewards/transfer-points" },
-    { bank: "Chase UR",  ratio: "1:1", etaMin: 60,   href: "https://ultimaterewards.chase.com" },
-    { bank: "Citi TYP",  ratio: "1:1", etaMin: 60,   href: "https://www.citi.com/thankyou" },
-  ],
-  emirates:  [
-    { bank: "Amex MR",   ratio: "1:1", etaMin: 60,   href: "https://global.americanexpress.com/rewards/transfer-points" },
-    { bank: "Bilt",      ratio: "1:1", etaMin: 5,    href: "https://www.biltrewards.com" },
-  ],
-  united:    [
-    { bank: "Chase UR",  ratio: "1:1", etaMin: 1,    href: "https://ultimaterewards.chase.com" },
-    { bank: "Bilt",      ratio: "1:1", etaMin: 5,    href: "https://www.biltrewards.com" },
-  ],
-  lifemiles: [
-    { bank: "Amex MR",   ratio: "1:1", etaMin: 1440, href: "https://global.americanexpress.com/rewards/transfer-points" },
-    { bank: "Citi TYP",  ratio: "1:1", etaMin: 60,   href: "https://www.citi.com/thankyou" },
-  ],
+  riskNote?: string;
 };
 
 // Best-effort airline booking deep links (program site, prefilled where possible).
@@ -67,15 +46,21 @@ export function buildPlaybook(a: AwardItinerary): Playbook {
   const balance = program?.balance ?? 0;
   const shortfall = Math.max(0, a.miles - balance);
   const steps: PlaybookStep[] = [];
+  const conf = confidenceFor(a);
+  const partners = transfersFor(a.programId);
+  const fastest = partners[0];
+  let riskNote: string | undefined;
 
   if (shortfall > 0) {
-    const partners = TRANSFER_PARTNERS[a.programId] ?? [];
-    const fastest = partners[0];
     if (fastest) {
+      const safeWindowMin = Math.max(0, 240 - conf.ageMin); // assume seat lifespan ~4h on a fresh cache
+      if (fastest.etaMin > safeWindowMin && conf.label !== "stale") {
+        riskNote = `Transfer ETA (~${Math.round(fastest.etaMin / 60)}h) likely exceeds remaining seat lifespan. Consider a faster bank or a different program.`;
+      }
       steps.push({
         kind: "transfer",
-        title: `Transfer ${shortfall.toLocaleString()} pts from ${fastest.bank}`,
-        detail: `${fastest.bank} → ${program?.name ?? a.programId} at ${fastest.ratio}. Log in, choose the program, and confirm the transfer.`,
+        title: `Transfer ${shortfall.toLocaleString()} pts from ${fastest.bank} (${fastest.ratio})`,
+        detail: `${fastest.bank} → ${program?.name ?? a.programId}. Typical ${fastest.etaMin < 60 ? `${fastest.etaMin}m` : `${Math.round(fastest.etaMin / 60)}h`}, worst case ${Math.round(fastest.etaMaxMin / 60)}h. Log in and confirm immediately.`,
         href: fastest.href,
         cta: `Open ${fastest.bank}`,
         etaMinutes: fastest.etaMin,
@@ -115,5 +100,6 @@ export function buildPlaybook(a: AwardItinerary): Playbook {
     totalMiles: a.miles,
     bookingProgramId: a.programId,
     steps,
+    riskNote,
   };
 }
