@@ -163,7 +163,7 @@ function Index() {
             )}
           </>
         ) : (
-          <Vault />
+          <Portfolio balances={balances} />
         )}
       </section>
 
@@ -190,50 +190,169 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Vault() {
+function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>["balances"] }) {
+  const { user, loading: authLoading } = useAuth();
+
+  // Total AUD value across all entered balances, using each program's
+  // benchmark cents-per-point. Falls back to a conservative 1.0¢ for
+  // programs not in the catalog.
+  const totalPoints = balances.reduce((s, b) => s + b.balance, 0);
+  const totalCents = balances.reduce((s, b) => {
+    const p = getProgram(b.program_id);
+    const cpp = p?.valueAudCents ?? 1.0;
+    return s + b.balance * cpp;
+  }, 0);
+  const totalAud = totalCents / 100;
+
+  if (authLoading) return null;
+
+  if (!user) {
+    return (
+      <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-14 text-center">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Your points portfolio</span>
+        <h2 className="font-display text-3xl md:text-4xl mt-3">
+          See what your points are <span className="text-gold-gradient">really worth</span>.
+        </h2>
+        <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
+          Sign in and add the loyalty programs you hold. We'll value your portfolio in AUD using
+          real benchmark redemption rates — and rank deals by what you can actually book.
+        </p>
+        <Link
+          to="/auth"
+          className="inline-block mt-7 text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+        >
+          Sign in to start
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <div className="flex items-end justify-between mb-6">
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
-          <h2 className="font-display text-3xl">Your points vault</h2>
+          <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Your portfolio</span>
+          <h2 className="font-display text-3xl mt-2">Your points, valued in AUD.</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Aggregate balances from every program you've linked.
+            Add or update balances on the Account page — values are benchmark estimates per
+            premium-cabin redemption.
           </p>
         </div>
-        <button className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition">
-          + Link program
-        </button>
+        <Link
+          to="/account"
+          className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
+        >
+          + Add / edit balances
+        </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        {PROGRAMS.map((p) => (
-          <div key={p.id} className="group rounded-xl border border-border bg-card hover:border-gold/40 transition p-5">
-            <div className="flex items-start justify-between mb-6">
+
+      {balances.length === 0 ? (
+        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+          <h3 className="font-display text-xl">No balances yet.</h3>
+          <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
+            Add the loyalty programs you hold and we'll show you how much your stash is worth —
+            and which premium redemptions are within reach.
+          </p>
+          <Link
+            to="/account"
+            className="inline-block mt-5 text-xs uppercase tracking-[0.25em] px-5 py-2.5 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+          >
+            Add your first program
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-8 md:p-10 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{p.alliance}</div>
-                <div className="font-display text-lg mt-1">{p.name}</div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Total points held
+                </div>
+                <div className="font-display text-4xl mt-2">
+                  {totalPoints.toLocaleString()}
+                </div>
               </div>
-              <span className="size-8 rounded-full grid place-items-center font-display text-xs"
-                style={{ background: `${p.accent}22`, color: p.accent, border: `1px solid ${p.accent}55` }}>
-                {p.short}
-              </span>
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Estimated value
+                </div>
+                <div className="font-display text-4xl text-gold-gradient mt-2">
+                  {totalAud.toLocaleString("en-AU", {
+                    style: "currency",
+                    currency: "AUD",
+                    maximumFractionDigits: 0,
+                  })}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Programs tracked
+                </div>
+                <div className="font-display text-4xl mt-2">{balances.length}</div>
+              </div>
             </div>
-            <div className="font-display text-3xl text-gold-gradient">
-              {p.balance.toLocaleString()}
-            </div>
-            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
-              points available
-            </div>
-            <div className="mt-5 flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400/90">
-                <span className="size-1.5 rounded-full bg-emerald-400" /> Connected
-              </span>
-              <button className="text-xs uppercase tracking-[0.18em] text-gold hover:underline">
-                Manage
-              </button>
-            </div>
+            <p className="text-[11px] text-muted-foreground mt-6 max-w-2xl">
+              Valuations are blended averages across business and first-class redemptions. Real
+              redemption value can be 2–3× higher on the right route.
+            </p>
           </div>
-        ))}
-      </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {balances.map((b) => {
+              const p = getProgram(b.program_id);
+              const accent = p?.accent ?? "#c9a84c";
+              const cpp = p?.valueAudCents ?? 1.0;
+              const audValue = (b.balance * cpp) / 100;
+              return (
+                <div
+                  key={b.id}
+                  className="group rounded-xl border border-border bg-card hover:border-gold/40 transition p-5"
+                >
+                  <div className="flex items-start justify-between mb-5">
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                        {p?.alliance ?? "Loyalty program"}
+                      </div>
+                      <div className="font-display text-lg mt-1">{b.program_name}</div>
+                    </div>
+                    <span
+                      className="size-8 rounded-full grid place-items-center font-display text-xs"
+                      style={{
+                        background: `${accent}22`,
+                        color: accent,
+                        border: `1px solid ${accent}55`,
+                      }}
+                    >
+                      {p?.short ?? "•"}
+                    </span>
+                  </div>
+                  <div className="font-display text-3xl text-gold-gradient">
+                    {b.balance.toLocaleString()}
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                    points · ≈ {audValue.toLocaleString("en-AU", {
+                      style: "currency",
+                      currency: "AUD",
+                      maximumFractionDigits: 0,
+                    })}
+                  </div>
+                  <div className="mt-5 flex items-center justify-between">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                      {cpp.toFixed(1)}¢ / pt
+                    </span>
+                    <Link
+                      to="/account"
+                      className="text-xs uppercase tracking-[0.18em] text-gold hover:underline"
+                    >
+                      Edit
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
