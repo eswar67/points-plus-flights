@@ -19,6 +19,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentLoginRouteImport } from './routes/agent-login'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout/return'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksPollWatchlistsRouteImport } from './routes/api/public/hooks/poll-watchlists'
 
@@ -72,6 +73,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/programs'
     | '/watchlists'
+    | '/checkout/return'
     | '/api/public/hooks/poll-watchlists'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/programs'
     | '/watchlists'
+    | '/checkout/return'
     | '/api/public/hooks/poll-watchlists'
     | '/api/public/payments/webhook'
   id:
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/programs'
     | '/watchlists'
+    | '/checkout/return'
     | '/api/public/hooks/poll-watchlists'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   ProgramsRoute: typeof ProgramsRoute
   WatchlistsRoute: typeof WatchlistsRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   ApiPublicHooksPollWatchlistsRoute: typeof ApiPublicHooksPollWatchlistsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
@@ -260,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   ProgramsRoute: ProgramsRoute,
   WatchlistsRoute: WatchlistsRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   ApiPublicHooksPollWatchlistsRoute: ApiPublicHooksPollWatchlistsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
