@@ -6,6 +6,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { PROGRAMS } from "@/lib/programs";
 import { useServerFn } from "@tanstack/react-start";
 import { sendTestTelegramAlert } from "@/server/alerts/alerts.functions";
+import {
+  getCronSecretMeta,
+  rotateCronSecret,
+} from "@/server/admin/cron-secret.functions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -38,6 +42,7 @@ function AccountPage() {
   const [testing, setTesting] = useState(false);
   const [testMsg, setTestMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const sendTest = useServerFn(sendTestTelegramAlert);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -58,6 +63,11 @@ function AccountPage() {
         setPrograms(new Set(data.programs_held ?? []));
         setTelegram(data.telegram_chat_id ?? "");
       }
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+      setIsAdmin(!!roles?.some((r) => r.role === "admin"));
       setLoading(false);
     })();
   }, [user, authLoading, nav]);
@@ -219,7 +229,167 @@ function AccountPage() {
             {saved && <span className="text-sm text-gold">Saved.</span>}
           </div>
         </form>
+        {isAdmin && <AdminCronSecretSection />}
       </main>
     </div>
+  );
+}
+
+function AdminCronSecretSection() {
+  const fetchMeta = useServerFn(getCronSecretMeta);
+  const rotate = useServerFn(rotateCronSecret);
+  const [meta, setMeta] = useState<{ exists: boolean; updatedAt: string | null } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [working, setWorking] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [revealed, setRevealed] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetchMeta({ data: {} });
+        if (res.ok) setMeta({ exists: res.exists, updatedAt: res.updatedAt });
+        else setErr(res.error);
+      } catch (e) {
+        setErr((e as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [fetchMeta]);
+
+  async function doRotate() {
+    setWorking(true);
+    setErr(null);
+    try {
+      const res = await rotate({ data: {} });
+      if (!res.ok) {
+        setErr(res.error);
+        return;
+      }
+      setRevealed(res.secret);
+      setMeta({ exists: true, updatedAt: res.updatedAt });
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setWorking(false);
+      setConfirming(false);
+    }
+  }
+
+  async function copy() {
+    if (!revealed) return;
+    await navigator.clipboard.writeText(revealed);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  }
+
+  return (
+    <section className="mt-16 pt-10 border-t border-border">
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+          Admin · CRON secret
+        </h2>
+        <span className="text-[10px] uppercase tracking-[0.2em] text-gold/70">Admin only</span>
+      </div>
+      <p className="text-sm text-muted-foreground mt-2 max-w-prose">
+        Rotates the shared secret used by the scheduled poller to authenticate against{" "}
+        <code className="text-xs">/api/public/hooks/poll-watchlists</code>. The new value is
+        written to the locked-down config table immediately. You must then paste the same
+        value into the Lovable Cloud secret <code className="text-xs">CRON_SECRET</code> so
+        runtime code stays in sync.
+      </p>
+
+      <div className="mt-5 text-xs text-muted-foreground">
+        {loading
+          ? "Loading…"
+          : meta?.exists
+            ? `Last rotated ${meta.updatedAt ? new Date(meta.updatedAt).toLocaleString() : "—"}`
+            : "No CRON_SECRET stored yet."}
+      </div>
+
+      {err && <div className="mt-3 text-sm text-destructive">{err}</div>}
+
+      {!revealed && (
+        <div className="mt-5 flex items-center gap-3">
+          {!confirming ? (
+            <button
+              type="button"
+              onClick={() => setConfirming(true)}
+              disabled={loading}
+              className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-50"
+            >
+              Rotate CRON_SECRET
+            </button>
+          ) : (
+            <>
+              <span className="text-xs text-muted-foreground">
+                This invalidates the current secret immediately. Continue?
+              </span>
+              <button
+                type="button"
+                onClick={doRotate}
+                disabled={working}
+                className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+              >
+                {working ? "Rotating…" : "Yes, rotate"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirming(false)}
+                disabled={working}
+                className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-muted-foreground hover:text-foreground transition"
+              >
+                Cancel
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {revealed && (
+        <div className="mt-6 rounded-lg border border-gold/40 bg-gold/5 p-5">
+          <div className="text-[10px] uppercase tracking-[0.2em] text-gold">
+            New secret — shown once
+          </div>
+          <div className="mt-3 font-mono text-xs break-all bg-background border border-border rounded p-3">
+            {revealed}
+          </div>
+          <div className="mt-3 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={copy}
+              className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+            >
+              {copied ? "Copied ✓" : "Copy to clipboard"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setRevealed(null)}
+              className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-muted-foreground hover:text-foreground transition"
+            >
+              Done
+            </button>
+          </div>
+          <ol className="mt-5 space-y-2 text-xs text-muted-foreground list-decimal list-inside">
+            <li>Copy the value above.</li>
+            <li>
+              Open Lovable Cloud → Secrets, find <code>CRON_SECRET</code>, and paste the new
+              value to update it.
+            </li>
+            <li>
+              The scheduled poller will pick up the new secret on its next run (within 15
+              minutes). No redeploy needed.
+            </li>
+          </ol>
+          <p className="mt-4 text-[11px] text-destructive/80">
+            Until you update the Cloud secret, runtime code that reads{" "}
+            <code>process.env.CRON_SECRET</code> will be out of sync with the database.
+          </p>
+        </div>
+      )}
+    </section>
   );
 }
