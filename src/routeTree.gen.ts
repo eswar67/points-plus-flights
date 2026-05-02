@@ -13,6 +13,7 @@ import { Route as WatchlistsRouteImport } from './routes/watchlists'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ConciergeRouteImport } from './routes/concierge'
+import { Route as BookRouteImport } from './routes/book'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentLoginRouteImport } from './routes/agent-login'
 import { Route as AccountRouteImport } from './routes/account'
@@ -37,6 +38,11 @@ const HowItWorksRoute = HowItWorksRouteImport.update({
 const ConciergeRoute = ConciergeRouteImport.update({
   id: '/concierge',
   path: '/concierge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookRoute = BookRouteImport.update({
+  id: '/book',
+  path: '/book',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/agent-login': typeof AgentLoginRoute
   '/auth': typeof AuthRoute
+  '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/agent-login': typeof AgentLoginRoute
   '/auth': typeof AuthRoute
+  '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/agent-login': typeof AgentLoginRoute
   '/auth': typeof AuthRoute
+  '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/agent-login'
     | '/auth'
+    | '/book'
     | '/concierge'
     | '/how-it-works'
     | '/programs'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/agent-login'
     | '/auth'
+    | '/book'
     | '/concierge'
     | '/how-it-works'
     | '/programs'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/agent-login'
     | '/auth'
+    | '/book'
     | '/concierge'
     | '/how-it-works'
     | '/programs'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AgentLoginRoute: typeof AgentLoginRoute
   AuthRoute: typeof AuthRoute
+  BookRoute: typeof BookRoute
   ConciergeRoute: typeof ConciergeRoute
   HowItWorksRoute: typeof HowItWorksRoute
   ProgramsRoute: typeof ProgramsRoute
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       path: '/concierge'
       fullPath: '/concierge'
       preLoaderRoute: typeof ConciergeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book': {
+      id: '/book'
+      path: '/book'
+      fullPath: '/book'
+      preLoaderRoute: typeof BookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   AgentLoginRoute: AgentLoginRoute,
   AuthRoute: AuthRoute,
+  BookRoute: BookRoute,
   ConciergeRoute: ConciergeRoute,
   HowItWorksRoute: HowItWorksRoute,
   ProgramsRoute: ProgramsRoute,
