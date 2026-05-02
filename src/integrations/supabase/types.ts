@@ -216,6 +216,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_cron_secret_meta: {
+        Args: never
+        Returns: {
+          has_secret: boolean
+          updated_at: string
+        }[]
+      }
+      admin_rotate_cron_secret: {
+        Args: { _new_value: string }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
