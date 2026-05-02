@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts_sent: {
+        Row: {
+          cpp_aud: number | null
+          fingerprint: string
+          id: string
+          miles: number | null
+          sent_at: string
+          watchlist_id: string
+        }
+        Insert: {
+          cpp_aud?: number | null
+          fingerprint: string
+          id?: string
+          miles?: number | null
+          sent_at?: string
+          watchlist_id: string
+        }
+        Update: {
+          cpp_aud?: number | null
+          fingerprint?: string
+          id?: string
+          miles?: number | null
+          sent_at?: string
+          watchlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_sent_watchlist_id_fkey"
+            columns: ["watchlist_id"]
+            isOneToOne: false
+            referencedRelation: "watchlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_requests: {
         Row: {
           agent_notes: string | null
@@ -71,6 +106,36 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          programs_held: string[]
+          telegram_chat_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          programs_held?: string[]
+          telegram_chat_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          programs_held?: string[]
+          telegram_chat_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -88,6 +153,60 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      watchlists: {
+        Row: {
+          active: boolean
+          cabin: string
+          channel: string
+          created_at: string
+          date_from: string
+          date_to: string
+          destination: string
+          id: string
+          label: string | null
+          max_miles: number | null
+          min_cpp_aud: number | null
+          origin: string
+          pax: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          cabin: string
+          channel?: string
+          created_at?: string
+          date_from: string
+          date_to: string
+          destination: string
+          id?: string
+          label?: string | null
+          max_miles?: number | null
+          min_cpp_aud?: number | null
+          origin: string
+          pax?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          cabin?: string
+          channel?: string
+          created_at?: string
+          date_from?: string
+          date_to?: string
+          destination?: string
+          id?: string
+          label?: string | null
+          max_miles?: number | null
+          min_cpp_aud?: number | null
+          origin?: string
+          pax?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
