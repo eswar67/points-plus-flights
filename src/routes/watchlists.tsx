@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
 import type { Cabin } from "@/server/awards/types";
 import { useServerFn } from "@tanstack/react-start";
@@ -39,6 +40,7 @@ const CABINS: Cabin[] = ["economy", "premium", "business", "first"];
 function WatchlistsPage() {
   const nav = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { isActive: hasPlus } = useSubscription();
   const [items, setItems] = useState<Watchlist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -103,11 +105,29 @@ function WatchlistsPage() {
           </div>
           <button
             onClick={() => setShowForm((s) => !s)}
-            className="text-xs uppercase tracking-[0.18em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+            disabled={!hasPlus && items.length >= 1 && !showForm}
+            className="text-xs uppercase tracking-[0.18em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {showForm ? "Close" : "+ New watchlist"}
           </button>
         </div>
+
+        {!hasPlus && items.length >= 1 && !showForm && (
+          <div className="mt-6 rounded-xl border border-gold/40 bg-gold/5 p-5 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.25em] text-gold mb-1">Free plan limit</div>
+              <p className="text-sm text-muted-foreground">
+                You're using your one free watchlist. Upgrade to <span className="text-foreground">Aureum Plus</span> for unlimited watchlists and priority alerts.
+              </p>
+            </div>
+            <Link
+              to="/pricing"
+              className="text-xs uppercase tracking-[0.25em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold whitespace-nowrap"
+            >
+              Upgrade
+            </Link>
+          </div>
+        )}
 
         {showForm && (
           <NewWatchlistForm
