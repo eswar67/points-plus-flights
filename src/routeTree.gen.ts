@@ -13,6 +13,7 @@ import { Route as WatchlistsRouteImport } from './routes/watchlists'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ConciergeRouteImport } from './routes/concierge'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -41,6 +42,11 @@ const PricingRoute = PricingRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConciergeRoute = ConciergeRouteImport.update({
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
+  '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
+  '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
+  '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/book'
     | '/concierge'
+    | '/faq'
     | '/how-it-works'
     | '/pricing'
     | '/programs'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/book'
     | '/concierge'
+    | '/faq'
     | '/how-it-works'
     | '/pricing'
     | '/programs'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/book'
     | '/concierge'
+    | '/faq'
     | '/how-it-works'
     | '/pricing'
     | '/programs'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BookRoute: typeof BookRoute
   ConciergeRoute: typeof ConciergeRoute
+  FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
   ProgramsRoute: typeof ProgramsRoute
@@ -229,6 +242,13 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/concierge': {
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BookRoute: BookRoute,
   ConciergeRoute: ConciergeRoute,
+  FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
   ProgramsRoute: ProgramsRoute,

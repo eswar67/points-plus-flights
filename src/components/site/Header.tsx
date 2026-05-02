@@ -21,6 +21,7 @@ export function Header() {
           )}
           <Link to="/how-it-works" className="hover:text-foreground transition">How it works</Link>
           <Link to="/pricing" className="hover:text-foreground transition">Pricing</Link>
+          <Link to="/faq" className="hover:text-foreground transition">FAQ</Link>
           <Link to="/book" className="hover:text-foreground transition">Book</Link>
         </nav>
         {loading ? (
