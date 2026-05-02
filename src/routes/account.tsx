@@ -5,6 +5,7 @@ import { Header } from "@/components/site/Header";
 import { useAuth } from "@/hooks/useAuth";
 import { PROGRAMS } from "@/lib/programs";
 import { useServerFn } from "@tanstack/react-start";
+import { useUserBalances } from "@/hooks/useUserBalances";
 import { sendTestTelegramAlert } from "@/server/alerts/alerts.functions";
 import {
   getCronSecretMeta,
@@ -34,7 +35,6 @@ function AccountPage() {
   const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [displayName, setDisplayName] = useState("");
-  const [programs, setPrograms] = useState<Set<string>>(new Set());
   const [telegram, setTelegram] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -61,7 +61,6 @@ function AccountPage() {
       if (data) {
         setProfile(data as ProfileRow);
         setDisplayName(data.display_name ?? "");
-        setPrograms(new Set(data.programs_held ?? []));
         setTelegram(data.telegram_chat_id ?? "");
       }
       const { data: roles } = await supabase
@@ -73,14 +72,6 @@ function AccountPage() {
     })();
   }, [user, authLoading, nav]);
 
-  function toggleProgram(id: string) {
-    setPrograms((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  }
-
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
@@ -90,7 +81,7 @@ function AccountPage() {
     const payload = {
       user_id: user.id,
       display_name: displayName.trim() || null,
-      programs_held: Array.from(programs),
+      programs_held: profile?.programs_held ?? [],
       telegram_chat_id: telegram.trim() || null,
     };
     const { error } = await supabase
@@ -143,34 +134,13 @@ function AccountPage() {
           </section>
 
           <section>
-            <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Programs you hold</h2>
+            <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Your points balances</h2>
             <p className="text-sm text-muted-foreground mt-2">
-              We use this to rank deals by what you can actually book — and to choose the right transfer partners.
+              Add the loyalty programs you hold and how many points you have. We'll value the
+              total in AUD on your homepage and use it to rank award deals.
             </p>
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {PROGRAMS.map((p) => {
-                const on = programs.has(p.id);
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => toggleProgram(p.id)}
-                    className={`flex items-center justify-between rounded-lg border px-3 py-2.5 text-left transition ${
-                      on
-                        ? "border-gold/60 bg-gold/5"
-                        : "border-border hover:border-muted-foreground/40"
-                    }`}
-                  >
-                    <div>
-                      <div className="text-sm">{p.name}</div>
-                      <div className="text-[11px] text-muted-foreground">{p.alliance}</div>
-                    </div>
-                    <div className={`text-[10px] uppercase tracking-[0.2em] ${on ? "text-gold" : "text-muted-foreground"}`}>
-                      {on ? "Held" : "Add"}
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="mt-5">
+              <BalancesEditor />
             </div>
           </section>
 
