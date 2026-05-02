@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/site/Header";
 import { submitBookingRequest } from "@/server/booking/booking.functions";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export const Route = createFileRoute("/book")({
   head: () => ({
@@ -34,6 +36,10 @@ const CABINS = [
 type Cabin = (typeof CABINS)[number]["value"];
 
 function BookPage() {
+  const { user, loading: authLoading } = useAuth();
+  const { isActive, loading: subLoading } = useSubscription();
+  const gated = !authLoading && !subLoading && (!user || !isActive);
+
   const submit = useServerFn(submitBookingRequest);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +108,41 @@ function BookPage() {
           </p>
         </div>
 
-        {success ? (
+        {gated ? (
+          <div className="rounded-2xl border border-gold/40 bg-gradient-to-b from-gold/10 to-transparent p-8">
+            <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-2">
+              Aureum Plus members only
+            </div>
+            <h2 className="font-display text-2xl">Concierge ticketing is a member benefit.</h2>
+            <p className="text-muted-foreground mt-3 max-w-xl">
+              An award specialist hunts the seats, holds them, and tickets on your
+              behalf — across 30+ programs. Available to Aureum Plus members for
+              A$12/month or A$120/year.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                to="/pricing"
+                className="text-xs uppercase tracking-[0.25em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
+              >
+                Upgrade to Aureum Plus
+              </Link>
+              {!user && (
+                <Link
+                  to="/auth"
+                  className="text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+                >
+                  Sign in
+                </Link>
+              )}
+              <Link
+                to="/"
+                className="text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full text-muted-foreground hover:text-foreground transition"
+              >
+                Back to search
+              </Link>
+            </div>
+          </div>
+        ) : success ? (
           <div className="rounded-2xl border border-gold/40 bg-gold/5 p-8">
             <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-2">
               Request received
