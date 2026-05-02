@@ -6,6 +6,7 @@ import { Footer } from "@/components/site/Footer";
 import { SearchForm } from "@/components/site/SearchForm";
 import { AwardCard } from "@/components/site/AwardCard";
 import { ProgramRail } from "@/components/site/ProgramRail";
+import { ValueProps, Testimonials, FAQ, ConciergeCTA } from "@/components/site/HomeSections";
 import { searchAwards } from "@/server/awards/awards.functions";
 import type { Cabin, AwardItinerary, SearchResult } from "@/server/awards/types";
 import { PROGRAMS } from "@/lib/programs";
@@ -162,6 +163,15 @@ function Index() {
           <Vault />
         )}
       </section>
+
+      {!query && (
+        <>
+          <ValueProps />
+          <Testimonials />
+          <FAQ limit={4} />
+          <ConciergeCTA />
+        </>
+      )}
 
       <Footer />
     </div>
