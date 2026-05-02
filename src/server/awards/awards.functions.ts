@@ -9,11 +9,22 @@ const SearchSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD"),
   cabin: z.enum(["economy", "premium", "business", "first"]),
   pax: z.number().int().min(1).max(9),
+  forceMock: z.boolean().optional(),
 });
 
 export const searchAwards = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SearchSchema.parse(input))
   .handler(async ({ data }): Promise<SearchResult> => {
+    if (data.forceMock) {
+      const { MockAwardProvider } = await import("./mockProvider");
+      const mock = new MockAwardProvider();
+      const itineraries = await mock.search(data);
+      return {
+        itineraries,
+        source: "mock",
+        warning: "Mock mode is ON. Toggle off to query live seats.aero data.",
+      };
+    }
     const provider = getAwardProvider();
     try {
       const itineraries = await provider.search(data);
