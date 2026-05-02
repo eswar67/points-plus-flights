@@ -18,6 +18,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentLoginRouteImport } from './routes/agent-login'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksPollWatchlistsRouteImport } from './routes/api/public/hooks/poll-watchlists'
 
 const WatchlistsRoute = WatchlistsRouteImport.update({
@@ -65,6 +66,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPollWatchlistsRoute =
   ApiPublicHooksPollWatchlistsRouteImport.update({
     id: '/api/public/hooks/poll-watchlists',
@@ -83,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -95,6 +103,7 @@ export interface FileRoutesByTo {
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -108,6 +117,7 @@ export interface FileRoutesById {
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/programs'
     | '/watchlists'
     | '/api/public/hooks/poll-watchlists'
+    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/programs'
     | '/watchlists'
     | '/api/public/hooks/poll-watchlists'
+    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
@@ -146,6 +158,7 @@ export interface FileRouteTypes {
     | '/programs'
     | '/watchlists'
     | '/api/public/hooks/poll-watchlists'
+    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -159,6 +172,7 @@ export interface RootRouteChildren {
   ProgramsRoute: typeof ProgramsRoute
   WatchlistsRoute: typeof WatchlistsRoute
   ApiPublicHooksPollWatchlistsRoute: typeof ApiPublicHooksPollWatchlistsRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -226,6 +240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/poll-watchlists': {
       id: '/api/public/hooks/poll-watchlists'
       path: '/api/public/hooks/poll-watchlists'
@@ -247,6 +268,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProgramsRoute: ProgramsRoute,
   WatchlistsRoute: WatchlistsRoute,
   ApiPublicHooksPollWatchlistsRoute: ApiPublicHooksPollWatchlistsRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
