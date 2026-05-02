@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { useAuth } from "@/hooks/useAuth";
 import { PROGRAMS } from "@/lib/programs";
+import { useServerFn } from "@tanstack/react-start";
+import { sendTestTelegramAlert } from "@/server/alerts/alerts.functions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -33,6 +35,9 @@ function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
+  const [testMsg, setTestMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const sendTest = useServerFn(sendTestTelegramAlert);
 
   useEffect(() => {
     if (authLoading) return;
@@ -169,6 +174,36 @@ function AccountPage() {
               placeholder="e.g. 123456789"
               className="mt-3 w-full max-w-md rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60"
             />
+            <div className="mt-3 flex items-center gap-3">
+              <button
+                type="button"
+                disabled={testing || !profile?.telegram_chat_id}
+                onClick={async () => {
+                  setTesting(true);
+                  setTestMsg(null);
+                  try {
+                    const res = await sendTest({ data: {} });
+                    if (res.ok) setTestMsg({ kind: "ok", text: "Test message sent — check Telegram." });
+                    else setTestMsg({ kind: "err", text: res.error });
+                  } catch (e) {
+                    setTestMsg({ kind: "err", text: (e as Error).message });
+                  } finally {
+                    setTesting(false);
+                  }
+                }}
+                className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-50"
+              >
+                {testing ? "Sending…" : "Send test alert"}
+              </button>
+              {!profile?.telegram_chat_id && (
+                <span className="text-[11px] text-muted-foreground">Save your chat ID first to enable test.</span>
+              )}
+              {testMsg && (
+                <span className={`text-[11px] ${testMsg.kind === "ok" ? "text-gold" : "text-destructive"}`}>
+                  {testMsg.text}
+                </span>
+              )}
+            </div>
           </section>
 
           {error && <div className="text-sm text-destructive">{error}</div>}
