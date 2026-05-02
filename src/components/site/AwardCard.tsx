@@ -1,5 +1,7 @@
+import { useState } from "react";
 import type { AwardItinerary } from "@/server/awards/types";
 import { PROGRAMS } from "@/lib/programs";
+import { PlaybookDrawer } from "./PlaybookDrawer";
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -16,6 +18,7 @@ function fmtTime(value: string) {
 }
 
 export function AwardCard({ award }: { award: AwardItinerary }) {
+  const [open, setOpen] = useState(false);
   const program = PROGRAMS.find((p) => p.id === award.programId);
   const accent = program?.accent ?? "#c9a84c";
   const programName = program?.name ?? award.programName;
@@ -69,11 +72,15 @@ export function AwardCard({ award }: { award: AwardItinerary }) {
           <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
             miles{award.taxesUsd ? ` + $${award.taxesUsd}` : ""}
           </div>
-          <button className="mt-3 text-xs uppercase tracking-[0.18em] px-4 py-2 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition">
-            Redeem
+          <button
+            onClick={() => setOpen(true)}
+            className="mt-3 text-xs uppercase tracking-[0.18em] px-4 py-2 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+          >
+            Plan & redeem
           </button>
         </div>
       </div>
+      {open && <PlaybookDrawer award={award} onClose={() => setOpen(false)} />}
     </div>
   );
 }
