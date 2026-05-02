@@ -193,16 +193,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>["balances"] }) {
   const { user, loading: authLoading } = useAuth();
 
-  // Total AUD value across all entered balances, using each program's
-  // benchmark cents-per-point. Falls back to a conservative 1.0¢ for
-  // programs not in the catalog.
   const totalPoints = balances.reduce((s, b) => s + b.balance, 0);
-  const totalCents = balances.reduce((s, b) => {
-    const p = getProgram(b.program_id);
-    const cpp = p?.valueAudCents ?? 1.0;
-    return s + b.balance * cpp;
-  }, 0);
-  const totalAud = totalCents / 100;
 
   if (authLoading) return null;
 
@@ -211,11 +202,11 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
       <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-14 text-center">
         <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Your points portfolio</span>
         <h2 className="font-display text-3xl md:text-4xl mt-3">
-          See what your points are <span className="text-gold-gradient">really worth</span>.
+          Track every program in <span className="text-gold-gradient">one place</span>.
         </h2>
         <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-          Sign in and add the loyalty programs you hold. We'll value your portfolio in AUD using
-          real benchmark redemption rates — and rank deals by what you can actually book.
+          Sign in and add the loyalty programs you hold. We'll rank premium-cabin awards
+          by what you can actually book with the points you have.
         </p>
         <Link
           to="/auth"
@@ -263,7 +254,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
       ) : (
         <>
           <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-8 md:p-10 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                   Total points held
@@ -274,35 +265,17 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
               </div>
               <div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                  Estimated value
-                </div>
-                <div className="font-display text-4xl text-gold-gradient mt-2">
-                  {totalAud.toLocaleString("en-AU", {
-                    style: "currency",
-                    currency: "AUD",
-                    maximumFractionDigits: 0,
-                  })}
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                   Programs tracked
                 </div>
                 <div className="font-display text-4xl mt-2">{balances.length}</div>
               </div>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-6 max-w-2xl">
-              Valuations are blended averages across business and first-class redemptions. Real
-              redemption value can be 2–3× higher on the right route.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {balances.map((b) => {
               const p = getProgram(b.program_id);
               const accent = p?.accent ?? "#c9a84c";
-              const cpp = p?.valueAudCents ?? 1.0;
-              const audValue = (b.balance * cpp) / 100;
               return (
                 <div
                   key={b.id}
@@ -330,16 +303,9 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
                     {b.balance.toLocaleString()}
                   </div>
                   <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
-                    points · ≈ {audValue.toLocaleString("en-AU", {
-                      style: "currency",
-                      currency: "AUD",
-                      maximumFractionDigits: 0,
-                    })}
+                    points
                   </div>
-                  <div className="mt-5 flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                      {cpp.toFixed(1)}¢ / pt
-                    </span>
+                  <div className="mt-5 flex items-center justify-end">
                     <Link
                       to="/account"
                       className="text-xs uppercase tracking-[0.18em] text-gold hover:underline"
