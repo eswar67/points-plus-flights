@@ -10,6 +10,7 @@ import {
   getCronSecretMeta,
   rotateCronSecret,
 } from "@/server/admin/cron-secret.functions";
+import { listPollerRuns } from "@/server/admin/observability.functions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -230,6 +231,7 @@ function AccountPage() {
           </div>
         </form>
         {isAdmin && <AdminCronSecretSection />}
+        {isAdmin && <AdminPollerRunsSection />}
       </main>
     </div>
   );
