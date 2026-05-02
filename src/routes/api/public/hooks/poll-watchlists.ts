@@ -155,11 +155,21 @@ export const Route = createFileRoute("/api/public/hooks/poll-watchlists")({
         }
 
         const start = Date.now();
+        const startedAt = new Date().toISOString();
         const { data: watchlists, error } = await supabaseAdmin
           .from("watchlists")
           .select("id, user_id, origin, destination, date_from, date_to, cabin, pax, max_miles, min_cpp_aud, channel, active, label")
           .eq("active", true);
         if (error) {
+          await supabaseAdmin.from("poller_runs").insert({
+            started_at: startedAt,
+            finished_at: new Date().toISOString(),
+            processed: 0,
+            alerts_sent: 0,
+            errors: [{ stage: "load-watchlists", message: error.message }],
+            duration_ms: Date.now() - start,
+            ok: false,
+          });
           return Response.json({ ok: false, error: error.message }, { status: 500 });
         }
 
@@ -183,12 +193,23 @@ export const Route = createFileRoute("/api/public/hooks/poll-watchlists")({
           }
         }
 
+        const duration = Date.now() - start;
+        await supabaseAdmin.from("poller_runs").insert({
+          started_at: startedAt,
+          finished_at: new Date().toISOString(),
+          processed,
+          alerts_sent: totalSent,
+          errors: errors.map((e) => ({ message: e })),
+          duration_ms: duration,
+          ok: errors.length === 0,
+        });
+
         return Response.json({
           ok: true,
           processed,
           alerts_sent: totalSent,
           errors,
-          duration_ms: Date.now() - start,
+          duration_ms: duration,
         });
       },
     },
