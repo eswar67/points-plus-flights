@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as ConciergeRouteImport } from './routes/concierge'
+import { Route as AgentLoginRouteImport } from './routes/agent-login'
 import { Route as IndexRouteImport } from './routes/index'
 
 const ProgramsRoute = ProgramsRouteImport.update({
@@ -23,6 +25,16 @@ const HowItWorksRoute = HowItWorksRouteImport.update({
   path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConciergeRoute = ConciergeRouteImport.update({
+  id: '/concierge',
+  path: '/concierge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentLoginRoute = AgentLoginRouteImport.update({
+  id: '/agent-login',
+  path: '/agent-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,30 +43,44 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agent-login': typeof AgentLoginRoute
+  '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agent-login': typeof AgentLoginRoute
+  '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/agent-login': typeof AgentLoginRoute
+  '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/how-it-works' | '/programs'
+  fullPaths: '/' | '/agent-login' | '/concierge' | '/how-it-works' | '/programs'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/how-it-works' | '/programs'
-  id: '__root__' | '/' | '/how-it-works' | '/programs'
+  to: '/' | '/agent-login' | '/concierge' | '/how-it-works' | '/programs'
+  id:
+    | '__root__'
+    | '/'
+    | '/agent-login'
+    | '/concierge'
+    | '/how-it-works'
+    | '/programs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AgentLoginRoute: typeof AgentLoginRoute
+  ConciergeRoute: typeof ConciergeRoute
   HowItWorksRoute: typeof HowItWorksRoute
   ProgramsRoute: typeof ProgramsRoute
 }
@@ -75,6 +101,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/concierge': {
+      id: '/concierge'
+      path: '/concierge'
+      fullPath: '/concierge'
+      preLoaderRoute: typeof ConciergeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent-login': {
+      id: '/agent-login'
+      path: '/agent-login'
+      fullPath: '/agent-login'
+      preLoaderRoute: typeof AgentLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,6 +127,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AgentLoginRoute: AgentLoginRoute,
+  ConciergeRoute: ConciergeRoute,
   HowItWorksRoute: HowItWorksRoute,
   ProgramsRoute: ProgramsRoute,
 }
