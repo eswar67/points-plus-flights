@@ -4,6 +4,7 @@ import { PROGRAMS } from "@/lib/programs";
 import { PlaybookDrawer } from "./PlaybookDrawer";
 import { calcCppAud, confidenceFor, gradeCpp, fmtCpp, fmtAud, fmtAge, fareEstimateAud, transfersFor } from "@/lib/intelligence";
 import { AlertTriangle, Sparkles, Zap } from "lucide-react";
+import { useUserBalances } from "@/hooks/useUserBalances";
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -21,6 +22,7 @@ function fmtTime(value: string) {
 
 export function AwardCard({ award }: { award: AwardItinerary }) {
   const [open, setOpen] = useState(false);
+  const { byProgramId } = useUserBalances();
   const program = PROGRAMS.find((p) => p.id === award.programId);
   const accent = program?.accent ?? "#c9a84c";
   const programName = program?.name ?? award.programName;
@@ -30,7 +32,7 @@ export function AwardCard({ award }: { award: AwardItinerary }) {
   const grade = gradeCpp(cpp, award.cabin);
   const confidence = confidenceFor(award);
   const fare = fareEstimateAud(award.from, award.to, award.cabin);
-  const balance = 0;
+  const balance = byProgramId[award.programId] ?? 0;
   const shortfall = Math.max(0, award.miles - balance);
   const fastest = shortfall > 0 ? transfersFor(award.programId)[0] : undefined;
   const transferTooSlow = !!fastest && fastest.etaMin > 60 && confidence.ageMin < 30;
