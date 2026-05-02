@@ -68,6 +68,7 @@ export class MockAwardProvider implements AwardProvider {
           taxesUsd: Math.round(taxes),
           seats: 1 + (s % 7),
           direct: stops === 0,
+          updatedAt: new Date(Date.now() - (s % 90) * 60 * 1000).toISOString(),
         };
         return it;
       })

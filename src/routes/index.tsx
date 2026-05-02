@@ -9,6 +9,7 @@ import { ProgramRail } from "@/components/site/ProgramRail";
 import { searchAwards } from "@/server/awards/awards.functions";
 import type { Cabin, AwardItinerary, SearchResult } from "@/server/awards/types";
 import { PROGRAMS } from "@/lib/programs";
+import { rankItineraries } from "@/lib/intelligence";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -39,6 +40,7 @@ function Index() {
   }
 
   const itineraries: AwardItinerary[] = result?.itineraries ?? [];
+  const ranked = rankItineraries(itineraries);
 
   return (
     <div className="min-h-screen bg-noir">
@@ -152,7 +154,7 @@ function Index() {
               </div>
             ) : (
               <div className="space-y-3">
-                {itineraries.map((a) => <AwardCard key={a.id} award={a} />)}
+                {ranked.map((a) => <AwardCard key={a.id} award={a} />)}
               </div>
             )}
           </>
