@@ -4,11 +4,13 @@ import { ArrowRight, Check, Clock, ExternalLink, Loader2, ShieldCheck, Sparkles 
 import type { AwardItinerary } from "@/server/awards/types";
 import { buildPlaybook } from "@/lib/playbook";
 import { submitBookingRequest } from "@/server/booking/booking.functions";
+import { useUserBalances } from "@/hooks/useUserBalances";
 
 type Mode = "playbook" | "concierge" | "submitted";
 
 export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onClose: () => void }) {
-  const playbook = buildPlaybook(award);
+  const { byProgramId } = useUserBalances();
+  const playbook = buildPlaybook(award, byProgramId);
   const [mode, setMode] = useState<Mode>("playbook");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
