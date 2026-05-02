@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WatchlistsRouteImport } from './routes/watchlists'
 import { Route as ProgramsRouteImport } from './routes/programs'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as ConciergeRouteImport } from './routes/concierge'
 import { Route as BookRouteImport } from './routes/book'
@@ -29,6 +30,11 @@ const WatchlistsRoute = WatchlistsRouteImport.update({
 const ProgramsRoute = ProgramsRouteImport.update({
   id: '/programs',
   path: '/programs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/book': typeof BookRoute
   '/concierge': typeof ConciergeRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/book'
     | '/concierge'
     | '/how-it-works'
+    | '/pricing'
     | '/programs'
     | '/watchlists'
     | '/api/public/hooks/poll-watchlists'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/book'
     | '/concierge'
     | '/how-it-works'
+    | '/pricing'
     | '/programs'
     | '/watchlists'
     | '/api/public/hooks/poll-watchlists'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/book'
     | '/concierge'
     | '/how-it-works'
+    | '/pricing'
     | '/programs'
     | '/watchlists'
     | '/api/public/hooks/poll-watchlists'
@@ -169,6 +181,7 @@ export interface RootRouteChildren {
   BookRoute: typeof BookRoute
   ConciergeRoute: typeof ConciergeRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  PricingRoute: typeof PricingRoute
   ProgramsRoute: typeof ProgramsRoute
   WatchlistsRoute: typeof WatchlistsRoute
   ApiPublicHooksPollWatchlistsRoute: typeof ApiPublicHooksPollWatchlistsRoute
@@ -189,6 +202,13 @@ declare module '@tanstack/react-router' {
       path: '/programs'
       fullPath: '/programs'
       preLoaderRoute: typeof ProgramsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -265,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookRoute: BookRoute,
   ConciergeRoute: ConciergeRoute,
   HowItWorksRoute: HowItWorksRoute,
+  PricingRoute: PricingRoute,
   ProgramsRoute: ProgramsRoute,
   WatchlistsRoute: WatchlistsRoute,
   ApiPublicHooksPollWatchlistsRoute: ApiPublicHooksPollWatchlistsRoute,
