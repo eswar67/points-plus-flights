@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useTransition } from "react";
 import heroWing from "@/assets/hero-wing.jpg";
 import { Header } from "@/components/site/Header";
@@ -9,8 +9,10 @@ import { ProgramRail } from "@/components/site/ProgramRail";
 import { ValueProps, Testimonials, FAQ, ConciergeCTA } from "@/components/site/HomeSections";
 import { searchAwards } from "@/server/awards/awards.functions";
 import type { Cabin, AwardItinerary, SearchResult } from "@/server/awards/types";
-import { PROGRAMS } from "@/lib/programs";
+import { PROGRAMS, getProgram } from "@/lib/programs";
 import { rankItineraries } from "@/lib/intelligence";
+import { useUserBalances } from "@/hooks/useUserBalances";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -24,7 +26,8 @@ function Index() {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [forceMock, setForceMock] = useState<boolean>(true);
-  const totalBalance = PROGRAMS.reduce((s, p) => s + p.balance, 0);
+  const { balances, byProgramId } = useUserBalances();
+  const totalBalance = balances.reduce((s, b) => s + b.balance, 0);
 
   function runSearch(q: Query) {
     setQuery(q);
@@ -41,7 +44,7 @@ function Index() {
   }
 
   const itineraries: AwardItinerary[] = result?.itineraries ?? [];
-  const ranked = rankItineraries(itineraries);
+  const ranked = rankItineraries(itineraries, byProgramId);
 
   return (
     <div className="min-h-screen bg-noir">
@@ -100,8 +103,8 @@ function Index() {
           </div>
 
           <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
-            <Stat label="Linked programs" value={`${PROGRAMS.length}`} />
-            <Stat label="Total miles" value={totalBalance.toLocaleString()} />
+            <Stat label="Programs supported" value={`${PROGRAMS.length}`} />
+            <Stat label="Your total points" value={totalBalance ? totalBalance.toLocaleString() : "—"} />
             <Stat label="Avg. premium redemption" value="118k mi" />
             <Stat label="Booking time" value="< 60s" />
           </div>
