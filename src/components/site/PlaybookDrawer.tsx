@@ -69,6 +69,11 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
           {mode === "playbook" && (
             <>
               <FeasibilityBanner playbook={playbook} />
+              {playbook.riskNote && (
+                <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/5 text-amber-300 px-4 py-3 text-sm">
+                  ⚠ {playbook.riskNote}
+                </div>
+              )}
               <ol className="mt-6 space-y-4">
                 {playbook.steps.map((s, i) => (
                   <li key={i} className="relative pl-10">
