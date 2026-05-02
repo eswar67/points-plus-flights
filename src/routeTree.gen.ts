@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentLoginRouteImport } from './routes/agent-login'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicHooksPollWatchlistsRouteImport } from './routes/api/public/hooks/poll-watchlists'
 
 const WatchlistsRoute = WatchlistsRouteImport.update({
   id: '/watchlists',
@@ -58,6 +59,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksPollWatchlistsRoute =
+  ApiPublicHooksPollWatchlistsRouteImport.update({
+    id: '/api/public/hooks/poll-watchlists',
+    path: '/api/public/hooks/poll-watchlists',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +86,7 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +98,7 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/programs': typeof ProgramsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/programs'
     | '/watchlists'
+    | '/api/public/hooks/poll-watchlists'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/programs'
     | '/watchlists'
+    | '/api/public/hooks/poll-watchlists'
   id:
     | '__root__'
     | '/'
@@ -121,6 +133,7 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/programs'
     | '/watchlists'
+    | '/api/public/hooks/poll-watchlists'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +145,7 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   ProgramsRoute: typeof ProgramsRoute
   WatchlistsRoute: typeof WatchlistsRoute
+  ApiPublicHooksPollWatchlistsRoute: typeof ApiPublicHooksPollWatchlistsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/poll-watchlists': {
+      id: '/api/public/hooks/poll-watchlists'
+      path: '/api/public/hooks/poll-watchlists'
+      fullPath: '/api/public/hooks/poll-watchlists'
+      preLoaderRoute: typeof ApiPublicHooksPollWatchlistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -204,7 +225,17 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   ProgramsRoute: ProgramsRoute,
   WatchlistsRoute: WatchlistsRoute,
+  ApiPublicHooksPollWatchlistsRoute: ApiPublicHooksPollWatchlistsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
