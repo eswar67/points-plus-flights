@@ -1,5 +1,5 @@
 import { useState, FormEvent } from "react";
-import type { Cabin } from "@/lib/awards";
+import type { Cabin } from "@/server/awards/types";
 
 const CABINS: { value: Cabin; label: string }[] = [
   { value: "economy", label: "Economy" },
