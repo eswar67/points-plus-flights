@@ -395,3 +395,173 @@ function AdminCronSecretSection() {
     </section>
   );
 }
+
+type PollerRun = {
+  id: string;
+  started_at: string;
+  finished_at: string | null;
+  processed: number;
+  alerts_sent: number;
+  errors: Array<{ message?: string; stage?: string }> | null;
+  duration_ms: number | null;
+  ok: boolean;
+};
+
+function AdminPollerRunsSection() {
+  const fetchRuns = useServerFn(listPollerRuns);
+  const [runs, setRuns] = useState<PollerRun[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function load() {
+    setRefreshing(true);
+    setErr(null);
+    try {
+      const res = await fetchRuns({ data: { limit: 20 } });
+      if (!res.ok) setErr(res.error);
+      else setRuns(res.runs as PollerRun[]);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const last = runs?.[0];
+  const failedCount = runs?.filter((r) => !r.ok).length ?? 0;
+
+  return (
+    <section className="mt-16 pt-10 border-t border-border">
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+          Admin · Poller observability
+        </h2>
+        <button
+          type="button"
+          onClick={load}
+          disabled={refreshing}
+          className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition disabled:opacity-50"
+        >
+          {refreshing ? "Refreshing…" : "Refresh"}
+        </button>
+      </div>
+      <p className="text-sm text-muted-foreground mt-2 max-w-prose">
+        Last 20 scheduled runs of the watchlist poller. Cron fires every 15 minutes.
+      </p>
+
+      {err && <div className="mt-3 text-sm text-destructive">{err}</div>}
+
+      <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Stat
+          label="Last run"
+          value={
+            last
+              ? new Date(last.started_at).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "—"
+          }
+          tone={last ? (last.ok ? "ok" : "err") : "muted"}
+        />
+        <Stat
+          label="Alerts sent (last run)"
+          value={last ? String(last.alerts_sent) : "—"}
+          tone="muted"
+        />
+        <Stat
+          label="Failed runs (last 20)"
+          value={String(failedCount)}
+          tone={failedCount > 0 ? "err" : "ok"}
+        />
+      </div>
+
+      <div className="mt-6 rounded-xl border border-border overflow-hidden">
+        <table className="w-full text-xs">
+          <thead className="bg-background/40 text-muted-foreground uppercase tracking-[0.18em] text-[10px]">
+            <tr>
+              <th className="text-left px-3 py-2">Started</th>
+              <th className="text-right px-3 py-2">Watchlists</th>
+              <th className="text-right px-3 py-2">Alerts</th>
+              <th className="text-right px-3 py-2">Duration</th>
+              <th className="text-left px-3 py-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {!runs ? (
+              <tr>
+                <td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">
+                  Loading…
+                </td>
+              </tr>
+            ) : runs.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">
+                  No runs recorded yet. The cron job runs every 15 minutes.
+                </td>
+              </tr>
+            ) : (
+              runs.map((r) => {
+                const errMsgs = (r.errors ?? [])
+                  .map((e) => e.message)
+                  .filter(Boolean) as string[];
+                return (
+                  <tr key={r.id} className="border-t border-border/60">
+                    <td className="px-3 py-2 font-mono text-[11px]">
+                      {new Date(r.started_at).toLocaleString()}
+                    </td>
+                    <td className="px-3 py-2 text-right">{r.processed}</td>
+                    <td className="px-3 py-2 text-right">{r.alerts_sent}</td>
+                    <td className="px-3 py-2 text-right text-muted-foreground">
+                      {r.duration_ms != null ? `${r.duration_ms}ms` : "—"}
+                    </td>
+                    <td className="px-3 py-2">
+                      {r.ok ? (
+                        <span className="text-emerald-400">OK</span>
+                      ) : (
+                        <span
+                          className="text-destructive"
+                          title={errMsgs.join("\n")}
+                        >
+                          {errMsgs.length} error{errMsgs.length === 1 ? "" : "s"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "ok" | "err" | "muted";
+}) {
+  const toneCls =
+    tone === "ok"
+      ? "text-emerald-400"
+      : tone === "err"
+        ? "text-destructive"
+        : "text-foreground";
+  return (
+    <div className="rounded-xl border border-border bg-background/40 px-4 py-3">
+      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
+      <div className={`font-display text-xl mt-1 ${toneCls}`}>{value}</div>
+    </div>
+  );
+}
