@@ -45,6 +45,7 @@ type RawAvailability = {
   Route?: { OriginAirport?: string; DestinationAirport?: string };
   Date?: string;
   Source?: string;
+  UpdatedAt?: string;
   YAvailable?: boolean; YMileageCost?: string; YRemainingSeats?: number; YDirect?: boolean; YAirlines?: string;
   WAvailable?: boolean; WMileageCost?: string; WRemainingSeats?: number; WDirect?: boolean; WAirlines?: string;
   JAvailable?: boolean; JMileageCost?: string; JRemainingSeats?: number; JDirect?: boolean; JAirlines?: string;
@@ -143,6 +144,7 @@ export class SeatsAeroProvider implements AwardProvider {
       taxesUsd: taxes > 1000 ? Math.round(taxes / 100) : Math.round(taxes),
       seats,
       direct,
+      updatedAt: row.UpdatedAt,
     };
   }
 }

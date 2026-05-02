@@ -17,6 +17,7 @@ export type AwardItinerary = {
   taxesUsd: number;
   seats: number;
   direct: boolean;
+  updatedAt?: string;      // ISO timestamp from provider; drives confidence score
 };
 
 export type SearchInput = {
