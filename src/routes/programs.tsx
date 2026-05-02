@@ -43,13 +43,13 @@ function ProgramsPage() {
               </span>
             </div>
             <div className="mt-6 grid grid-cols-3 gap-3 text-sm">
-              <Info label="Balance" value={p.balance.toLocaleString()} />
-              <Info label="Status" value="Linked" accent />
+              <Info label="Alliance" value={p.alliance} />
+              <Info label="Value" value={`${p.valueAudCents.toFixed(1)}¢ / pt`} accent />
               <Info label="Cabins" value="All" />
             </div>
-            <button className="mt-6 w-full rounded-xl py-3 text-xs uppercase tracking-[0.2em] hairline text-gold hover:bg-gold/10 transition">
-              Manage connection
-            </button>
+            <a href="/account" className="mt-6 block w-full text-center rounded-xl py-3 text-xs uppercase tracking-[0.2em] hairline text-gold hover:bg-gold/10 transition">
+              Add my balance
+            </a>
           </div>
         ))}
       </section>
