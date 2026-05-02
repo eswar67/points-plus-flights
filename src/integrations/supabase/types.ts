@@ -220,6 +220,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_program_balances: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          note: string | null
+          program_id: string
+          program_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          program_id: string
+          program_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          note?: string | null
+          program_id?: string
+          program_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

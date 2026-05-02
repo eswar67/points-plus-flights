@@ -152,16 +152,19 @@ export type RankedItinerary = AwardItinerary & {
   riskFlag?: "transfer-too-slow" | "single-seat" | "stale-cache";
 };
 
-export function rankItineraries(items: AwardItinerary[]): RankedItinerary[] {
+export function rankItineraries(
+  items: AwardItinerary[],
+  balances: Record<string, number> = {},
+): RankedItinerary[] {
   return items
     .map((a): RankedItinerary => {
       const program = PROGRAMS.find((p) => p.id === a.programId);
-      const balance = program?.balance ?? 0;
+      const balance = balances[a.programId] ?? 0;
       const cpp = calcCppAud(a);
       const grade = gradeCpp(cpp, a.cabin);
       const confidence = confidenceFor(a);
       const shortfallMiles = Math.max(0, a.miles - balance);
-      const hasBalance = !!program;
+      const hasBalance = balance > 0;
       const transfers = transfersFor(a.programId);
       const fastestTransfer = shortfallMiles > 0 ? transfers[0] : undefined;
 

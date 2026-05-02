@@ -5,6 +5,7 @@ import { Header } from "@/components/site/Header";
 import { useAuth } from "@/hooks/useAuth";
 import { PROGRAMS } from "@/lib/programs";
 import { useServerFn } from "@tanstack/react-start";
+import { useUserBalances } from "@/hooks/useUserBalances";
 import { sendTestTelegramAlert } from "@/server/alerts/alerts.functions";
 import {
   getCronSecretMeta,
@@ -34,7 +35,6 @@ function AccountPage() {
   const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [displayName, setDisplayName] = useState("");
-  const [programs, setPrograms] = useState<Set<string>>(new Set());
   const [telegram, setTelegram] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -61,7 +61,6 @@ function AccountPage() {
       if (data) {
         setProfile(data as ProfileRow);
         setDisplayName(data.display_name ?? "");
-        setPrograms(new Set(data.programs_held ?? []));
         setTelegram(data.telegram_chat_id ?? "");
       }
       const { data: roles } = await supabase
@@ -73,14 +72,6 @@ function AccountPage() {
     })();
   }, [user, authLoading, nav]);
 
-  function toggleProgram(id: string) {
-    setPrograms((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  }
-
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
@@ -90,7 +81,7 @@ function AccountPage() {
     const payload = {
       user_id: user.id,
       display_name: displayName.trim() || null,
-      programs_held: Array.from(programs),
+      programs_held: profile?.programs_held ?? [],
       telegram_chat_id: telegram.trim() || null,
     };
     const { error } = await supabase
@@ -143,34 +134,13 @@ function AccountPage() {
           </section>
 
           <section>
-            <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Programs you hold</h2>
+            <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Your points balances</h2>
             <p className="text-sm text-muted-foreground mt-2">
-              We use this to rank deals by what you can actually book — and to choose the right transfer partners.
+              Add the loyalty programs you hold and how many points you have. We'll value the
+              total in AUD on your homepage and use it to rank award deals.
             </p>
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {PROGRAMS.map((p) => {
-                const on = programs.has(p.id);
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => toggleProgram(p.id)}
-                    className={`flex items-center justify-between rounded-lg border px-3 py-2.5 text-left transition ${
-                      on
-                        ? "border-gold/60 bg-gold/5"
-                        : "border-border hover:border-muted-foreground/40"
-                    }`}
-                  >
-                    <div>
-                      <div className="text-sm">{p.name}</div>
-                      <div className="text-[11px] text-muted-foreground">{p.alliance}</div>
-                    </div>
-                    <div className={`text-[10px] uppercase tracking-[0.2em] ${on ? "text-gold" : "text-muted-foreground"}`}>
-                      {on ? "Held" : "Add"}
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="mt-5">
+              <BalancesEditor />
             </div>
           </section>
 
@@ -562,6 +532,171 @@ function Stat({
     <div className="rounded-xl border border-border bg-background/40 px-4 py-3">
       <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
       <div className={`font-display text-xl mt-1 ${toneCls}`}>{value}</div>
+    </div>
+  );
+}
+
+function BalancesEditor() {
+  const { balances, refetch, loading } = useUserBalances();
+  const { user } = useAuth();
+  const [programId, setProgramId] = useState<string>(PROGRAMS[0]?.id ?? "");
+  const [amount, setAmount] = useState<string>("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const heldIds = new Set(balances.map((b) => b.program_id));
+  const available = PROGRAMS.filter((p) => !heldIds.has(p.id));
+
+  // Keep the dropdown selection valid as the available list changes.
+  useEffect(() => {
+    if (available.length && !available.some((p) => p.id === programId)) {
+      setProgramId(available[0].id);
+    }
+  }, [available, programId]);
+
+  async function addBalance(e: React.FormEvent) {
+    e.preventDefault();
+    if (!user) return;
+    setErr(null);
+    const program = PROGRAMS.find((p) => p.id === programId);
+    if (!program) {
+      setErr("Pick a program.");
+      return;
+    }
+    const value = Number.parseInt(amount.replace(/[^\d]/g, ""), 10);
+    if (!Number.isFinite(value) || value < 0 || value > 50_000_000) {
+      setErr("Enter a valid points balance (0–50,000,000).");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.from("user_program_balances").insert({
+      user_id: user.id,
+      program_id: program.id,
+      program_name: program.name,
+      balance: value,
+    });
+    setBusy(false);
+    if (error) {
+      setErr(error.message);
+      return;
+    }
+    setAmount("");
+    refetch();
+  }
+
+  async function updateBalance(id: string, value: number) {
+    if (!Number.isFinite(value) || value < 0 || value > 50_000_000) return;
+    await supabase
+      .from("user_program_balances")
+      .update({ balance: value })
+      .eq("id", id);
+    refetch();
+  }
+
+  async function removeBalance(id: string) {
+    await supabase.from("user_program_balances").delete().eq("id", id);
+    refetch();
+  }
+
+  return (
+    <div className="space-y-5">
+      {loading ? (
+        <div className="text-xs text-muted-foreground">Loading balances…</div>
+      ) : balances.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border px-4 py-5 text-sm text-muted-foreground">
+          No balances yet. Add your first program below.
+        </div>
+      ) : (
+        <ul className="divide-y divide-border/60 border border-border rounded-lg overflow-hidden">
+          {balances.map((b) => {
+            const p = PROGRAMS.find((x) => x.id === b.program_id);
+            return (
+              <li key={b.id} className="flex items-center gap-3 px-4 py-3 bg-card/40">
+                <span
+                  className="size-7 shrink-0 rounded-full grid place-items-center font-display text-[10px]"
+                  style={{
+                    background: `${p?.accent ?? "#c9a84c"}22`,
+                    color: p?.accent ?? "#c9a84c",
+                    border: `1px solid ${p?.accent ?? "#c9a84c"}55`,
+                  }}
+                >
+                  {p?.short ?? "•"}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm truncate">{b.program_name}</div>
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {p?.alliance ?? "Loyalty program"}
+                  </div>
+                </div>
+                <input
+                  type="number"
+                  min={0}
+                  max={50_000_000}
+                  defaultValue={b.balance}
+                  onBlur={(e) => {
+                    const v = Number.parseInt(e.target.value, 10);
+                    if (Number.isFinite(v) && v !== b.balance) updateBalance(b.id, v);
+                  }}
+                  className="w-32 rounded-md bg-background border border-border px-2 py-1.5 text-sm text-right focus:outline-none focus:border-gold/60"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeBalance(b.id)}
+                  className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-destructive transition"
+                >
+                  Remove
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {available.length > 0 ? (
+        <form onSubmit={addBalance} className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[180px]">
+            <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              Program
+            </label>
+            <select
+              value={programId}
+              onChange={(e) => setProgramId(e.target.value)}
+              className="mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60"
+            >
+              {available.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="w-40">
+            <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              Points
+            </label>
+            <input
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              inputMode="numeric"
+              placeholder="125000"
+              className="mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={busy}
+            className="text-[10px] uppercase tracking-[0.2em] px-4 py-2.5 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-60"
+          >
+            {busy ? "Adding…" : "+ Add program"}
+          </button>
+        </form>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          You've added every supported program. Edit balances above as they change.
+        </p>
+      )}
+
+      {err && <div className="text-sm text-destructive">{err}</div>}
     </div>
   );
 }
