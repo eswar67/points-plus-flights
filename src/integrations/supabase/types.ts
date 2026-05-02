@@ -106,6 +106,39 @@ export type Database = {
         }
         Relationships: []
       }
+      poller_runs: {
+        Row: {
+          alerts_sent: number
+          duration_ms: number | null
+          errors: Json
+          finished_at: string | null
+          id: string
+          ok: boolean
+          processed: number
+          started_at: string
+        }
+        Insert: {
+          alerts_sent?: number
+          duration_ms?: number | null
+          errors?: Json
+          finished_at?: string | null
+          id?: string
+          ok?: boolean
+          processed?: number
+          started_at?: string
+        }
+        Update: {
+          alerts_sent?: number
+          duration_ms?: number | null
+          errors?: Json
+          finished_at?: string | null
+          id?: string
+          ok?: boolean
+          processed?: number
+          started_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

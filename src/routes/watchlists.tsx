@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { useAuth } from "@/hooks/useAuth";
 import type { Cabin } from "@/server/awards/types";
+import { useServerFn } from "@tanstack/react-start";
+import { listWatchlistAlerts } from "@/server/alerts/history.functions";
 
 export const Route = createFileRoute("/watchlists")({
   head: () => ({
@@ -163,11 +165,92 @@ function WatchlistsPage() {
                     Delete
                   </button>
                 </div>
+                <AlertHistory watchlistId={w.id} />
               </article>
             ))
           )}
         </div>
       </main>
+    </div>
+  );
+}
+
+type AlertRow = {
+  id: string;
+  sent_at: string;
+  fingerprint: string;
+  cpp_aud: number | null;
+  miles: number | null;
+};
+
+function AlertHistory({ watchlistId }: { watchlistId: string }) {
+  const fetchAlerts = useServerFn(listWatchlistAlerts);
+  const [open, setOpen] = useState(false);
+  const [alerts, setAlerts] = useState<AlertRow[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function load() {
+    setLoading(true);
+    setErr(null);
+    try {
+      const res = await fetchAlerts({ data: { watchlistId, limit: 10 } });
+      if (!res.ok) setErr(res.error);
+      else setAlerts(res.alerts as AlertRow[]);
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function toggle() {
+    const next = !open;
+    setOpen(next);
+    if (next && alerts === null) load();
+  }
+
+  return (
+    <div className="basis-full mt-2 pt-3 border-t border-border/40">
+      <button
+        type="button"
+        onClick={toggle}
+        className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition"
+      >
+        {open ? "▾ Hide alert history" : "▸ Show alert history"}
+      </button>
+      {open && (
+        <div className="mt-3 text-xs">
+          {loading && <div className="text-muted-foreground">Loading…</div>}
+          {err && <div className="text-destructive">{err}</div>}
+          {!loading && !err && alerts && alerts.length === 0 && (
+            <div className="text-muted-foreground">
+              No alerts sent yet. We'll record one here every time this watchlist fires.
+            </div>
+          )}
+          {!loading && alerts && alerts.length > 0 && (
+            <ul className="space-y-1.5">
+              {alerts.map((a) => (
+                <li key={a.id} className="flex items-center justify-between gap-3 font-mono">
+                  <span className="text-muted-foreground">
+                    {new Date(a.sent_at).toLocaleString()}
+                  </span>
+                  <span className="text-foreground">
+                    {a.cpp_aud != null && (
+                      <span className="text-gold mr-3">{a.cpp_aud.toFixed(1)}¢/pt</span>
+                    )}
+                    {a.miles != null && (
+                      <span className="text-muted-foreground">
+                        {a.miles.toLocaleString()} mi
+                      </span>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }
