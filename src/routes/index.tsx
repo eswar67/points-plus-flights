@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState, useTransition } from "react";
 import heroWing from "@/assets/hero-wing.jpg";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SearchForm } from "@/components/site/SearchForm";
 import { AwardCard } from "@/components/site/AwardCard";
 import { ProgramRail } from "@/components/site/ProgramRail";
-import { searchAwards, type Cabin, type Award } from "@/lib/awards";
+import { searchAwards } from "@/server/awards/awards.functions";
+import type { Cabin, AwardItinerary, SearchResult } from "@/server/awards/types";
 import { PROGRAMS } from "@/lib/programs";
 
 export const Route = createFileRoute("/")({
@@ -17,8 +18,26 @@ type Query = { from: string; to: string; date: string; cabin: Cabin; pax: number
 
 function Index() {
   const [query, setQuery] = useState<Query | null>(null);
-  const results: Award[] = useMemo(() => (query ? searchAwards(query) : []), [query]);
+  const [result, setResult] = useState<SearchResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const totalBalance = PROGRAMS.reduce((s, p) => s + p.balance, 0);
+
+  function runSearch(q: Query) {
+    setQuery(q);
+    setError(null);
+    startTransition(async () => {
+      try {
+        const res = await searchAwards({ data: q });
+        setResult(res);
+      } catch (e) {
+        setError((e as Error).message || "Search failed");
+        setResult(null);
+      }
+    });
+  }
+
+  const itineraries: AwardItinerary[] = result?.itineraries ?? [];
 
   return (
     <div className="min-h-screen bg-noir">
@@ -48,10 +67,9 @@ function Index() {
           </div>
 
           <div className="mt-10 md:mt-14">
-            <SearchForm onSearch={setQuery} initial={query ?? undefined} />
+            <SearchForm onSearch={runSearch} initial={query ?? undefined} />
           </div>
 
-          {/* Balance preview */}
           <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
             <Stat label="Linked programs" value={`${PROGRAMS.length}`} />
             <Stat label="Total miles" value={totalBalance.toLocaleString()} />
@@ -63,7 +81,6 @@ function Index() {
 
       <ProgramRail />
 
-      {/* RESULTS / MOMENT */}
       <section className="mx-auto max-w-7xl px-6 py-16">
         {query ? (
           <>
@@ -73,16 +90,45 @@ function Index() {
                   {query.from} <span className="text-gold">→</span> {query.to}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {results.length} award itineraries · {query.cabin} · {query.pax} pax · {query.date}
+                  {pending
+                    ? "Scanning award space across alliances…"
+                    : `${itineraries.length} award itineraries · ${query.cabin} · ${query.pax} pax · ${query.date}`}
                 </p>
               </div>
-              <div className="hidden md:block text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Sorted by miles cost
+              {result && (
+                <div className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <span className={`size-1.5 rounded-full ${result.source === "seats.aero" ? "bg-emerald-400" : "bg-gold"}`} />
+                  Source: {result.source}
+                </div>
+              )}
+            </div>
+
+            {error && (
+              <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 text-destructive-foreground p-4 text-sm">
+                {error}
               </div>
-            </div>
-            <div className="space-y-3">
-              {results.map((a) => <AwardCard key={a.id} award={a} />)}
-            </div>
+            )}
+            {result?.warning && !error && (
+              <div className="mb-4 rounded-lg border border-gold/30 bg-gold/5 text-gold p-4 text-xs uppercase tracking-[0.18em]">
+                {result.warning}
+              </div>
+            )}
+
+            {pending ? (
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="h-28 rounded-xl border border-border bg-card animate-pulse" />
+                ))}
+              </div>
+            ) : itineraries.length === 0 && !error ? (
+              <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground">
+                No award space found for this route and date. Try a different cabin or nearby dates.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {itineraries.map((a) => <AwardCard key={a.id} award={a} />)}
+              </div>
+            )}
           </>
         ) : (
           <Vault />
