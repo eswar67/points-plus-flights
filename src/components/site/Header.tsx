@@ -20,6 +20,7 @@ export function Header() {
             <Link to="/watchlists" className="hover:text-foreground transition">Watchlists</Link>
           )}
           <Link to="/how-it-works" className="hover:text-foreground transition">How it works</Link>
+          <Link to="/book" className="hover:text-foreground transition">Book</Link>
         </nav>
         {loading ? (
           <div className="h-8 w-20" />
