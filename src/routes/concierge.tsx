@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
-import { listBookingRequests, updateBookingRequest } from "@/server/booking/agent.functions";
+import { listBookingRequests, updateBookingRequest } from "@/lib/booking/agent.functions";
 
 export const Route = createFileRoute("/concierge")({
   head: () => ({

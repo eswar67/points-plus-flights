@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/site/Header";
-import { submitBookingRequest } from "@/server/booking/booking.functions";
+import { submitBookingRequest } from "@/lib/booking/booking.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 
