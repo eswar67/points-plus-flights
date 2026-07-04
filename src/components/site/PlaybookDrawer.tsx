@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Check, Clock, ExternalLink, Loader2, ShieldCheck, Sparkles } from "lucide-react";
-import type { AwardItinerary } from "@/server/awards/types";
+import type { AwardItinerary } from "@/lib/awards/types";
 import { buildPlaybook } from "@/lib/playbook";
 import { submitBookingRequest } from "@/lib/booking/booking.functions";
 import { useUserBalances } from "@/hooks/useUserBalances";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AwardItinerary } from "@/server/awards/types";
+import type { AwardItinerary } from "@/lib/awards/types";
 import { PROGRAMS } from "@/lib/programs";
 import { PlaybookDrawer } from "./PlaybookDrawer";
 import { calcCppAud, confidenceFor, gradeCpp, fmtCpp, fmtAud, fmtAge, fareEstimateAud, transfersFor } from "@/lib/intelligence";

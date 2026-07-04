@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getAwardProvider } from "@/server/awards/provider.server";
+import { getAwardProvider } from "@/lib/awards/provider.server";
 import { calcCppAud, gradeCpp, confidenceFor, fmtCpp, fmtAud, fareEstimateAud } from "@/lib/intelligence";
-import { sendTelegramMessage } from "@/server/alerts/telegram.server";
-import type { Cabin, AwardItinerary } from "@/server/awards/types";
+import { sendTelegramMessage } from "@/lib/alerts/telegram.server";
+import type { Cabin, AwardItinerary } from "@/lib/awards/types";
 
 /**
  * Scheduled poller. Called by pg_cron with `Authorization: Bearer <CRON_SECRET>`.

@@ -4,9 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
-import type { Cabin } from "@/server/awards/types";
+import type { Cabin } from "@/lib/awards/types";
 import { useServerFn } from "@tanstack/react-start";
-import { listWatchlistAlerts } from "@/server/alerts/history.functions";
+import { listWatchlistAlerts } from "@/lib/alerts/history.functions";
 
 export const Route = createFileRoute("/watchlists")({
   head: () => ({
