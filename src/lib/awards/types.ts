@@ -13,8 +13,9 @@ export type AwardItinerary = {
   durationMin: number;     // 0 when unknown
   stops: number;           // 0 when unknown
   cabin: Cabin;
-  miles: number;
-  taxesUsd: number;
+  miles: number;           // total for all passengers
+  pax?: number;            // passenger count the miles/taxes cover (default 1)
+  taxesUsd: number;        // total for all passengers
   seats: number;
   direct: boolean;
   updatedAt?: string;      // ISO timestamp from provider; drives confidence score

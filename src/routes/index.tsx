@@ -10,7 +10,7 @@ import { ValueProps, Testimonials, FAQ, ConciergeCTA } from "@/components/site/H
 import { searchAwards } from "@/lib/awards/awards.functions";
 import type { Cabin, AwardItinerary, SearchResult } from "@/lib/awards/types";
 import { PROGRAMS, getProgram } from "@/lib/programs";
-import { rankItineraries } from "@/lib/intelligence";
+import { rankItineraries, fmtAud } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -25,7 +25,9 @@ function Index() {
   const [result, setResult] = useState<SearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const [forceMock, setForceMock] = useState<boolean>(true);
+  // Live-first: searchAwards falls back to mock (with a warning) when no
+  // SEATS_AERO_API_KEY is configured or the provider errors.
+  const [forceMock, setForceMock] = useState<boolean>(false);
   const { balances, byProgramId } = useUserBalances();
   const totalBalance = balances.reduce((s, b) => s + b.balance, 0);
 
@@ -56,6 +58,9 @@ function Index() {
           <img src={heroWing} alt="" width={1600} height={1200}
             className="w-full h-full object-cover opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
+          {/* Ambient gold glow */}
+          <div className="absolute -top-24 right-[8%] size-96 rounded-full bg-gold/10 blur-3xl animate-float-slow" aria-hidden="true" />
+          <div className="absolute top-1/2 -left-24 size-72 rounded-full bg-gold/[0.06] blur-3xl animate-float-slow [animation-delay:-4.5s]" aria-hidden="true" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 pt-20 pb-12 md:pt-32 md:pb-20">
@@ -65,7 +70,7 @@ function Index() {
             </span>
             <h1 className="font-display text-5xl md:text-7xl font-semibold tracking-tight leading-[1.02]">
               Your miles deserve <br />
-              <span className="text-gold-gradient">a first-class seat.</span>
+              <span className="text-gold-shimmer">a first-class seat.</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl">
               Connect Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault.
@@ -158,7 +163,7 @@ function Index() {
               </div>
             ) : (
               <div className="space-y-3">
-                {ranked.map((a) => <AwardCard key={a.id} award={a} />)}
+                {ranked.map((a) => <AwardCard key={a.id} award={a} balances={byProgramId} />)}
               </div>
             )}
           </>
@@ -194,6 +199,10 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
   const { user, loading: authLoading } = useAuth();
 
   const totalPoints = balances.reduce((s, b) => s + b.balance, 0);
+  const totalValueAud = balances.reduce((s, b) => {
+    const p = getProgram(b.program_id);
+    return s + (p ? (b.balance * p.valueAudCents) / 100 : 0);
+  }, 0);
 
   if (authLoading) return null;
 
@@ -254,13 +263,24 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
       ) : (
         <>
           <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-8 md:p-10 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
                   Total points held
                 </div>
                 <div className="font-display text-4xl mt-2">
                   {totalPoints.toLocaleString()}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Estimated value
+                </div>
+                <div className="font-display text-4xl mt-2 text-gold-gradient">
+                  {fmtAud(totalValueAud)}
+                </div>
+                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                  at premium-cabin rates
                 </div>
               </div>
               <div>
@@ -303,7 +323,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
                     {b.balance.toLocaleString()}
                   </div>
                   <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
-                    points
+                    points{p ? ` · ≈ ${fmtAud((b.balance * p.valueAudCents) / 100)}` : ""}
                   </div>
                   <div className="mt-5 flex items-center justify-end">
                     <Link

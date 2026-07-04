@@ -229,6 +229,7 @@ function BookPage() {
                   <input
                     required
                     type="date"
+                    min={new Date().toISOString().slice(0, 10)}
                     value={form.travel_date}
                     onChange={(e) => set("travel_date", e.target.value)}
                     className={inputCls}

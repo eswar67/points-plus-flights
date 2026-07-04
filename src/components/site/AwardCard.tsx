@@ -3,8 +3,7 @@ import type { AwardItinerary } from "@/lib/awards/types";
 import { PROGRAMS } from "@/lib/programs";
 import { PlaybookDrawer } from "./PlaybookDrawer";
 import { calcCppAud, confidenceFor, gradeCpp, fmtCpp, fmtAud, fmtAge, fareEstimateAud, transfersFor } from "@/lib/intelligence";
-import { AlertTriangle, Sparkles, Zap } from "lucide-react";
-import { useUserBalances } from "@/hooks/useUserBalances";
+import { AlertTriangle, Plane, Sparkles, Zap } from "lucide-react";
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -15,14 +14,25 @@ function fmtTime(value: string) {
   // Accepts ISO datetime, "YYYY-MM-DD", or "HH:mm"
   if (!value) return "—";
   if (/^\d{2}:\d{2}$/.test(value)) return value;
+  // Date-only (no time component): showing a clock time would be fabricated.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const d = new Date(value + "T00:00:00");
+    return d.toLocaleDateString([], { day: "numeric", month: "short" });
+  }
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-export function AwardCard({ award }: { award: AwardItinerary }) {
+export function AwardCard({
+  award,
+  balances = {},
+}: {
+  award: AwardItinerary;
+  balances?: Record<string, number>;
+}) {
   const [open, setOpen] = useState(false);
-  const { byProgramId } = useUserBalances();
+  const byProgramId = balances;
   const program = PROGRAMS.find((p) => p.id === award.programId);
   const accent = program?.accent ?? "#c9a84c";
   const programName = program?.name ?? award.programName;
@@ -49,6 +59,17 @@ export function AwardCard({ award }: { award: AwardItinerary }) {
     stale:  "text-muted-foreground",
   };
 
+  // Value meter: how far this CPP sits along the road to "exceptional" for the cabin.
+  const exceptionalCpp =
+    award.cabin === "first" ? 6.0 : award.cabin === "business" ? 5.0 : award.cabin === "premium" ? 3.5 : 2.5;
+  const meterPct = Math.max(4, Math.min(100, (cpp / (exceptionalCpp * 1.15)) * 100));
+  const meterColor: Record<typeof grade, string> = {
+    exceptional: "oklch(0.72 0.17 160)",
+    great:       "var(--gold)",
+    fair:        "oklch(0.62 0.01 90)",
+    skip:        "oklch(0.55 0.16 25)",
+  };
+
   return (
     <div className="group relative rounded-xl border border-border bg-card hover:border-gold/40 transition overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent opacity-0 group-hover:opacity-100 transition" />
@@ -65,6 +86,14 @@ export function AwardCard({ award }: { award: AwardItinerary }) {
           <span className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-emerald-400" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`} />
           {confidence.label} · {fmtAge(confidence.ageMin)}
         </span>
+      </div>
+
+      {/* Value meter */}
+      <div className="h-0.5 bg-border/30" aria-hidden="true">
+        <div
+          className="h-full transition-[width] duration-700 ease-out"
+          style={{ width: `${meterPct}%`, background: meterColor[grade], opacity: 0.85 }}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr_auto] gap-6 p-5 items-center">
@@ -88,6 +117,10 @@ export function AwardCard({ award }: { award: AwardItinerary }) {
             <div className="relative h-px bg-gradient-to-r from-border via-gold/50 to-border">
               <span className="absolute -top-[3px] left-0 size-1.5 rounded-full bg-gold" />
               <span className="absolute -top-[3px] right-0 size-1.5 rounded-full bg-gold" />
+              <Plane
+                className="absolute -top-[8px] size-4 text-gold rotate-45 hidden group-hover:block animate-fly"
+                aria-hidden="true"
+              />
             </div>
           </div>
           <div className="text-center">

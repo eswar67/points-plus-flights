@@ -21,9 +21,11 @@ export function SearchForm({
   const [cabin, setCabin] = useState<Cabin>(initial?.cabin ?? "business");
   const [pax, setPax] = useState(initial?.pax ?? 1);
 
+  const today = new Date().toISOString().slice(0, 10);
+
   function submit(e: FormEvent) {
     e.preventDefault();
-    onSearch({ from, to, date, cabin, pax });
+    onSearch({ from, to, date, cabin, pax: Math.min(9, Math.max(1, pax || 1)) });
   }
 
   return (
@@ -33,15 +35,17 @@ export function SearchForm({
     >
       <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1.2fr_1fr_1fr_0.8fr_auto] gap-2">
         <Field label="From">
-          <input value={from} onChange={(e) => setFrom(e.target.value.toUpperCase())} maxLength={3}
+          <input value={from} onChange={(e) => setFrom(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
+            maxLength={3} required pattern="[A-Za-z]{3}" title="3-letter IATA airport code, e.g. SYD"
             className="w-full bg-transparent text-2xl font-display tracking-wider text-foreground outline-none" />
         </Field>
         <Field label="To">
-          <input value={to} onChange={(e) => setTo(e.target.value.toUpperCase())} maxLength={3}
+          <input value={to} onChange={(e) => setTo(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
+            maxLength={3} required pattern="[A-Za-z]{3}" title="3-letter IATA airport code, e.g. LHR"
             className="w-full bg-transparent text-2xl font-display tracking-wider text-foreground outline-none" />
         </Field>
         <Field label="Depart">
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+          <input type="date" value={date} min={today} onChange={(e) => setDate(e.target.value)}
             className="w-full bg-transparent text-sm text-foreground outline-none [color-scheme:dark]" />
         </Field>
         <Field label="Cabin">
@@ -51,7 +55,8 @@ export function SearchForm({
           </select>
         </Field>
         <Field label="Pax">
-          <input type="number" min={1} max={9} value={pax} onChange={(e) => setPax(Number(e.target.value))}
+          <input type="number" min={1} max={9} value={pax}
+            onChange={(e) => setPax(Math.min(9, Math.max(1, Number(e.target.value) || 1)))}
             className="w-full bg-transparent text-sm text-foreground outline-none" />
         </Field>
         <button type="submit"

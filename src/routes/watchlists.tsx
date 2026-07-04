@@ -296,6 +296,10 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
+    if (dateTo < dateFrom) {
+      setErr("Latest date must be on or after the earliest date.");
+      return;
+    }
     setSubmitting(true);
     setErr(null);
     const payload = {
@@ -330,10 +334,12 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
           </select>
         </Field>
         <Field label="From (IATA)">
-          <input required value={origin} onChange={(e) => setOrigin(e.target.value)} maxLength={4} className={inputCls} />
+          <input required value={origin} onChange={(e) => setOrigin(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
+            maxLength={3} pattern="[A-Za-z]{3}" title="3-letter IATA airport code" className={inputCls} />
         </Field>
         <Field label="To (IATA)">
-          <input required value={destination} onChange={(e) => setDestination(e.target.value)} maxLength={4} className={inputCls} />
+          <input required value={destination} onChange={(e) => setDestination(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
+            maxLength={3} pattern="[A-Za-z]{3}" title="3-letter IATA airport code" className={inputCls} />
         </Field>
         <Field label="Earliest date">
           <input required type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={inputCls} />

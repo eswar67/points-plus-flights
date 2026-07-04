@@ -68,8 +68,6 @@ function PricingPage() {
             </div>
             <StripeEmbeddedCheckout_
               priceId={open === "monthly" ? "aureum_plus_monthly" : "aureum_plus_yearly"}
-              customerEmail={user?.email}
-              userId={user?.id}
             />
           </div>
         ) : (

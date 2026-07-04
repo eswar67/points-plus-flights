@@ -30,7 +30,9 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
           passenger_count: Number(fd.get("pax") || 1),
           route_from: award.from,
           route_to: award.to,
-          travel_date: (award.depart || "").slice(0, 10) || new Date().toISOString().slice(0, 10),
+          travel_date: /^\d{4}-\d{2}-\d{2}/.test(award.depart || "")
+            ? award.depart.slice(0, 10)
+            : new Date().toISOString().slice(0, 10),
           cabin: award.cabin,
           program: award.programId,
           carrier: award.carrier,
