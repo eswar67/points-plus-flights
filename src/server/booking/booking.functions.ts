@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const RequestSchema = z.object({
@@ -22,6 +21,7 @@ export const submitBookingRequest = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => RequestSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // Gate: must have an active Aureum Plus subscription (sandbox or live).
     // Check both environments — the column defaults to 'sandbox' but we want
