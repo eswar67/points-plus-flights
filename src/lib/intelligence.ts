@@ -1,4 +1,4 @@
-import type { AwardItinerary, Cabin } from "@/server/awards/types";
+import type { AwardItinerary, Cabin } from "@/lib/awards/types";
 import { PROGRAMS } from "./programs";
 
 /**

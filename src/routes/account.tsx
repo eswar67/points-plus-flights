@@ -6,12 +6,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { PROGRAMS } from "@/lib/programs";
 import { useServerFn } from "@tanstack/react-start";
 import { useUserBalances } from "@/hooks/useUserBalances";
-import { sendTestTelegramAlert } from "@/server/alerts/alerts.functions";
+import { sendTestTelegramAlert } from "@/lib/alerts/alerts.functions";
 import {
   getCronSecretMeta,
   rotateCronSecret,
-} from "@/server/admin/cron-secret.functions";
-import { listPollerRuns } from "@/server/admin/observability.functions";
+} from "@/lib/admin/cron-secret.functions";
+import { listPollerRuns } from "@/lib/admin/observability.functions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
