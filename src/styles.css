@@ -107,3 +107,50 @@
 @utility hairline {
   border: 1px solid color-mix(in oklab, var(--gold) 18%, transparent);
 }
+
+/* --- Motion --- */
+
+@keyframes fly-across {
+  0%   { left: 0%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { left: calc(100% - 16px); opacity: 0; }
+}
+
+@keyframes shimmer-x {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -16px, 0); }
+}
+
+@utility animate-fly {
+  animation: fly-across 2.8s ease-in-out infinite;
+}
+
+@utility animate-float-slow {
+  animation: float-slow 9s ease-in-out infinite;
+}
+
+@utility text-gold-shimmer {
+  background: linear-gradient(
+    110deg,
+    oklch(0.88 0.10 88),
+    oklch(0.72 0.13 80) 35%,
+    oklch(0.95 0.08 90) 50%,
+    oklch(0.72 0.13 80) 65%,
+    oklch(0.88 0.10 88)
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-x 6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fly, .animate-float-slow, .text-gold-shimmer { animation: none; }
+}

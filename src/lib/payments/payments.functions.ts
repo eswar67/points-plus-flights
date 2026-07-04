@@ -3,10 +3,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: {
     priceId: string;
-    customerEmail?: string;
-    userId?: string;
     returnUrl: string;
     environment: StripeEnv;
   }) => {
@@ -14,7 +13,12 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     if (data.environment !== "sandbox" && data.environment !== "live") throw new Error("Invalid env");
     return data;
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    // Identity comes from the verified session, never from client input —
+    // the webhook trusts `metadata.userId` to attach the subscription.
+    const { userId, claims } = context;
+    const customerEmail = typeof claims.email === "string" ? claims.email : undefined;
+
     const stripe = createStripeClient(data.environment);
     const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
     if (!prices.data.length) throw new Error("Price not found");
@@ -26,11 +30,9 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       mode: isRecurring ? "subscription" : "payment",
       ui_mode: "embedded_page",
       return_url: data.returnUrl,
-      ...(data.customerEmail && { customer_email: data.customerEmail }),
-      ...(data.userId && {
-        metadata: { userId: data.userId },
-        ...(isRecurring && { subscription_data: { metadata: { userId: data.userId } } }),
-      }),
+      ...(customerEmail && { customer_email: customerEmail }),
+      metadata: { userId },
+      ...(isRecurring && { subscription_data: { metadata: { userId } } }),
     });
     return session.client_secret;
   });

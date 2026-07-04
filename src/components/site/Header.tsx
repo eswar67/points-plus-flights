@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useAuth, signOut } from "@/hooks/useAuth";
+import { LogoMark } from "./Logo";
 
 export function Header() {
   const { user, loading } = useAuth();
@@ -8,7 +9,7 @@ export function Header() {
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/70 border-b border-border/50">
       <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="size-7 rounded-md bg-gradient-to-br from-gold-soft to-gold shadow-gold" />
+          <LogoMark className="size-8" />
           <span className="font-display font-semibold tracking-tight text-lg">
             Aureum
           </span>

@@ -120,7 +120,10 @@ export class SeatsAeroProvider implements AwardProvider {
     const sourceSlug = row.Source ?? "";
     const programId = SOURCE_TO_PROGRAM[sourceSlug] ?? sourceSlug;
 
-    const taxes = (row[`${field}TotalTaxes`] as number | undefined) ?? 0;
+    // seats.aero returns TotalTaxes in the smallest denomination of
+    // TaxesCurrency (i.e. cents), so always divide by 100.
+    const taxesRaw = (row[`${field}TotalTaxes`] as number | undefined) ?? 0;
+    const taxes = taxesRaw / 100;
     const seats = (row[`${field}RemainingSeats`] as number | undefined) ?? 0;
     const direct = (row[`${field}Direct`] as boolean | undefined) ?? false;
     const airlines = (row[`${field}Airlines`] as string | undefined) ?? "";
@@ -139,9 +142,9 @@ export class SeatsAeroProvider implements AwardProvider {
       durationMin: 0,
       stops: direct ? 0 : 1,
       cabin: input.cabin,
-      // taxes are returned in cents in many seats.aero responses; normalize defensively.
       miles: miles * input.pax,
-      taxesUsd: taxes > 1000 ? Math.round(taxes / 100) : Math.round(taxes),
+      pax: input.pax,
+      taxesUsd: Math.round(taxes * input.pax),
       seats,
       direct,
       updatedAt: row.UpdatedAt,

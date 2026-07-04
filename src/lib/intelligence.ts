@@ -59,7 +59,9 @@ export function fareEstimateAud(from: string, to: string, cabin: Cabin): number 
  */
 const USD_TO_AUD = 1.55;
 export function calcCppAud(a: AwardItinerary): number {
-  const fare = fareEstimateAud(a.from, a.to, a.cabin);
+  const pax = a.pax && a.pax > 0 ? a.pax : 1;
+  // miles/taxes are totals across all passengers; the fare benchmark is per seat.
+  const fare = fareEstimateAud(a.from, a.to, a.cabin) * pax;
   const taxesAud = a.taxesUsd * USD_TO_AUD;
   if (a.miles <= 0) return 0;
   return Math.max(0, ((fare - taxesAud) / a.miles) * 100);

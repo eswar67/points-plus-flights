@@ -47,6 +47,10 @@ export class MockAwardProvider implements AwardProvider {
         const dur = baseDur + stops * 90 + ((s % 60) - 30);
         const departMin = (6 * 60) + ((s * 13) % (16 * 60));
         const arriveMin = departMin + dur;
+        // Full ISO datetimes so consumers can safely `.slice(0, 10)` for the date
+        // (concierge form validation, poller dedup fingerprints, deep links).
+        const departIso = `${input.date}T${fmt(departMin)}:00`;
+        const arriveIso = `${input.date}T${fmt(arriveMin)}:00`;
         const baseMiles = 25000 + (s % 18000);
         const miles = Math.round((baseMiles * CABIN_MULT[input.cabin]) / 500) * 500 * input.pax;
         const taxes = 25 + (s % 280) + (input.cabin === "first" ? 180 : input.cabin === "business" ? 90 : 0);
@@ -59,13 +63,14 @@ export class MockAwardProvider implements AwardProvider {
           flightNo: `${carrier.slice(0, 2).toUpperCase()}${100 + (s % 899)}`,
           from: input.from.toUpperCase(),
           to: input.to.toUpperCase(),
-          depart: fmt(departMin),
-          arrive: fmt(arriveMin),
+          depart: departIso,
+          arrive: arriveIso,
           durationMin: dur,
           stops,
           cabin: input.cabin,
           miles,
-          taxesUsd: Math.round(taxes),
+          pax: input.pax,
+          taxesUsd: Math.round(taxes * input.pax),
           seats: 1 + (s % 7),
           direct: stops === 0,
           updatedAt: new Date(Date.now() - (s % 90) * 60 * 1000).toISOString(),
