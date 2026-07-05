@@ -6,6 +6,9 @@ import { Footer } from "@/components/site/Footer";
 import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
 import { AwardCard } from "@/components/site/AwardCard";
 import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
+import { FlightScene } from "@/components/site/FlightScene";
+import { SearchingState } from "@/components/site/SearchingState";
+import { useCountUp } from "@/hooks/useCountUp";
 import { ProgramRail } from "@/components/site/ProgramRail";
 import { ValueProps, Testimonials, FAQ, ConciergeCTA } from "@/components/site/HomeSections";
 import { searchAwards } from "@/lib/awards/awards.functions";
@@ -72,7 +75,7 @@ function Index() {
   // SEATS_AERO_API_KEY is configured or the provider errors.
   const [forceMock, setForceMock] = useState<boolean>(false);
   const { balances, byProgramId } = useUserBalances();
-  const totalBalance = balances.reduce((s, b) => s + b.balance, 0);
+  const totalBalance = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -148,6 +151,7 @@ function Index() {
           {/* Ambient gold glow */}
           <div className="absolute -top-24 right-[8%] size-96 rounded-full bg-gold/10 blur-3xl animate-float-slow" aria-hidden="true" />
           <div className="absolute top-1/2 -left-24 size-72 rounded-full bg-gold/[0.06] blur-3xl animate-float-slow [animation-delay:-4.5s]" aria-hidden="true" />
+          <FlightScene />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 pt-20 pb-12 md:pt-32 md:pb-20">
@@ -246,11 +250,7 @@ function Index() {
             )}
 
             {pending ? (
-              <div className="space-y-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-28 rounded-xl border border-border bg-card animate-pulse" />
-                ))}
-              </div>
+              <SearchingState from={query.from} to={query.to} />
             ) : query.mode === "month" ? (
               <MonthHeatmap
                 monthStart={monthStart}
@@ -292,8 +292,14 @@ function Index() {
                         </h3>
                       )}
                       <div className="space-y-3">
-                        {(byDate.get(d) ?? []).map((a) => (
-                          <AwardCard key={a.id} award={a} balances={byProgramId} />
+                        {(byDate.get(d) ?? []).map((a, i) => (
+                          <div
+                            key={a.id}
+                            className="animate-card-in"
+                            style={{ "--stagger": Math.min(i, 8) } as React.CSSProperties}
+                          >
+                            <AwardCard award={a} balances={byProgramId} />
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -351,11 +357,13 @@ function Stat({ label, value }: { label: string; value: string }) {
 function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>["balances"] }) {
   const { user, loading: authLoading } = useAuth();
 
-  const totalPoints = balances.reduce((s, b) => s + b.balance, 0);
-  const totalValueAud = balances.reduce((s, b) => {
-    const p = getProgram(b.program_id);
-    return s + (p ? (b.balance * p.valueAudCents) / 100 : 0);
-  }, 0);
+  const totalPoints = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
+  const totalValueAud = useCountUp(
+    balances.reduce((s, b) => {
+      const p = getProgram(b.program_id);
+      return s + (p ? (b.balance * p.valueAudCents) / 100 : 0);
+    }, 0),
+  );
 
   if (authLoading) return null;
 

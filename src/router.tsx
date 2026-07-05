@@ -62,6 +62,9 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
     defaultErrorComponent: DefaultErrorComponent,
     defaultPendingComponent: DefaultPendingComponent,
+    // Browser View Transitions between routes (styles.css defines vt-in/vt-out;
+    // unsupported browsers and reduced-motion users get instant navigation).
+    defaultViewTransition: true,
   });
 
   return router;

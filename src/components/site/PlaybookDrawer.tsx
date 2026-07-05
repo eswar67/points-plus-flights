@@ -50,9 +50,9 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-background/80 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-background/80 backdrop-blur-sm animate-backdrop-in" onClick={onClose}>
       <div
-        className="relative w-full md:max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-2xl md:rounded-2xl border border-gold/20 bg-card shadow-gold"
+        className="relative w-full md:max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-2xl md:rounded-2xl border border-gold/20 bg-card shadow-gold animate-drawer-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border px-6 py-4 flex items-center justify-between">

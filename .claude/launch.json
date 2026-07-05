@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "aureum-dev",
+      "runtimeExecutable": "/Users/eswar/.bun/bin/bun",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "/tmp/points-plus-flights",
+      "port": 8080
+    }
+  ]
+}

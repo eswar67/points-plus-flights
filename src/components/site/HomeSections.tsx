@@ -3,6 +3,7 @@ import { useState } from "react";
 import luxuryImg from "@/assets/lifestyle-luxury.jpg";
 import familyImg from "@/assets/lifestyle-family.jpg";
 import weekendImg from "@/assets/lifestyle-weekend.jpg";
+import { Reveal } from "./Reveal";
 
 const PROPS = [
   {
@@ -35,10 +36,10 @@ export function ValueProps() {
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {PROPS.map((p) => (
+        {PROPS.map((p, i) => (
+          <Reveal key={p.title} stagger={i}>
           <article
-            key={p.title}
-            className="group rounded-2xl overflow-hidden border border-border bg-card hover:border-gold/40 transition"
+            className="group rounded-2xl overflow-hidden border border-border bg-card hover:border-gold/40 hover:-translate-y-1 transition duration-300"
           >
             <div className="aspect-[4/3] overflow-hidden">
               <img
@@ -55,6 +56,7 @@ export function ValueProps() {
               <p className="text-sm text-muted-foreground mt-2">{p.body}</p>
             </div>
           </article>
+          </Reveal>
         ))}
       </div>
     </section>
@@ -93,10 +95,10 @@ export function Testimonials() {
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {TESTIMONIALS.map((t) => (
+          {TESTIMONIALS.map((t, i) => (
+            <Reveal key={t.name} stagger={i}>
             <figure
-              key={t.name}
-              className="rounded-2xl border border-border bg-background/60 p-6 flex flex-col"
+              className="h-full rounded-2xl border border-border bg-background/60 p-6 flex flex-col"
             >
               <div className="text-gold font-display text-3xl leading-none mb-3">"</div>
               <blockquote className="text-sm text-foreground/90 leading-relaxed flex-1">
@@ -109,6 +111,7 @@ export function Testimonials() {
                 </div>
               </figcaption>
             </figure>
+            </Reveal>
           ))}
         </div>
       </div>
