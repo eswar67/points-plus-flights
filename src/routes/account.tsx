@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { PROGRAMS } from "@/lib/programs";
 import { useServerFn } from "@tanstack/react-start";
 import { useUserBalances } from "@/hooks/useUserBalances";
+import { TransferPlanner } from "@/components/site/TransferPlanner";
 import { sendTestTelegramAlert } from "@/lib/alerts/alerts.functions";
 import {
   getCronSecretMeta,
@@ -200,6 +201,7 @@ function AccountPage() {
             {saved && <span className="text-sm text-gold">Saved.</span>}
           </div>
         </form>
+        <TransferPlanner />
         {isAdmin && <AdminCronSecretSection />}
         {isAdmin && <AdminPollerRunsSection />}
       </main>

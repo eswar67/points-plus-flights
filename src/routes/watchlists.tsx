@@ -6,6 +6,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
 import type { Cabin } from "@/lib/awards/types";
 import { useServerFn } from "@tanstack/react-start";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { listWatchlistAlerts } from "@/lib/alerts/history.functions";
 import { getAlertChannelAvailability } from "@/lib/alerts/alerts.functions";
 
@@ -256,6 +257,7 @@ function AlertHistory({ watchlistId }: { watchlistId: string }) {
               No alerts sent yet. We'll record one here every time this watchlist fires.
             </div>
           )}
+          {!loading && alerts && <CppSparkline alerts={alerts} />}
           {!loading && alerts && alerts.length > 0 && (
             <ul className="space-y-1.5">
               {alerts.map((a) => (
@@ -279,6 +281,54 @@ function AlertHistory({ watchlistId }: { watchlistId: string }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/** CPP of every alert this watchlist fired, oldest → newest. */
+function CppSparkline({ alerts }: { alerts: AlertRow[] }) {
+  const data = alerts
+    .filter((a) => a.cpp_aud != null)
+    .map((a) => ({
+      t: new Date(a.sent_at).getTime(),
+      label: new Date(a.sent_at).toLocaleDateString([], { day: "numeric", month: "short" }),
+      cpp: a.cpp_aud as number,
+    }))
+    .sort((a, b) => a.t - b.t);
+
+  if (data.length < 2) return null;
+
+  return (
+    <div className="mb-4">
+      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1.5">
+        Alert value over time
+      </div>
+      <div className="h-16">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
+            <XAxis dataKey="label" hide />
+            <YAxis hide domain={["auto", "auto"]} />
+            <Tooltip
+              contentStyle={{
+                background: "var(--card)",
+                border: "1px solid var(--border)",
+                borderRadius: 8,
+                fontSize: 11,
+              }}
+              labelStyle={{ color: "var(--muted-foreground)" }}
+              formatter={(value) => [`${Number(value).toFixed(1)}¢/pt`, "CPP"]}
+            />
+            <Line
+              type="monotone"
+              dataKey="cpp"
+              stroke="var(--gold)"
+              strokeWidth={1.5}
+              dot={false}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

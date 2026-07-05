@@ -1,5 +1,4 @@
 import type { AwardItinerary, Cabin } from "@/lib/awards/types";
-import { PROGRAMS } from "./programs";
 
 /**
  * Cash fare benchmarks (AUD) per route-class. Used as the denominator for CPP.
@@ -141,6 +140,80 @@ export function transfersFor(programId: string): TransferRoute[] {
 }
 
 /**
+ * Transferable point-currency programs (ids from PROGRAMS) mapped to the
+ * TRANSFER_MATRIX bank labels they can transfer out through.
+ */
+export const TRANSFERABLE_PROGRAM_BANKS: Record<string, string[]> = {
+  amex_mr: ["Amex MR (AU)", "Amex MR"],
+  citi: ["Citi TYP"],
+  anz: [], // no partner routes on file yet
+};
+
+/** "1:1.25" -> 1.25, "1:0.5" -> 0.5 */
+export function ratioMultiplier(ratio: string): number {
+  const [from, to] = ratio.split(":").map(Number);
+  if (!from || !to) return 1;
+  return to / from;
+}
+
+/** Outbound routes available from a transferable program the user holds. */
+export function routesFromBankProgram(bankProgramId: string): TransferRoute[] {
+  const banks = TRANSFERABLE_PROGRAM_BANKS[bankProgramId] ?? [];
+  return TRANSFER_MATRIX
+    .filter((t) => banks.includes(t.bank))
+    .sort((a, b) => a.etaMin - b.etaMin);
+}
+
+/** Best route (highest ratio, then fastest) from one bank program to one airline program. */
+export function bestTransferRoute(
+  bankProgramId: string,
+  airlineProgramId: string,
+): TransferRoute | undefined {
+  return routesFromBankProgram(bankProgramId)
+    .filter((r) => r.programId === airlineProgramId)
+    .sort((a, b) => ratioMultiplier(b.ratio) - ratioMultiplier(a.ratio) || a.etaMin - b.etaMin)[0];
+}
+
+export type EffectiveBalance = {
+  direct: number;       // points held in the program itself
+  viaTransfer: number;  // reachable by transferring bank currencies at best ratio
+  total: number;
+};
+
+/**
+ * Per-program reach: direct balance plus what transferable currencies could
+ * add at their best ratio. Each program's total is independent "reach" — the
+ * same bank points can't fund two programs at once, and the UI says so.
+ */
+export function effectiveBalances(
+  byProgramId: Record<string, number>,
+): Record<string, EffectiveBalance> {
+  const out: Record<string, EffectiveBalance> = {};
+  for (const [pid, bal] of Object.entries(byProgramId)) {
+    out[pid] = { direct: bal, viaTransfer: 0, total: bal };
+  }
+  for (const bankProgramId of Object.keys(TRANSFERABLE_PROGRAM_BANKS)) {
+    const bal = byProgramId[bankProgramId] ?? 0;
+    if (bal <= 0) continue;
+    const targets = new Set(routesFromBankProgram(bankProgramId).map((r) => r.programId));
+    for (const target of targets) {
+      const route = bestTransferRoute(bankProgramId, target);
+      if (!route) continue;
+      const gain = Math.floor(bal * ratioMultiplier(route.ratio));
+      const cur = out[target] ?? {
+        direct: byProgramId[target] ?? 0,
+        viaTransfer: 0,
+        total: byProgramId[target] ?? 0,
+      };
+      cur.viaTransfer += gain;
+      cur.total = cur.direct + cur.viaTransfer;
+      out[target] = cur;
+    }
+  }
+  return out;
+}
+
+/**
  * Best-program ranking: given a search cluster (same route + cabin + date),
  * rank itineraries by AUD-effective cost considering held balances.
  */
@@ -148,8 +221,9 @@ export type RankedItinerary = AwardItinerary & {
   cpp: number;
   grade: ValueGrade;
   confidence: Confidence;
-  shortfallMiles: number;        // how many extra miles needed in this program
-  hasBalance: boolean;           // user has the program linked
+  shortfallMiles: number;        // extra miles needed after counting transferable reach
+  effectiveBalance: number;      // direct balance + best-ratio transferable reach
+  hasBalance: boolean;           // user holds a direct balance in this program
   fastestTransfer?: TransferRoute;
   riskFlag?: "transfer-too-slow" | "single-seat" | "stale-cache";
 };
@@ -158,17 +232,20 @@ export function rankItineraries(
   items: AwardItinerary[],
   balances: Record<string, number> = {},
 ): RankedItinerary[] {
+  const reach = effectiveBalances(balances);
   return items
     .map((a): RankedItinerary => {
-      const program = PROGRAMS.find((p) => p.id === a.programId);
       const balance = balances[a.programId] ?? 0;
+      const effectiveBalance = reach[a.programId]?.total ?? balance;
       const cpp = calcCppAud(a);
       const grade = gradeCpp(cpp, a.cabin);
       const confidence = confidenceFor(a);
-      const shortfallMiles = Math.max(0, a.miles - balance);
+      const shortfallMiles = Math.max(0, a.miles - effectiveBalance);
       const hasBalance = balance > 0;
       const transfers = transfersFor(a.programId);
-      const fastestTransfer = shortfallMiles > 0 ? transfers[0] : undefined;
+      const fastestTransfer = shortfallMiles > 0 || (balance < a.miles && effectiveBalance >= a.miles)
+        ? transfers[0]
+        : undefined;
 
       let riskFlag: RankedItinerary["riskFlag"];
       if (confidence.label === "stale") riskFlag = "stale-cache";
@@ -177,7 +254,7 @@ export function rankItineraries(
         riskFlag = "transfer-too-slow";
       }
 
-      return { ...a, cpp, grade, confidence, shortfallMiles, hasBalance, fastestTransfer, riskFlag };
+      return { ...a, cpp, grade, confidence, shortfallMiles, effectiveBalance, hasBalance, fastestTransfer, riskFlag };
     })
     // Sort: best CPP first, then highest confidence, then lowest miles
     .sort((a, b) => {
