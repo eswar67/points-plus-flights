@@ -18,7 +18,7 @@ const PROPS = [
   {
     img: weekendImg,
     title: "Effortless weekend escapes",
-    body: "Short-haul premium cabins and city breaks, booked in under 60 seconds.",
+    body: "Short-haul premium cabins and city breaks, with a ready-to-book playbook in under a minute.",
   },
 ];
 
@@ -119,7 +119,7 @@ export function Testimonials() {
 export const FAQ_ITEMS = [
   {
     q: "How does Aureum actually find seats?",
-    a: "We aggregate live award availability across 30+ frequent flyer programs (Qantas, Velocity, KrisFlyer, Aeroplan, Avios and more) using seats.aero plus our own carrier feeds. You search once — we surface every program that has the route, ranked by cents-per-point value.",
+    a: "We search cached award availability across frequent flyer programs (Qantas, Velocity, KrisFlyer, United, Emirates, LifeMiles and more) via seats.aero, updated continuously. You search once — we surface every program that has the route, ranked by cents-per-point value, with a freshness badge on every result so you know how current it is.",
   },
   {
     q: "Do I need to give you my frequent flyer logins?",

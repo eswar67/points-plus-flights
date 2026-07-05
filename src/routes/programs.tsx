@@ -7,7 +7,7 @@ export const Route = createFileRoute("/programs")({
   head: () => ({
     meta: [
       { title: "Loyalty Programs — Aureum" },
-      { name: "description", content: "Connect Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles to redeem reward points in real time." },
+      { name: "description", content: "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles balances and search cached award space, updated continuously." },
       { property: "og:title", content: "Loyalty Programs — Aureum" },
       { property: "og:description", content: "Six premium loyalty programs, one vault." },
     ],
@@ -25,7 +25,7 @@ function ProgramsPage() {
           Six programs. <span className="text-gold-gradient">One vault.</span>
         </h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
-          Securely link your loyalty accounts and let Aureum scan award space across every cabin and alliance, in real time.
+          Add the programs you hold and let Aureum search cached award space across every cabin and alliance — updated continuously.
         </p>
       </section>
 

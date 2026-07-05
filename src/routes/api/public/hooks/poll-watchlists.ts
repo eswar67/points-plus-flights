@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getAwardProvider } from "@/lib/awards/provider.server";
 import { calcCppAud, gradeCpp, confidenceFor, fmtCpp, fmtAud, fareEstimateAud } from "@/lib/intelligence";
 import { sendTelegramMessage } from "@/lib/alerts/telegram.server";
+import { emailAlertsConfigured, sendAlertEmail } from "@/lib/alerts/email.server";
 import type { Cabin, AwardItinerary } from "@/lib/awards/types";
 
 /**
@@ -49,7 +50,11 @@ function sampleDates(from: string, to: string, max: number): string[] {
   );
 }
 
-async function processWatchlist(w: Watchlist, telegramChatId: string | null) {
+async function processWatchlist(
+  w: Watchlist,
+  telegramChatId: string | null,
+  userEmail: string | null,
+) {
   const provider = getAwardProvider();
   // Never alert users off simulated data — mock results would page people
   // about award seats that don't exist.
@@ -110,10 +115,14 @@ async function processWatchlist(w: Watchlist, telegramChatId: string | null) {
       .maybeSingle();
     if (existing) continue;
 
+    const grade = gradeCpp(cpp, a.cabin);
+    const conf = confidenceFor(a);
+    const fare = fareEstimateAud(a.from, a.to, a.cabin);
+
+    // Deliver on the watchlist's channel. Only record the alert when it was
+    // actually delivered ("app" is in-app history only, so always recorded).
+    let delivered = false;
     if (w.channel === "telegram" && telegramChatId) {
-      const grade = gradeCpp(cpp, a.cabin);
-      const conf = confidenceFor(a);
-      const fare = fareEstimateAud(a.from, a.to, a.cabin);
       const text =
         `🚨 <b>${grade.toUpperCase()} award seat — ${fmtCpp(cpp)}</b>\n` +
         `${w.label ? `<i>${escapeHtml(w.label)}</i>\n` : ""}` +
@@ -124,12 +133,36 @@ async function processWatchlist(w: Watchlist, telegramChatId: string | null) {
         `Open Aureum to book before this disappears.`;
       try {
         await sendTelegramMessage(telegramChatId, text);
-        sent += 1;
+        delivered = true;
       } catch (e) {
         console.error(`[poller] telegram send failed for watchlist ${w.id}:`, (e as Error).message);
         continue;
       }
+    } else if (w.channel === "email" && userEmail && emailAlertsConfigured()) {
+      const subject = `${grade.toUpperCase()} award seat — ${a.from} → ${a.to} · ${fmtCpp(cpp)}`;
+      const html =
+        `<div style="font-family:sans-serif;max-width:520px">` +
+        `<h2 style="margin:0 0 6px">🚨 ${grade.toUpperCase()} award seat — ${fmtCpp(cpp)}</h2>` +
+        `${w.label ? `<p style="margin:0 0 10px;font-style:italic">${escapeHtml(w.label)}</p>` : ""}` +
+        `<p style="margin:0 0 4px"><b>${a.from} → ${a.to}</b> · ${a.depart.slice(0, 10)} · ${a.cabin}</p>` +
+        `<p style="margin:0 0 4px">${a.miles.toLocaleString()} ${escapeHtml(a.programName)} miles${a.taxesUsd ? ` + ~$${a.taxesUsd} taxes` : ""}</p>` +
+        `<p style="margin:0 0 4px">${a.seats} seat${a.seats === 1 ? "" : "s"} · ${escapeHtml(a.carrier)}</p>` +
+        `<p style="margin:0 0 12px"><b>Value</b>: vs ${fmtAud(fare)} cash · confidence ${conf.label}</p>` +
+        `<p style="margin:0">Open Aureum to book before this disappears.</p>` +
+        `</div>`;
+      try {
+        await sendAlertEmail(userEmail, subject, html);
+        delivered = true;
+      } catch (e) {
+        console.error(`[poller] email send failed for watchlist ${w.id}:`, (e as Error).message);
+        continue;
+      }
+    } else if (w.channel === "app") {
+      delivered = true;
     }
+
+    if (!delivered) continue;
+    sent += 1;
 
     await supabaseAdmin.from("alerts_sent").insert({
       watchlist_id: w.id,
@@ -183,12 +216,30 @@ export const Route = createFileRoute("/api/public/hooks/poll-watchlists")({
           : { data: [] as { user_id: string; telegram_chat_id: string | null }[] };
         const chatById = new Map((profiles ?? []).map((p) => [p.user_id, p.telegram_chat_id]));
 
+        // Preload account emails for watchlists alerting via email
+        const emailById = new Map<string, string>();
+        const emailUserIds = Array.from(
+          new Set((watchlists ?? []).filter((w) => w.channel === "email").map((w) => w.user_id)),
+        );
+        for (const uid of emailUserIds) {
+          try {
+            const { data } = await supabaseAdmin.auth.admin.getUserById(uid);
+            if (data?.user?.email) emailById.set(uid, data.user.email);
+          } catch (e) {
+            console.error(`[poller] could not load email for user ${uid}:`, (e as Error).message);
+          }
+        }
+
         let totalSent = 0;
         let processed = 0;
         const errors: string[] = [];
         for (const w of (watchlists ?? []) as Watchlist[]) {
           try {
-            const { sent } = await processWatchlist(w, chatById.get(w.user_id) ?? null);
+            const { sent } = await processWatchlist(
+              w,
+              chatById.get(w.user_id) ?? null,
+              emailById.get(w.user_id) ?? null,
+            );
             totalSent += sent;
             processed += 1;
           } catch (e) {

@@ -20,6 +20,9 @@ export function Header() {
           {user && (
             <Link to="/watchlists" className="hover:text-foreground transition">Watchlists</Link>
           )}
+          {user && (
+            <Link to="/requests" className="hover:text-foreground transition">Requests</Link>
+          )}
           <Link to="/how-it-works" className="hover:text-foreground transition">How it works</Link>
           <Link to="/pricing" className="hover:text-foreground transition">Pricing</Link>
           <Link to="/faq" className="hover:text-foreground transition">FAQ</Link>

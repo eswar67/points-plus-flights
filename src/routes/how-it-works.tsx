@@ -5,8 +5,8 @@ import { Footer } from "@/components/site/Footer";
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How Aureum Works — Real-Time Award Redemption" },
-      { name: "description", content: "Link your loyalty accounts, search live award space, and book in seconds. Here's how." },
+      { title: "How Aureum Works — Award Search & Concierge" },
+      { name: "description", content: "Track your points, search cached award space across programs — updated continuously — and follow a guided redemption playbook." },
       { property: "og:title", content: "How Aureum Works" },
       { property: "og:description", content: "Three steps from points to premium cabin." },
     ],
@@ -15,9 +15,9 @@ export const Route = createFileRoute("/how-it-works")({
 });
 
 const STEPS = [
-  { n: "01", t: "Link your programs", d: "Connect Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles with read-only access. Balances sync instantly." },
-  { n: "02", t: "Search live award space", d: "We scan every alliance and cabin for the date you want — no more loading dummy calendars on six different airline websites." },
-  { n: "03", t: "Redeem in real time", d: "Pick the itinerary, confirm with one tap. Aureum spends the points from the right account and ticketing happens immediately." },
+  { n: "01", t: "Track your programs", d: "Add the loyalty programs you hold — Qantas, Velocity, KrisFlyer, Emirates, United, LifeMiles and more — with the balances you have. We value the lot in AUD. No passwords, ever." },
+  { n: "02", t: "Search cached award space", d: "One search covers every program, cabin and alliance — cached award data, updated continuously, with freshness badges so you know exactly how current each seat is." },
+  { n: "03", t: "Follow the playbook", d: "Every result comes with a step-by-step plan: which points to transfer, how long they take to land, and where to ticket — or hand the whole thing to our concierge." },
 ];
 
 function HowItWorks() {

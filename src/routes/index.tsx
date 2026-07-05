@@ -66,15 +66,16 @@ function Index() {
         <div className="relative mx-auto max-w-7xl px-6 pt-20 pb-12 md:pt-32 md:pb-20">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-gold mb-6">
-              <span className="size-1 rounded-full bg-gold" /> Real-time award availability
+              <span className="size-1 rounded-full bg-gold" /> Award space, continuously refreshed
             </span>
             <h1 className="font-display text-5xl md:text-7xl font-semibold tracking-tight leading-[1.02]">
               Your miles deserve <br />
               <span className="text-gold-shimmer">a first-class seat.</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-              Connect Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault.
-              Search live award space and redeem in seconds — no phone calls, no agent fees.
+              Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault.
+              Search cached award space across programs — updated continuously — then follow a
+              step-by-step redemption playbook. No phone calls, no agent fees.
             </p>
           </div>
 
@@ -111,7 +112,7 @@ function Index() {
             <Stat label="Programs supported" value={`${PROGRAMS.length}`} />
             <Stat label="Your total points" value={totalBalance ? totalBalance.toLocaleString() : "—"} />
             <Stat label="Avg. premium redemption" value="118k mi" />
-            <Stat label="Booking time" value="< 60s" />
+            <Stat label="Availability checks" value="24/7" />
           </div>
         </div>
       </section>

@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import type { Cabin } from "@/lib/awards/types";
 import { useServerFn } from "@tanstack/react-start";
 import { listWatchlistAlerts } from "@/lib/alerts/history.functions";
+import { getAlertChannelAvailability } from "@/lib/alerts/alerts.functions";
 
 export const Route = createFileRoute("/watchlists")({
   head: () => ({
@@ -72,7 +73,14 @@ function WatchlistsPage() {
       .from("watchlists")
       .update({ active: !w.active })
       .eq("id", w.id);
-    if (error) { setError(error.message); return; }
+    if (error) {
+      setError(
+        error.message.includes("row-level security")
+          ? "The free plan includes one active watchlist. Pause the other one or upgrade to Aureum Plus."
+          : error.message,
+      );
+      return;
+    }
     setItems((prev) => prev.map((x) => x.id === w.id ? { ...x, active: !x.active } : x));
   }
 
@@ -289,9 +297,35 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
   const [pax, setPax] = useState(1);
   const [minCpp, setMinCpp] = useState<string>("3.5");
   const [maxMiles, setMaxMiles] = useState<string>("");
-  const [channel, setChannel] = useState<"telegram" | "email">("telegram");
+  const [channel, setChannel] = useState<string>("telegram");
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  // Only offer channels this deployment can actually deliver on.
+  const fetchChannels = useServerFn(getAlertChannelAvailability);
+  const [channelOptions, setChannelOptions] = useState<{ value: string; label: string }[]>([
+    { value: "app", label: "In-app history only" },
+  ]);
+  useEffect(() => {
+    let alive = true;
+    fetchChannels()
+      .then((avail) => {
+        if (!alive) return;
+        const opts = [
+          ...(avail.telegram ? [{ value: "telegram", label: "Telegram" }] : []),
+          ...(avail.email ? [{ value: "email", label: "Email" }] : []),
+          { value: "app", label: "In-app history only" },
+        ];
+        setChannelOptions(opts);
+        setChannel(opts[0].value);
+      })
+      .catch(() => {
+        /* keep in-app fallback */
+        setChannel("app");
+      });
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -318,7 +352,14 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
     };
     const { error } = await supabase.from("watchlists").insert(payload);
     setSubmitting(false);
-    if (error) { setErr(error.message); return; }
+    if (error) {
+      setErr(
+        error.message.includes("row-level security")
+          ? "The free plan includes one active watchlist. Upgrade to Aureum Plus for unlimited watchlists."
+          : error.message,
+      );
+      return;
+    }
     onCreated();
   }
 
@@ -357,9 +398,10 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
           <input type="number" min="0" value={maxMiles} onChange={(e) => setMaxMiles(e.target.value)} className={inputCls} placeholder="e.g. 120000" />
         </Field>
         <Field label="Alert channel">
-          <select value={channel} onChange={(e) => setChannel(e.target.value as "telegram" | "email")} className={inputCls}>
-            <option value="telegram">Telegram</option>
-            <option value="email">Email</option>
+          <select value={channel} onChange={(e) => setChannel(e.target.value)} className={inputCls}>
+            {channelOptions.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
           </select>
         </Field>
       </div>
