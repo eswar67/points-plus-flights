@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import heroWing from "@/assets/hero-wing.jpg";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -9,13 +9,21 @@ import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
 import { ProgramRail } from "@/components/site/ProgramRail";
 import { ValueProps, Testimonials, FAQ, ConciergeCTA } from "@/components/site/HomeSections";
 import { searchAwards } from "@/lib/awards/awards.functions";
-import type { AwardItinerary, SearchResult } from "@/lib/awards/types";
+import type { AwardItinerary, Cabin, SearchResult } from "@/lib/awards/types";
 import { PROGRAMS, getProgram } from "@/lib/programs";
 import { rankItineraries, fmtAud, type RankedItinerary } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useAuth } from "@/hooks/useAuth";
 
+const CABIN_VALUES = ["economy", "premium", "business", "first"] as const;
+
 export const Route = createFileRoute("/")({
+  // Pre-filled searches arrive from the /awards landing pages.
+  validateSearch: (s: Record<string, unknown>) => ({
+    from: typeof s.from === "string" && /^[A-Za-z]{3}$/.test(s.from) ? s.from.toUpperCase() : undefined,
+    to: typeof s.to === "string" && /^[A-Za-z]{3}$/.test(s.to) ? s.to.toUpperCase() : undefined,
+    cabin: CABIN_VALUES.includes(s.cabin as Cabin) ? (s.cabin as Cabin) : undefined,
+  }),
   component: Index,
 });
 
@@ -67,6 +75,22 @@ function Index() {
   const totalBalance = balances.reduce((s, b) => s + b.balance, 0);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  // Auto-run a search when arriving from an /awards landing page.
+  const urlSearch = Route.useSearch();
+  useEffect(() => {
+    if (urlSearch.from && urlSearch.to) {
+      runSearch({
+        from: urlSearch.from,
+        to: urlSearch.to,
+        date: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+        cabin: urlSearch.cabin ?? "business",
+        pax: 1,
+        mode: "flex",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function runSearch(q: Query) {
     setQuery(q);

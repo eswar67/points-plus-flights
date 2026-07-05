@@ -51,6 +51,19 @@ export function fareEstimateAud(from: string, to: string, cabin: Cabin): number 
   return direct ?? reverse ?? region ?? 2000;
 }
 
+/** Routes with curated fare benchmarks (drives the /awards landing pages). */
+export function knownRoutes(): { from: string; to: string }[] {
+  return Object.keys(FARE_AUD).map((k) => {
+    const [from, to] = k.split("-");
+    return { from, to };
+  });
+}
+
+/** Curated per-cabin fare benchmarks for a route, if we have them. */
+export function fareTableFor(from: string, to: string): Partial<Record<Cabin, number>> | undefined {
+  return FARE_AUD[`${from}-${to}`] ?? FARE_AUD[`${to}-${from}`];
+}
+
 /**
  * Cents per point/mile (AUD basis).
  * cpp = (cash fare AUD - taxes AUD) / miles  * 100
