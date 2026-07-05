@@ -15,7 +15,7 @@ export function Footer() {
           <Link to="/how-it-works" className="hover:text-gold transition">How it works</Link>
           <Link to="/faq" className="hover:text-gold transition">FAQ</Link>
         </nav>
-        <p className="opacity-70">© {new Date().getFullYear()} Aureum. Award availability shown for demo purposes.</p>
+        <p className="opacity-70">© {new Date().getFullYear()} Aureum. Availability via seats.aero, refreshed continuously.</p>
       </div>
     </footer>
   );

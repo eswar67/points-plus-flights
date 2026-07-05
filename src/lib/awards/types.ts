@@ -32,11 +32,11 @@ export type SearchInput = {
 
 export type SearchResult = {
   itineraries: AwardItinerary[];
-  source: "seats.aero" | "mock";
-  warning?: string;        // surfaced to UI (e.g. fallback reason)
+  source: "seats.aero";
+  warning?: string;        // surfaced to UI
 };
 
 export interface AwardProvider {
-  name: "seats.aero" | "mock";
+  name: "seats.aero";
   search(input: SearchInput): Promise<AwardItinerary[]>;
 }

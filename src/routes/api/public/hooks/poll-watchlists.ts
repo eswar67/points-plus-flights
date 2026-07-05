@@ -55,10 +55,9 @@ async function processWatchlist(
   telegramChatId: string | null,
   userEmail: string | null,
 ) {
+  // Throws when SEATS_AERO_API_KEY is unset — the run is recorded as an
+  // error rather than ever alerting from non-live data.
   const provider = getAwardProvider();
-  // Never alert users off simulated data — mock results would page people
-  // about award seats that don't exist.
-  if (provider.name === "mock") return { hits: 0, sent: 0 };
   const dates = sampleDates(w.date_from, w.date_to, MAX_DATES_PER_WATCHLIST);
   const allResults: AwardItinerary[] = [];
 

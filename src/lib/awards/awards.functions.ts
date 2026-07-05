@@ -14,7 +14,6 @@ const SearchSchema = z
     dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD").optional(),
     cabin: z.enum(["economy", "premium", "business", "first"]),
     pax: z.number().int().min(1).max(9),
-    forceMock: z.boolean().optional(),
   })
   .refine((d) => !d.dateTo || d.dateTo >= d.date, {
     message: "dateTo must be on or after date",
@@ -89,17 +88,6 @@ function cacheSet(key: string, result: SearchResult) {
 export const searchAwards = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SearchSchema.parse(input))
   .handler(async ({ data }): Promise<SearchResult> => {
-    if (data.forceMock) {
-      const { MockAwardProvider } = await import("./mockProvider");
-      const mock = new MockAwardProvider();
-      const itineraries = await mock.search(data);
-      return {
-        itineraries,
-        source: "mock",
-        warning: "Mock mode is ON. Toggle off to query live seats.aero data.",
-      };
-    }
-
     assertRateLimit(clientIp());
 
     const cacheKey = [data.from, data.to, data.date, data.dateTo ?? "", data.cabin, data.pax]
@@ -111,25 +99,13 @@ export const searchAwards = createServerFn({ method: "POST" })
     const provider = getAwardProvider();
     try {
       const itineraries = await provider.search(data);
-      const result: SearchResult = {
-        itineraries,
-        source: provider.name,
-        warning: provider.name === "mock"
-          ? "Showing simulated availability. Add SEATS_AERO_API_KEY to enable live award data."
-          : undefined,
-      };
-      if (provider.name !== "mock") cacheSet(cacheKey, result);
+      const result: SearchResult = { itineraries, source: provider.name };
+      cacheSet(cacheKey, result);
       return result;
     } catch (err) {
       console.error("[searchAwards] provider error:", err);
-      // Graceful fallback to mock so the UI never goes blank.
-      const { MockAwardProvider } = await import("./mockProvider");
-      const fallback = new MockAwardProvider();
-      const itineraries = await fallback.search(data);
-      return {
-        itineraries,
-        source: "mock",
-        warning: `Live provider failed (${(err as Error).message}). Showing simulated results.`,
-      };
+      throw new Error(
+        "Live award search is temporarily unavailable. Please try again in a moment.",
+      );
     }
   });

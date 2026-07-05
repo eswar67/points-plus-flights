@@ -71,9 +71,6 @@ function Index() {
   const [result, setResult] = useState<SearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  // Live-first: searchAwards falls back to mock (with a warning) when no
-  // SEATS_AERO_API_KEY is configured or the provider errors.
-  const [forceMock, setForceMock] = useState<boolean>(false);
   const { balances, byProgramId } = useUserBalances();
   const totalBalance = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
 
@@ -103,7 +100,7 @@ function Index() {
       try {
         const range = rangeFor(q);
         const res = await searchAwards({
-          data: { from: q.from, to: q.to, ...range, cabin: q.cabin, pax: q.pax, forceMock },
+          data: { from: q.from, to: q.to, ...range, cabin: q.cabin, pax: q.pax },
         });
         setResult(res);
       } catch (e) {
@@ -172,31 +169,6 @@ function Index() {
 
           <div className="mt-10 md:mt-14">
             <SearchForm onSearch={runSearch} initial={query ?? undefined} />
-          </div>
-
-          <div className="mt-6 flex items-center justify-between gap-4 max-w-3xl rounded-xl border border-border/60 bg-card/40 backdrop-blur px-4 py-3">
-            <div>
-              <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Data source</div>
-              <div className="font-display text-sm mt-0.5">
-                {forceMock ? "Simulated availability (mock)" : "Live seats.aero"}
-              </div>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={!forceMock}
-              onClick={() => setForceMock((v) => !v)}
-              className={`relative h-7 w-12 rounded-full transition border ${
-                forceMock ? "bg-muted border-border" : "bg-gold/80 border-gold"
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 size-6 rounded-full bg-background shadow transition-all ${
-                  forceMock ? "left-0.5" : "left-[22px]"
-                }`}
-              />
-              <span className="sr-only">Toggle live data</span>
-            </button>
           </div>
 
           <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
