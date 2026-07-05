@@ -36,8 +36,29 @@ function airlineBookingUrl(programId: string, a: AwardItinerary): { href: string
       return { site: "united.com", href: `https://www.united.com/en/us/fsr/choose-flights?f=${a.from}&t=${a.to}&d=${dep}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches` };
     case "lifemiles":
       return { site: "lifemiles.com", href: `https://www.lifemiles.com/fly/redeem` };
-    default:
-      return { site: "airline website", href: "#" };
+    case "flyingblue":
+      return { site: "flyingblue.com", href: `https://www.flyingblue.com/en/spend/flights` };
+    case "american":
+      return { site: "aa.com", href: `https://www.aa.com/booking/find-flights?from=${a.from}&to=${a.to}&departDate=${dep}&redeemMiles=true` };
+    case "delta":
+      return { site: "delta.com", href: `https://www.delta.com/flight-search/book-a-flight` };
+    case "alaska":
+      return { site: "alaskaair.com", href: `https://www.alaskaair.com/planbook` };
+    case "aeroplan":
+      return { site: "aircanada.com", href: `https://www.aircanada.com/aeroplan/redeem` };
+    case "etihad":
+      return { site: "etihadguest.com", href: `https://www.etihadguest.com/en/spend-miles.html` };
+    case "qatar":
+      return { site: "qatarairways.com", href: `https://www.qatarairways.com/en/Privilege-Club/redeem-avios.html` };
+    case "turkish":
+      return { site: "turkishairlines.com", href: `https://www.turkishairlines.com/en-int/miles-and-smiles/` };
+    case "virginatlantic":
+      return { site: "virginatlantic.com", href: `https://www.virginatlantic.com/flyingclub` };
+    default: {
+      // Program site unknown — hand off to a targeted search rather than a dead link.
+      const q = encodeURIComponent(`${programId} award booking ${a.from} ${a.to}`);
+      return { site: "program website", href: `https://www.google.com/search?q=${q}` };
+    }
   }
 }
 

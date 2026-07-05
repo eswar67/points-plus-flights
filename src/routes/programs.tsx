@@ -22,7 +22,7 @@ function ProgramsPage() {
       <section className="mx-auto max-w-7xl px-6 pt-20 pb-10">
         <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Supported programs</span>
         <h1 className="font-display text-5xl md:text-6xl mt-4">
-          Six programs. <span className="text-gold-gradient">One vault.</span>
+          Every program. <span className="text-gold-gradient">One vault.</span>
         </h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
           Add the programs you hold and let Aureum search cached award space across every cabin and alliance — updated continuously.

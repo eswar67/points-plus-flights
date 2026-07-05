@@ -161,9 +161,9 @@ function Index() {
               <span className="text-gold-shimmer">a first-class seat.</span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-              Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault.
-              Search cached award space across programs — updated continuously — then follow a
-              step-by-step redemption playbook. No phone calls, no agent fees.
+              Track Qantas, Velocity, KrisFlyer, Flying Blue and 20+ programs in one vault.
+              Search cached award space across every alliance — updated continuously — then
+              follow a step-by-step redemption playbook. No phone calls, no agent fees.
             </p>
           </div>
 
