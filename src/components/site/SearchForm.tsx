@@ -8,24 +8,42 @@ const CABINS: { value: Cabin; label: string }[] = [
   { value: "first", label: "First" },
 ];
 
+export type SearchMode = "exact" | "flex" | "month";
+
+const MODES: { value: SearchMode; label: string }[] = [
+  { value: "exact", label: "Exact date" },
+  { value: "flex", label: "± 3 days" },
+  { value: "month", label: "Whole month" },
+];
+
+export type SearchFormQuery = {
+  from: string;
+  to: string;
+  date: string;
+  cabin: Cabin;
+  pax: number;
+  mode: SearchMode;
+};
+
 export function SearchForm({
   onSearch,
   initial,
 }: {
-  onSearch: (q: { from: string; to: string; date: string; cabin: Cabin; pax: number }) => void;
-  initial?: { from: string; to: string; date: string; cabin: Cabin; pax: number };
+  onSearch: (q: SearchFormQuery) => void;
+  initial?: SearchFormQuery;
 }) {
   const [from, setFrom] = useState(initial?.from ?? "SYD");
   const [to, setTo] = useState(initial?.to ?? "LHR");
   const [date, setDate] = useState(initial?.date ?? new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10));
   const [cabin, setCabin] = useState<Cabin>(initial?.cabin ?? "business");
   const [pax, setPax] = useState(initial?.pax ?? 1);
+  const [mode, setMode] = useState<SearchMode>(initial?.mode ?? "exact");
 
   const today = new Date().toISOString().slice(0, 10);
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    onSearch({ from, to, date, cabin, pax: Math.min(9, Math.max(1, pax || 1)) });
+    onSearch({ from, to, date, cabin, pax: Math.min(9, Math.max(1, pax || 1)), mode });
   }
 
   return (
@@ -63,6 +81,27 @@ export function SearchForm({
           className="rounded-xl px-6 py-4 font-display font-semibold text-sm tracking-wide text-gold-foreground bg-gradient-to-br from-gold-soft to-gold shadow-gold hover:opacity-95 transition">
           Search Awards
         </button>
+      </div>
+
+      {/* Date flexibility */}
+      <div className="mt-2 flex items-center gap-1.5 px-1" role="radiogroup" aria-label="Date flexibility">
+        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mr-2">Dates</span>
+        {MODES.map((m) => (
+          <button
+            key={m.value}
+            type="button"
+            role="radio"
+            aria-checked={mode === m.value}
+            onClick={() => setMode(m.value)}
+            className={`text-[10px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border transition ${
+              mode === m.value
+                ? "bg-gold/15 text-gold border-gold/50"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+            }`}
+          >
+            {m.label}
+          </button>
+        ))}
       </div>
     </form>
   );

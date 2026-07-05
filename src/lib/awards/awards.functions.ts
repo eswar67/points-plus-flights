@@ -4,14 +4,29 @@ import { z } from "zod";
 import { getAwardProvider } from "./provider.server";
 import type { SearchResult } from "./types";
 
-const SearchSchema = z.object({
-  from: z.string().trim().min(3).max(7).regex(/^[A-Za-z,]+$/, "IATA codes only"),
-  to: z.string().trim().min(3).max(7).regex(/^[A-Za-z,]+$/, "IATA codes only"),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD"),
-  cabin: z.enum(["economy", "premium", "business", "first"]),
-  pax: z.number().int().min(1).max(9),
-  forceMock: z.boolean().optional(),
-});
+const MAX_RANGE_DAYS = 31;
+
+const SearchSchema = z
+  .object({
+    from: z.string().trim().min(3).max(7).regex(/^[A-Za-z,]+$/, "IATA codes only"),
+    to: z.string().trim().min(3).max(7).regex(/^[A-Za-z,]+$/, "IATA codes only"),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD"),
+    dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD").optional(),
+    cabin: z.enum(["economy", "premium", "business", "first"]),
+    pax: z.number().int().min(1).max(9),
+    forceMock: z.boolean().optional(),
+  })
+  .refine((d) => !d.dateTo || d.dateTo >= d.date, {
+    message: "dateTo must be on or after date",
+  })
+  .refine(
+    (d) =>
+      !d.dateTo ||
+      (new Date(d.dateTo + "T00:00:00Z").getTime() - new Date(d.date + "T00:00:00Z").getTime()) /
+        86_400_000 <
+        MAX_RANGE_DAYS,
+    { message: `Date range cannot exceed ${MAX_RANGE_DAYS} days` },
+  );
 
 // --- Per-IP rate limiting (best effort, per isolate) -----------------------
 // Protects the seats.aero quota from anonymous hammering. State is in-memory,
@@ -87,7 +102,7 @@ export const searchAwards = createServerFn({ method: "POST" })
 
     assertRateLimit(clientIp());
 
-    const cacheKey = [data.from, data.to, data.date, data.cabin, data.pax]
+    const cacheKey = [data.from, data.to, data.date, data.dateTo ?? "", data.cabin, data.pax]
       .join("|")
       .toUpperCase();
     const cached = cacheGet(cacheKey);

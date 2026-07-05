@@ -3,14 +3,15 @@ import { useState, useTransition } from "react";
 import heroWing from "@/assets/hero-wing.jpg";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { SearchForm } from "@/components/site/SearchForm";
+import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
 import { AwardCard } from "@/components/site/AwardCard";
+import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
 import { ProgramRail } from "@/components/site/ProgramRail";
 import { ValueProps, Testimonials, FAQ, ConciergeCTA } from "@/components/site/HomeSections";
 import { searchAwards } from "@/lib/awards/awards.functions";
-import type { Cabin, AwardItinerary, SearchResult } from "@/lib/awards/types";
+import type { AwardItinerary, SearchResult } from "@/lib/awards/types";
 import { PROGRAMS, getProgram } from "@/lib/programs";
-import { rankItineraries, fmtAud } from "@/lib/intelligence";
+import { rankItineraries, fmtAud, type RankedItinerary } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -18,7 +19,41 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Query = { from: string; to: string; date: string; cabin: Cabin; pax: number };
+type Query = SearchFormQuery;
+
+// --- Date helpers (UTC-safe on YYYY-MM-DD strings) --------------------------
+function addDays(d: string, n: number): string {
+  const t = new Date(d + "T00:00:00Z");
+  t.setUTCDate(t.getUTCDate() + n);
+  return t.toISOString().slice(0, 10);
+}
+
+function endOfMonth(d: string): string {
+  const t = new Date(d.slice(0, 8) + "01T00:00:00Z");
+  t.setUTCMonth(t.getUTCMonth() + 1);
+  t.setUTCDate(0);
+  return t.toISOString().slice(0, 10);
+}
+
+function addMonths(monthStart: string, n: number): string {
+  const t = new Date(monthStart + "T00:00:00Z");
+  t.setUTCMonth(t.getUTCMonth() + n);
+  return t.toISOString().slice(0, 10);
+}
+
+/** Expand a query's mode into the provider date range. */
+function rangeFor(q: Query): { date: string; dateTo?: string } {
+  const today = new Date().toISOString().slice(0, 10);
+  if (q.mode === "flex") {
+    const start = addDays(q.date, -3);
+    return { date: start < today ? today : start, dateTo: addDays(q.date, 3) };
+  }
+  if (q.mode === "month") {
+    const first = q.date.slice(0, 8) + "01";
+    return { date: first < today ? today : first, dateTo: endOfMonth(q.date) };
+  }
+  return { date: q.date };
+}
 
 function Index() {
   const [query, setQuery] = useState<Query | null>(null);
@@ -31,12 +66,18 @@ function Index() {
   const { balances, byProgramId } = useUserBalances();
   const totalBalance = balances.reduce((s, b) => s + b.balance, 0);
 
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
   function runSearch(q: Query) {
     setQuery(q);
     setError(null);
+    setSelectedDate(null);
     startTransition(async () => {
       try {
-        const res = await searchAwards({ data: { ...q, forceMock } });
+        const range = rangeFor(q);
+        const res = await searchAwards({
+          data: { from: q.from, to: q.to, ...range, cabin: q.cabin, pax: q.pax, forceMock },
+        });
         setResult(res);
       } catch (e) {
         setError((e as Error).message || "Search failed");
@@ -47,6 +88,28 @@ function Index() {
 
   const itineraries: AwardItinerary[] = result?.itineraries ?? [];
   const ranked = rankItineraries(itineraries, byProgramId);
+
+  // Group by departure date (ranked is best-CPP-first, so each group's first
+  // entry is that day's best value).
+  const byDate = new Map<string, RankedItinerary[]>();
+  for (const a of ranked) {
+    const d = (a.depart || "").slice(0, 10);
+    const list = byDate.get(d) ?? [];
+    list.push(a);
+    byDate.set(d, list);
+  }
+  const dates = [...byDate.keys()].sort();
+  const multiDate = dates.length > 1;
+
+  const daySummaries: Record<string, DaySummary> = {};
+  for (const [d, list] of byDate) {
+    daySummaries[d] = { cpp: list[0].cpp, grade: list[0].grade, count: list.length };
+  }
+
+  const monthStart = query ? query.date.slice(0, 8) + "01" : "";
+  const currentMonthStart = new Date().toISOString().slice(0, 8) + "01";
+
+  const visibleDates = selectedDate ? dates.filter((d) => d === selectedDate) : dates;
 
   return (
     <div className="min-h-screen bg-noir">
@@ -130,7 +193,13 @@ function Index() {
                 <p className="text-sm text-muted-foreground mt-1">
                   {pending
                     ? "Scanning award space across alliances…"
-                    : `${itineraries.length} award itineraries · ${query.cabin} · ${query.pax} pax · ${query.date}`}
+                    : `${itineraries.length} award itineraries · ${query.cabin} · ${query.pax} pax · ${
+                        query.mode === "month"
+                          ? new Date(monthStart + "T00:00:00").toLocaleDateString([], { month: "long", year: "numeric" })
+                          : query.mode === "flex"
+                            ? `${query.date} ± 3 days`
+                            : query.date
+                      }`}
                 </p>
               </div>
               {result && (
@@ -158,14 +227,55 @@ function Index() {
                   <div key={i} className="h-28 rounded-xl border border-border bg-card animate-pulse" />
                 ))}
               </div>
+            ) : query.mode === "month" ? (
+              <MonthHeatmap
+                monthStart={monthStart}
+                days={daySummaries}
+                onPickDate={(d) => runSearch({ ...query, date: d, mode: "exact" })}
+                onMonthChange={(delta) => runSearch({ ...query, date: addMonths(monthStart, delta), mode: "month" })}
+                canPrev={monthStart > currentMonthStart}
+                canNext={monthStart < addMonths(currentMonthStart, 11)}
+              />
             ) : itineraries.length === 0 && !error ? (
               <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground">
                 No award space found for this route and date. Try a different cabin or nearby dates.
               </div>
             ) : (
-              <div className="space-y-3">
-                {ranked.map((a) => <AwardCard key={a.id} award={a} balances={byProgramId} />)}
-              </div>
+              <>
+                {multiDate && (
+                  <div className="mb-6 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Departure dates">
+                    <DateChip active={!selectedDate} onClick={() => setSelectedDate(null)} label="All dates" />
+                    {dates.map((d) => {
+                      const s = daySummaries[d];
+                      const label = new Date(d + "T00:00:00").toLocaleDateString([], { weekday: "short", day: "numeric" });
+                      return (
+                        <DateChip
+                          key={d}
+                          active={selectedDate === d}
+                          onClick={() => setSelectedDate(d)}
+                          label={`${label} · ${s.cpp.toFixed(1)}¢`}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="space-y-8">
+                  {visibleDates.map((d) => (
+                    <div key={d}>
+                      {multiDate && !selectedDate && (
+                        <h3 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                          {new Date(d + "T00:00:00").toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" })}
+                        </h3>
+                      )}
+                      <div className="space-y-3">
+                        {(byDate.get(d) ?? []).map((a) => (
+                          <AwardCard key={a.id} award={a} balances={byProgramId} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </>
         ) : (
@@ -184,6 +294,24 @@ function Index() {
 
       <Footer />
     </div>
+  );
+}
+
+function DateChip({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      onClick={onClick}
+      className={`shrink-0 text-[11px] uppercase tracking-[0.15em] px-3.5 py-2 rounded-full border transition whitespace-nowrap ${
+        active
+          ? "bg-gold/15 text-gold border-gold/50"
+          : "border-border text-muted-foreground hover:text-foreground hover:border-gold/40"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 

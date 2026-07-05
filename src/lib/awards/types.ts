@@ -24,7 +24,8 @@ export type AwardItinerary = {
 export type SearchInput = {
   from: string;            // IATA, comma-allowed
   to: string;              // IATA, comma-allowed
-  date: string;            // YYYY-MM-DD
+  date: string;            // YYYY-MM-DD (range start)
+  dateTo?: string;         // YYYY-MM-DD inclusive range end; defaults to `date`
   cabin: Cabin;
   pax: number;
 };

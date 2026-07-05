@@ -30,11 +30,28 @@ function fmt(mins: number) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 }
 
+function enumerateDates(from: string, to: string, cap: number): string[] {
+  const start = new Date(from + "T00:00:00Z").getTime();
+  const end = new Date(to + "T00:00:00Z").getTime();
+  if (Number.isNaN(start) || Number.isNaN(end) || end < start) return [from];
+  const days = Math.min(cap, Math.floor((end - start) / 86_400_000) + 1);
+  return Array.from({ length: days }, (_, i) =>
+    new Date(start + i * 86_400_000).toISOString().slice(0, 10),
+  );
+}
+
 export class MockAwardProvider implements AwardProvider {
   readonly name = "mock" as const;
 
   async search(input: SearchInput): Promise<AwardItinerary[]> {
-    const seed = hash(`${input.from}-${input.to}-${input.date}-${input.cabin}`);
+    const dates = enumerateDates(input.date, input.dateTo ?? input.date, 31);
+    return dates
+      .flatMap((d) => this.searchDay(input, d))
+      .sort((a, b) => a.miles - b.miles);
+  }
+
+  private searchDay(input: SearchInput, date: string): AwardItinerary[] {
+    const seed = hash(`${input.from}-${input.to}-${date}-${input.cabin}`);
     const count = 6 + (seed % 4);
     const baseDur = 240 + (seed % 600);
 
@@ -49,14 +66,14 @@ export class MockAwardProvider implements AwardProvider {
         const arriveMin = departMin + dur;
         // Full ISO datetimes so consumers can safely `.slice(0, 10)` for the date
         // (concierge form validation, poller dedup fingerprints, deep links).
-        const departIso = `${input.date}T${fmt(departMin)}:00`;
-        const arriveIso = `${input.date}T${fmt(arriveMin)}:00`;
+        const departIso = `${date}T${fmt(departMin)}:00`;
+        const arriveIso = `${date}T${fmt(arriveMin)}:00`;
         const baseMiles = 25000 + (s % 18000);
         const miles = Math.round((baseMiles * CABIN_MULT[input.cabin]) / 500) * 500 * input.pax;
         const taxes = 25 + (s % 280) + (input.cabin === "first" ? 180 : input.cabin === "business" ? 90 : 0);
 
         const it: AwardItinerary = {
-          id: `mock-${i}-${s}`,
+          id: `mock-${date}-${i}-${s}`,
           programId,
           programName: PROGRAM_NAMES[programId],
           carrier,

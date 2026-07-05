@@ -74,13 +74,15 @@ export class SeatsAeroProvider implements AwardProvider {
   constructor(private readonly apiKey: string) {}
 
   async search(input: SearchInput): Promise<AwardItinerary[]> {
+    const endDate = input.dateTo ?? input.date;
     const params = new URLSearchParams({
       origin_airport: input.from.toUpperCase(),
       destination_airport: input.to.toUpperCase(),
       start_date: input.date,
-      end_date: input.date,
+      end_date: endDate,
       cabin: input.cabin,
-      take: "200",
+      // Ranges span up to a month of daily availability across 6 sources.
+      take: endDate === input.date ? "200" : "1000",
       order_by: "lowest_mileage",
       sources: Object.values(PROGRAM_TO_SOURCE).join(","),
     });
