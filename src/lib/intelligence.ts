@@ -1,41 +1,43 @@
 import type { AwardItinerary, Cabin } from "@/lib/awards/types";
 
 /**
- * Cash fare benchmarks (AUD) per route-class. Used as the denominator for CPP.
- * Conservative midpoints from public flight-fare data; refined per route over time.
- * Format: "FROM-TO" with city codes. Falls back to a regional default.
+ * ONE-WAY cash fare benchmarks (AUD) per route-cabin, used as the CPP
+ * denominator. Award seats are one-way, so the comparison fare must be too.
+ * Curated routes first; anything else is modeled from great-circle distance;
+ * regional defaults only when an airport is unknown.
  */
 const FARE_AUD: Record<string, Partial<Record<Cabin, number>>> = {
   // Trans-Pacific
-  "SYD-LAX": { economy: 1800, premium: 3800, business: 9500, first: 18000 },
-  "SYD-SFO": { economy: 1900, premium: 4000, business: 9800, first: 18500 },
-  "SYD-JFK": { economy: 2400, premium: 5200, business: 12000, first: 22000 },
+  "SYD-LAX": { economy: 1100, premium: 2200, business: 5200, first: 9800 },
+  "SYD-SFO": { economy: 1150, premium: 2300, business: 5400, first: 10000 },
+  "SYD-JFK": { economy: 1400, premium: 2900, business: 6800, first: 12500 },
   // Asia
-  "SYD-SIN": { economy: 1100, premium: 2200, business: 5800, first: 11000 },
-  "SYD-HKG": { economy: 1300, premium: 2600, business: 6500, first: 12500 },
-  "SYD-NRT": { economy: 1500, premium: 3000, business: 7000, first: 13500 },
-  "SYD-HND": { economy: 1500, premium: 3000, business: 7000, first: 13500 },
+  "SYD-SIN": { economy: 600, premium: 1200, business: 3200, first: 6000 },
+  "SYD-HKG": { economy: 700, premium: 1500, business: 3600, first: 7000 },
+  "SYD-NRT": { economy: 850, premium: 1700, business: 3900, first: 7500 },
+  "SYD-HND": { economy: 850, premium: 1700, business: 3900, first: 7500 },
+  "SYD-DPS": { economy: 550, premium: 1000, business: 1650, first: 3200 },
   // India
-  "SYD-BOM": { economy: 1700, premium: 3400, business: 7800, first: 14500 },
-  "SYD-DEL": { economy: 1700, premium: 3400, business: 7800, first: 14500 },
-  "SYD-HYD": { economy: 1800, premium: 3600, business: 8000, first: 15000 },
-  "SYD-BLR": { economy: 1700, premium: 3400, business: 7800, first: 14500 },
+  "SYD-BOM": { economy: 950, premium: 1900, business: 4300, first: 8000 },
+  "SYD-DEL": { economy: 950, premium: 1900, business: 4300, first: 8000 },
+  "SYD-HYD": { economy: 1000, premium: 2000, business: 4400, first: 8200 },
+  "SYD-BLR": { economy: 950, premium: 1900, business: 4300, first: 8000 },
   // Europe
-  "SYD-LHR": { economy: 2400, premium: 5400, business: 12500, first: 24000 },
-  "SYD-CDG": { economy: 2400, premium: 5400, business: 12500, first: 24000 },
-  "SYD-FRA": { economy: 2300, premium: 5200, business: 12000, first: 23000 },
+  "SYD-LHR": { economy: 1350, premium: 2900, business: 6800, first: 13000 },
+  "SYD-CDG": { economy: 1350, premium: 2900, business: 6800, first: 13000 },
+  "SYD-FRA": { economy: 1300, premium: 2800, business: 6500, first: 12500 },
   // Middle East
-  "SYD-DXB": { economy: 2100, premium: 4200, business: 9500, first: 18000 },
+  "SYD-DXB": { economy: 1200, premium: 2400, business: 5300, first: 10000 },
 };
 
+// Last-resort defaults when an airport has no coordinates on file (one-way).
 const REGION_DEFAULTS_AUD: Record<string, Partial<Record<Cabin, number>>> = {
-  short:  { economy: 600,  premium: 1200, business: 2800, first: 5500 },
-  medium: { economy: 1500, premium: 3000, business: 7000, first: 13500 },
-  long:   { economy: 2300, premium: 5000, business: 11500, first: 22000 },
+  short:  { economy: 350, premium: 700, business: 1600, first: 3000 },
+  medium: { economy: 850, premium: 1700, business: 3900, first: 7500 },
+  long:   { economy: 1300, premium: 2800, business: 6500, first: 12500 },
 };
 
 function regionFor(from: string, to: string): keyof typeof REGION_DEFAULTS_AUD {
-  // Crude classification fallback
   const aussie = ["SYD", "MEL", "BNE", "PER", "ADL"];
   const isAU = aussie.includes(from) || aussie.includes(to);
   if (!isAU) return "medium";
@@ -44,11 +46,75 @@ function regionFor(from: string, to: string): keyof typeof REGION_DEFAULTS_AUD {
   return "medium";
 }
 
+/** [lat, lon] for fare modeling. Unknown airports fall back to region defaults. */
+const AIRPORT_COORDS: Record<string, [number, number]> = {
+  // Australia / NZ / Pacific
+  SYD: [-33.95, 151.18], MEL: [-37.67, 144.84], BNE: [-27.38, 153.12], PER: [-31.94, 115.97],
+  ADL: [-34.95, 138.53], OOL: [-28.16, 153.50], CNS: [-16.88, 145.75], DRW: [-12.41, 130.88],
+  HBA: [-42.84, 147.51], CBR: [-35.31, 149.19], AKL: [-37.01, 174.79], CHC: [-43.49, 172.53],
+  WLG: [-41.33, 174.81], ZQN: [-45.02, 168.74], NAN: [-17.76, 177.44],
+  // Asia
+  DPS: [-8.75, 115.17], CGK: [-6.13, 106.66], SIN: [1.36, 103.99], KUL: [2.75, 101.71],
+  BKK: [13.69, 100.75], HKT: [8.11, 98.32], HKG: [22.31, 113.91], TPE: [25.08, 121.23],
+  MNL: [14.51, 121.02], NRT: [35.77, 140.39], HND: [35.55, 139.78], KIX: [34.43, 135.24],
+  ICN: [37.46, 126.44], PVG: [31.14, 121.81], PEK: [40.08, 116.58], CAN: [23.39, 113.30],
+  SGN: [10.82, 106.65], HAN: [21.21, 105.80], PNH: [11.55, 104.84],
+  DEL: [28.57, 77.10], BOM: [19.09, 72.87], BLR: [13.20, 77.71], HYD: [17.24, 78.43],
+  MAA: [12.99, 80.17], CMB: [7.18, 79.88], KTM: [27.70, 85.36], MLE: [4.19, 73.53],
+  // Middle East
+  DXB: [25.25, 55.36], AUH: [24.43, 54.65], DOH: [25.27, 51.61], JED: [21.68, 39.16],
+  RUH: [24.96, 46.70],
+  // Europe
+  LHR: [51.47, -0.45], LGW: [51.15, -0.19], CDG: [49.01, 2.55], FRA: [50.03, 8.56],
+  MUC: [48.35, 11.79], AMS: [52.31, 4.76], ZRH: [47.46, 8.55], VIE: [48.11, 16.57],
+  FCO: [41.80, 12.25], MAD: [40.47, -3.56], BCN: [41.30, 2.08], IST: [41.28, 28.75],
+  ATH: [37.94, 23.94], DUB: [53.42, -6.27], MAN: [53.35, -2.28], HEL: [60.32, 24.96],
+  ARN: [59.65, 17.92], CPH: [55.62, 12.66], OSL: [60.19, 11.10],
+  // Americas
+  LAX: [33.94, -118.41], SFO: [37.62, -122.38], SEA: [47.45, -122.31], YVR: [49.19, -123.18],
+  YYZ: [43.68, -79.63], JFK: [40.64, -73.78], EWR: [40.69, -74.17], BOS: [42.36, -71.01],
+  ORD: [41.97, -87.91], DFW: [32.90, -97.04], IAH: [29.98, -95.34], MIA: [25.79, -80.29],
+  ATL: [33.64, -84.43], DEN: [39.86, -104.67], LAS: [36.08, -115.15], HNL: [21.32, -157.92],
+  MEX: [19.44, -99.07], GRU: [-23.43, -46.47], EZE: [-34.82, -58.54], SCL: [-33.39, -70.79],
+  LIM: [-12.02, -77.11], BOG: [4.70, -74.14],
+  // Africa
+  JNB: [-26.14, 28.25], CPT: [-33.96, 18.60], NBO: [-1.32, 36.93], CAI: [30.12, 31.41],
+};
+
+function distanceKm(a: [number, number], b: [number, number]): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b[0] - a[0]);
+  const dLon = toRad(b[1] - a[1]);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a[0])) * Math.cos(toRad(b[0])) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+const CABIN_FARE_MULT: Record<Cabin, number> = {
+  economy: 1,
+  premium: 1.95,
+  business: 2.9,
+  first: 4.8,
+};
+
+/** Distance-based one-way fare model: base fee + tiered per-km rate. */
+function modeledFareAud(from: string, to: string, cabin: Cabin): number | undefined {
+  const a = AIRPORT_COORDS[from];
+  const b = AIRPORT_COORDS[to];
+  if (!a || !b) return undefined;
+  const km = distanceKm(a, b);
+  const economy = 80 + Math.min(km, 1500) * 0.16 + Math.max(0, km - 1500) * 0.105;
+  return Math.round((economy * CABIN_FARE_MULT[cabin]) / 10) * 10;
+}
+
 export function fareEstimateAud(from: string, to: string, cabin: Cabin): number {
   const direct = FARE_AUD[`${from}-${to}`]?.[cabin];
   const reverse = FARE_AUD[`${to}-${from}`]?.[cabin];
+  const modeled = modeledFareAud(from, to, cabin);
   const region = REGION_DEFAULTS_AUD[regionFor(from, to)][cabin];
-  return direct ?? reverse ?? region ?? 2000;
+  return direct ?? reverse ?? modeled ?? region ?? 1200;
 }
 
 /** Routes with curated fare benchmarks (drives the /awards landing pages). */

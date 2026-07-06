@@ -111,7 +111,7 @@ function AwardRoutePage() {
                   {fmtAud(fareEstimateAud(from, to, c.value))}
                 </div>
                 <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mt-1">
-                  return-trip benchmark
+                  one-way benchmark
                 </div>
               </div>
             ))}
