@@ -27,7 +27,7 @@ export function ValueProps() {
   return (
     <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
       <div className="max-w-2xl mb-12">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Why Aureum</span>
+        <span className="text-xs uppercase tracking-widest text-gold">Why Aureum</span>
         <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
           Your points are worth <span className="text-gold-gradient">more</span> than you think.
         </h2>
@@ -89,7 +89,7 @@ export function Testimonials() {
     <section className="border-y border-border/60 bg-card/30">
       <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
         <div className="max-w-2xl mb-12">
-          <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Members</span>
+          <span className="text-xs uppercase tracking-widest text-gold">Members</span>
           <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
             Seats other people couldn't find.
           </h2>
@@ -106,7 +106,7 @@ export function Testimonials() {
               </blockquote>
               <figcaption className="mt-5 pt-5 border-t border-border/60">
                 <div className="font-display text-sm">{t.name}</div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
                   {t.detail}
                 </div>
               </figcaption>
@@ -152,7 +152,7 @@ export function FAQ({ limit }: { limit?: number }) {
   return (
     <section className="mx-auto max-w-4xl px-6 py-20 md:py-28">
       <div className="text-center mb-12">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-gold">FAQ</span>
+        <span className="text-xs uppercase tracking-widest text-gold">FAQ</span>
         <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
           Questions, answered.
         </h2>
@@ -191,7 +191,7 @@ export function FAQ({ limit }: { limit?: number }) {
         <div className="text-center mt-10">
           <Link
             to="/faq"
-            className="text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition inline-block"
+            className="text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition inline-block"
           >
             See all questions
           </Link>
@@ -206,7 +206,7 @@ export function ConciergeCTA() {
     <section className="mx-auto max-w-7xl px-6 pb-20 md:pb-28">
       <div className="relative overflow-hidden rounded-3xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-16">
         <div className="max-w-2xl">
-          <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Aureum Plus</span>
+          <span className="text-xs uppercase tracking-widest text-gold">Aureum Plus</span>
           <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
             Hand the search to us.
           </h2>
@@ -217,13 +217,13 @@ export function ConciergeCTA() {
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               to="/book"
-              className="text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+              className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
             >
               Submit a request
             </Link>
             <Link
               to="/pricing"
-              className="text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+              className="text-xs uppercase tracking-widest px-6 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
             >
               See pricing
             </Link>

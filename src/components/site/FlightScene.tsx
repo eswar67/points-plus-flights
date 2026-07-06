@@ -23,7 +23,7 @@ export function FlightScene() {
       <svg
         viewBox="0 0 1200 340"
         preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-x-0 top-0 w-full h-[65%] opacity-70"
+        className="absolute inset-x-0 top-0 w-full h-[65%] opacity-40"
       >
         {/* Nav stars */}
         {STARS.map((s, i) => (
@@ -69,14 +69,14 @@ export function FlightScene() {
           style={{
             offsetPath: `path('${ARC}')`,
             offsetRotate: "auto",
-            animation: "hero-flight 14s linear infinite",
+            animation: "hero-flight 22s linear infinite",
           }}
         >
           <path
             d="M 0 0 L 14 4.5 L 0 9 L 3.5 4.5 Z"
             transform="translate(-7,-4.5)"
             fill="var(--gold-soft)"
-            style={{ filter: "drop-shadow(0 0 5px rgba(201,168,76,0.9))" }}
+            style={{ filter: "drop-shadow(0 0 3px rgba(201,168,76,0.45))" }}
           />
         </g>
       </svg>

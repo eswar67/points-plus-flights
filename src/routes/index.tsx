@@ -146,14 +146,14 @@ function Index() {
             className="w-full h-full object-cover opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
           {/* Ambient gold glow */}
-          <div className="absolute -top-24 right-[8%] size-96 rounded-full bg-gold/10 blur-3xl animate-float-slow" aria-hidden="true" />
-          <div className="absolute top-1/2 -left-24 size-72 rounded-full bg-gold/[0.06] blur-3xl animate-float-slow [animation-delay:-4.5s]" aria-hidden="true" />
+          <div className="absolute -top-24 right-[8%] size-96 rounded-full bg-gold/[0.05] blur-3xl animate-float-slow" aria-hidden="true" />
+          <div className="absolute top-1/2 -left-24 size-72 rounded-full bg-gold/[0.03] blur-3xl animate-float-slow [animation-delay:-4.5s]" aria-hidden="true" />
           <FlightScene />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 pt-20 pb-12 md:pt-32 md:pb-20">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-gold mb-6">
+            <span className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground mb-6">
               <span className="size-1 rounded-full bg-gold" /> Award space, continuously refreshed
             </span>
             <h1 className="font-display text-5xl md:text-7xl font-semibold tracking-tight leading-[1.02]">
@@ -203,7 +203,7 @@ function Index() {
                 </p>
               </div>
               {result && (
-                <div className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                <div className="hidden md:flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
                   <span className={`size-1.5 rounded-full ${result.source === "seats.aero" ? "bg-emerald-400" : "bg-gold"}`} />
                   Source: {result.source}
                 </div>
@@ -216,7 +216,7 @@ function Index() {
               </div>
             )}
             {result?.warning && !error && (
-              <div className="mb-4 rounded-lg border border-gold/30 bg-gold/5 text-gold p-4 text-xs uppercase tracking-[0.18em]">
+              <div className="mb-4 rounded-lg border border-gold/30 bg-gold/5 text-gold p-4 text-xs uppercase tracking-widest">
                 {result.warning}
               </div>
             )}
@@ -259,7 +259,7 @@ function Index() {
                   {visibleDates.map((d) => (
                     <div key={d}>
                       {multiDate && !selectedDate && (
-                        <h3 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-3">
+                        <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
                           {new Date(d + "T00:00:00").toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" })}
                         </h3>
                       )}
@@ -306,7 +306,7 @@ function DateChip({ active, onClick, label }: { active: boolean; onClick: () => 
       role="tab"
       aria-selected={active}
       onClick={onClick}
-      className={`shrink-0 text-[11px] uppercase tracking-[0.15em] px-3.5 py-2 rounded-full border transition whitespace-nowrap ${
+      className={`shrink-0 text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
         active
           ? "bg-gold/15 text-gold border-gold/50"
           : "border-border text-muted-foreground hover:text-foreground hover:border-gold/40"
@@ -320,8 +320,8 @@ function DateChip({ active, onClick, label }: { active: boolean; onClick: () => 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-border/60 bg-card/40 backdrop-blur px-4 py-3">
-      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
-      <div className="font-display text-xl mt-1">{value}</div>
+      <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="font-display text-2xl mt-1 tabular-nums">{value}</div>
     </div>
   );
 }
@@ -342,7 +342,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
   if (!user) {
     return (
       <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-14 text-center">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Your points portfolio</span>
+        <span className="text-xs uppercase tracking-widest text-gold">Your points portfolio</span>
         <h2 className="font-display text-3xl md:text-4xl mt-3">
           Track every program in <span className="text-gold-gradient">one place</span>.
         </h2>
@@ -352,7 +352,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
         </p>
         <Link
           to="/auth"
-          className="inline-block mt-7 text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+          className="inline-block mt-7 text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
         >
           Sign in to start
         </Link>
@@ -364,7 +364,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
     <div>
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
-          <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Your portfolio</span>
+          <span className="text-xs uppercase tracking-widest text-gold">Your portfolio</span>
           <h2 className="font-display text-3xl mt-2">Your points, valued in AUD.</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Add or update balances on the Account page — values are benchmark estimates per
@@ -373,7 +373,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
         </div>
         <Link
           to="/account"
-          className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
+          className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
         >
           + Add / edit balances
         </Link>
@@ -388,7 +388,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
           </p>
           <Link
             to="/account"
-            className="inline-block mt-5 text-xs uppercase tracking-[0.25em] px-5 py-2.5 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+            className="inline-block mt-5 text-xs uppercase tracking-widest px-5 py-2.5 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
           >
             Add your first program
           </Link>
@@ -398,7 +398,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
           <div className="rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-8 md:p-10 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">
                   Total points held
                 </div>
                 <div className="font-display text-4xl mt-2">
@@ -406,18 +406,18 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
                 </div>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">
                   Estimated value
                 </div>
                 <div className="font-display text-4xl mt-2 text-gold-gradient">
                   {fmtAud(totalValueAud)}
                 </div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
                   at premium-cabin rates
                 </div>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">
                   Programs tracked
                 </div>
                 <div className="font-display text-4xl mt-2">{balances.length}</div>
@@ -436,7 +436,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
                 >
                   <div className="flex items-start justify-between mb-5">
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                      <div className="text-xs uppercase tracking-widest text-muted-foreground">
                         {p?.alliance ?? "Loyalty program"}
                       </div>
                       <div className="font-display text-lg mt-1">{b.program_name}</div>
@@ -455,13 +455,13 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
                   <div className="font-display text-3xl text-gold-gradient">
                     {b.balance.toLocaleString()}
                   </div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
                     points{p ? ` · ≈ ${fmtAud((b.balance * p.valueAudCents) / 100)}` : ""}
                   </div>
                   <div className="mt-5 flex items-center justify-end">
                     <Link
                       to="/account"
-                      className="text-xs uppercase tracking-[0.18em] text-gold hover:underline"
+                      className="text-xs uppercase tracking-widest text-gold hover:underline"
                     >
                       Edit
                     </Link>

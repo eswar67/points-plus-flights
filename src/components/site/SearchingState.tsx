@@ -62,7 +62,7 @@ export function SearchingState({ from, to }: { from: string; to: string }) {
         <div className="mt-6 flex items-center justify-between">
           <div className="font-display text-xl tracking-wider">{from}</div>
           <div className="text-center" aria-live="polite">
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">
               Scanning award space
             </div>
             <div className="mt-1 text-sm text-gold flex items-center justify-center gap-2">

@@ -25,7 +25,7 @@ function HowItWorks() {
     <div className="min-h-screen bg-noir">
       <Header />
       <section className="mx-auto max-w-7xl px-6 pt-20 pb-12">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-gold">How it works</span>
+        <span className="text-xs uppercase tracking-widest text-gold">How it works</span>
         <h1 className="font-display text-5xl md:text-6xl mt-4 max-w-3xl">
           From points to <span className="text-gold-gradient">premium cabin</span>, in three steps.
         </h1>

@@ -84,7 +84,7 @@ export function MonthHeatmap({
 
       <div className="grid grid-cols-7 gap-1.5 text-center mb-1.5">
         {WEEKDAYS.map((w) => (
-          <div key={w} className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground py-1">
+          <div key={w} className="text-xs uppercase tracking-widest text-muted-foreground py-1">
             {w}
           </div>
         ))}
@@ -117,7 +117,7 @@ export function MonthHeatmap({
             >
               <span className="leading-tight">
                 <span className="block text-xs text-foreground">{cell.day}</span>
-                <span className={`block text-[9px] font-mono ${GRADE_TEXT[summary.grade]}`}>
+                <span className={`block text-xs font-mono ${GRADE_TEXT[summary.grade]}`}>
                   {summary.cpp.toFixed(1)}¢
                 </span>
               </span>
@@ -126,7 +126,7 @@ export function MonthHeatmap({
         })}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-4 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="mt-4 flex flex-wrap items-center gap-4 text-xs uppercase tracking-widest text-muted-foreground">
         <Legend className="bg-emerald-500/40" label="Exceptional" />
         <Legend className="bg-gold/50" label="Great" />
         <Legend className="bg-muted" label="Fair" />

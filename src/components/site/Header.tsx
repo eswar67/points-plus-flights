@@ -44,13 +44,13 @@ export function Header() {
             <div className="hidden md:flex items-center gap-2">
               <Link
                 to="/account"
-                className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
               >
                 Account
               </Link>
               <button
                 onClick={async () => { await signOut(); nav({ to: "/" }); }}
-                className="text-xs uppercase tracking-[0.2em] px-3 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
+                className="text-xs uppercase tracking-widest px-3 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
               >
                 Sign out
               </button>
@@ -58,7 +58,7 @@ export function Header() {
           ) : (
             <Link
               to="/auth"
-              className="hidden md:inline-block text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
+              className="hidden md:inline-block text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
             >
               Sign in
             </Link>
@@ -96,13 +96,13 @@ export function Header() {
                 <Link
                   to="/account"
                   onClick={() => setOpen(false)}
-                  className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
+                  className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
                 >
                   Account
                 </Link>
                 <button
                   onClick={async () => { setOpen(false); await signOut(); nav({ to: "/" }); }}
-                  className="text-xs uppercase tracking-[0.2em] px-3 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
+                  className="text-xs uppercase tracking-widest px-3 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
                 >
                   Sign out
                 </button>
@@ -111,7 +111,7 @@ export function Header() {
               <Link
                 to="/auth"
                 onClick={() => setOpen(false)}
-                className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
               >
                 Sign in
               </Link>

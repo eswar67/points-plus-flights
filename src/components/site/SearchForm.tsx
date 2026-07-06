@@ -77,15 +77,14 @@ export function SearchForm({
             onChange={(e) => setPax(Math.min(9, Math.max(1, Number(e.target.value) || 1)))}
             className="w-full bg-transparent text-sm text-foreground outline-none" />
         </Field>
-        <button type="submit"
-          className="rounded-xl px-6 py-4 font-display font-semibold text-sm tracking-wide text-gold-foreground bg-gradient-to-br from-gold-soft to-gold shadow-gold hover:opacity-95 transition">
-          Search Awards
+        <button type="submit" className="btn btn-primary rounded-xl px-8 font-semibold shadow-gold">
+          Search awards
         </button>
       </div>
 
       {/* Date flexibility */}
       <div className="mt-2 flex items-center gap-1.5 px-1" role="radiogroup" aria-label="Date flexibility">
-        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mr-2">Dates</span>
+        <span className="text-xs uppercase tracking-widest text-muted-foreground mr-2">Dates</span>
         {MODES.map((m) => (
           <button
             key={m.value}
@@ -93,7 +92,7 @@ export function SearchForm({
             role="radio"
             aria-checked={mode === m.value}
             onClick={() => setMode(m.value)}
-            className={`text-[10px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border transition ${
+            className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
               mode === m.value
                 ? "bg-gold/15 text-gold border-gold/50"
                 : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
@@ -110,7 +109,7 @@ export function SearchForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="rounded-xl bg-background/40 hover:bg-background/60 transition px-4 py-3 flex flex-col gap-1 border border-transparent hover:border-border">
-      <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</span>
+      <span className="text-xs uppercase tracking-widest text-muted-foreground">{label}</span>
       {children}
     </label>
   );

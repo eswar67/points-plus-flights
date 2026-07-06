@@ -115,16 +115,16 @@ function AccountPage() {
             <h1 className="font-display text-3xl">Your account</h1>
             <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
           </div>
-          <Link to="/watchlists" className="text-xs uppercase tracking-[0.2em] text-gold hover:underline">
+          <Link to="/watchlists" className="text-xs uppercase tracking-widest text-gold hover:underline">
             Watchlists →
           </Link>
         </div>
 
         <form onSubmit={onSave} className="mt-10 space-y-10">
           <section>
-            <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Profile</h2>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Profile</h2>
             <div className="mt-4">
-              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Display name</label>
+              <label className="text-xs uppercase tracking-widest text-muted-foreground">Display name</label>
               <input
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
@@ -135,7 +135,7 @@ function AccountPage() {
           </section>
 
           <section>
-            <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Your points balances</h2>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Your points balances</h2>
             <p className="text-sm text-muted-foreground mt-2">
               Add the loyalty programs you hold and how many points you have. We'll value the
               total in AUD on your homepage and use it to rank award deals.
@@ -146,7 +146,7 @@ function AccountPage() {
           </section>
 
           <section>
-            <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Telegram alerts</h2>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Telegram alerts</h2>
             <p className="text-sm text-muted-foreground mt-2">
               Paste your Telegram chat ID to receive alerts when watchlists hit. Get yours by messaging @userinfobot on Telegram.
             </p>
@@ -173,15 +173,15 @@ function AccountPage() {
                     setTesting(false);
                   }
                 }}
-                className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-50"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-50"
               >
                 {testing ? "Sending…" : "Send test alert"}
               </button>
               {!profile?.telegram_chat_id && (
-                <span className="text-[11px] text-muted-foreground">Save your chat ID first to enable test.</span>
+                <span className="text-xs text-muted-foreground">Save your chat ID first to enable test.</span>
               )}
               {testMsg && (
-                <span className={`text-[11px] ${testMsg.kind === "ok" ? "text-gold" : "text-destructive"}`}>
+                <span className={`text-xs ${testMsg.kind === "ok" ? "text-gold" : "text-destructive"}`}>
                   {testMsg.text}
                 </span>
               )}
@@ -194,7 +194,7 @@ function AccountPage() {
             <button
               type="submit"
               disabled={saving}
-              className="text-xs uppercase tracking-[0.18em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+              className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
             >
               {saving ? "Saving…" : "Save changes"}
             </button>
@@ -263,10 +263,10 @@ function AdminCronSecretSection() {
   return (
     <section className="mt-16 pt-10 border-t border-border">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+        <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
           Admin · CRON secret
         </h2>
-        <span className="text-[10px] uppercase tracking-[0.2em] text-gold/70">Admin only</span>
+        <span className="text-xs uppercase tracking-widest text-gold/70">Admin only</span>
       </div>
       <p className="text-sm text-muted-foreground mt-2 max-w-prose">
         Rotates the shared secret used by the scheduled poller to authenticate against{" "}
@@ -293,7 +293,7 @@ function AdminCronSecretSection() {
               type="button"
               onClick={() => setConfirming(true)}
               disabled={loading}
-              className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-50"
+              className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-50"
             >
               Rotate CRON_SECRET
             </button>
@@ -306,7 +306,7 @@ function AdminCronSecretSection() {
                 type="button"
                 onClick={doRotate}
                 disabled={working}
-                className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
               >
                 {working ? "Rotating…" : "Yes, rotate"}
               </button>
@@ -314,7 +314,7 @@ function AdminCronSecretSection() {
                 type="button"
                 onClick={() => setConfirming(false)}
                 disabled={working}
-                className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-muted-foreground hover:text-foreground transition"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-muted-foreground hover:text-foreground transition"
               >
                 Cancel
               </button>
@@ -325,7 +325,7 @@ function AdminCronSecretSection() {
 
       {revealed && (
         <div className="mt-6 rounded-lg border border-gold/40 bg-gold/5 p-5">
-          <div className="text-[10px] uppercase tracking-[0.2em] text-gold">
+          <div className="text-xs uppercase tracking-widest text-gold">
             New secret — shown once
           </div>
           <div className="mt-3 font-mono text-xs break-all bg-background border border-border rounded p-3">
@@ -335,14 +335,14 @@ function AdminCronSecretSection() {
             <button
               type="button"
               onClick={copy}
-              className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+              className="text-xs uppercase tracking-widest px-4 py-2 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
             >
               {copied ? "Copied ✓" : "Copy to clipboard"}
             </button>
             <button
               type="button"
               onClick={() => setRevealed(null)}
-              className="text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-muted-foreground hover:text-foreground transition"
+              className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-muted-foreground hover:text-foreground transition"
             >
               Done
             </button>
@@ -358,7 +358,7 @@ function AdminCronSecretSection() {
               minutes). No redeploy needed.
             </li>
           </ol>
-          <p className="mt-4 text-[11px] text-destructive/80">
+          <p className="mt-4 text-xs text-destructive/80">
             Until you update the Cloud secret, runtime code that reads{" "}
             <code>process.env.CRON_SECRET</code> will be out of sync with the database.
           </p>
@@ -410,14 +410,14 @@ function AdminPollerRunsSection() {
   return (
     <section className="mt-16 pt-10 border-t border-border">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+        <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
           Admin · Poller observability
         </h2>
         <button
           type="button"
           onClick={load}
           disabled={refreshing}
-          className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition disabled:opacity-50"
+          className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition disabled:opacity-50"
         >
           {refreshing ? "Refreshing…" : "Refresh"}
         </button>
@@ -455,7 +455,7 @@ function AdminPollerRunsSection() {
 
       <div className="mt-6 rounded-xl border border-border overflow-hidden">
         <table className="w-full text-xs">
-          <thead className="bg-background/40 text-muted-foreground uppercase tracking-[0.18em] text-[10px]">
+          <thead className="bg-background/40 text-muted-foreground uppercase tracking-widest text-xs">
             <tr>
               <th className="text-left px-3 py-2">Started</th>
               <th className="text-right px-3 py-2">Watchlists</th>
@@ -484,7 +484,7 @@ function AdminPollerRunsSection() {
                   .filter(Boolean) as string[];
                 return (
                   <tr key={r.id} className="border-t border-border/60">
-                    <td className="px-3 py-2 font-mono text-[11px]">
+                    <td className="px-3 py-2 font-mono text-xs">
                       {new Date(r.started_at).toLocaleString()}
                     </td>
                     <td className="px-3 py-2 text-right">{r.processed}</td>
@@ -532,7 +532,7 @@ function Stat({
         : "text-foreground";
   return (
     <div className="rounded-xl border border-border bg-background/40 px-4 py-3">
-      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
+      <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className={`font-display text-xl mt-1 ${toneCls}`}>{value}</div>
     </div>
   );
@@ -615,7 +615,7 @@ function BalancesEditor() {
             return (
               <li key={b.id} className="flex items-center gap-3 px-4 py-3 bg-card/40">
                 <span
-                  className="size-7 shrink-0 rounded-full grid place-items-center font-display text-[10px]"
+                  className="size-7 shrink-0 rounded-full grid place-items-center font-display text-xs"
                   style={{
                     background: `${p?.accent ?? "#c9a84c"}22`,
                     color: p?.accent ?? "#c9a84c",
@@ -626,7 +626,7 @@ function BalancesEditor() {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm truncate">{b.program_name}</div>
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">
                     {p?.alliance ?? "Loyalty program"}
                   </div>
                 </div>
@@ -644,7 +644,7 @@ function BalancesEditor() {
                 <button
                   type="button"
                   onClick={() => removeBalance(b.id)}
-                  className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-destructive transition"
+                  className="text-xs uppercase tracking-widest text-muted-foreground hover:text-destructive transition"
                 >
                   Remove
                 </button>
@@ -657,7 +657,7 @@ function BalancesEditor() {
       {available.length > 0 ? (
         <form onSubmit={addBalance} className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[180px]">
-            <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">
               Program
             </label>
             <select
@@ -673,7 +673,7 @@ function BalancesEditor() {
             </select>
           </div>
           <div className="w-40">
-            <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">
               Points
             </label>
             <input
@@ -687,7 +687,7 @@ function BalancesEditor() {
           <button
             type="submit"
             disabled={busy}
-            className="text-[10px] uppercase tracking-[0.2em] px-4 py-2.5 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-60"
+            className="text-xs uppercase tracking-widest px-4 py-2.5 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-60"
           >
             {busy ? "Adding…" : "+ Add program"}
           </button>

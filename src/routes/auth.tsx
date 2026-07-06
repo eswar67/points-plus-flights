@@ -96,7 +96,7 @@ function AuthPage() {
           Continue with Google
         </button>
 
-        <div className="my-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        <div className="my-6 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
           <div className="flex-1 h-px bg-border" />
           or
           <div className="flex-1 h-px bg-border" />
@@ -105,7 +105,7 @@ function AuthPage() {
         <form onSubmit={onSubmit} className="space-y-4">
           {mode === "signup" && (
             <div>
-              <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Display name</label>
+              <label className="text-xs uppercase tracking-widest text-muted-foreground">Display name</label>
               <input
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
@@ -115,7 +115,7 @@ function AuthPage() {
             </div>
           )}
           <div>
-            <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Email</label>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">Email</label>
             <input
               type="email"
               required
@@ -125,7 +125,7 @@ function AuthPage() {
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Password</label>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">Password</label>
             <input
               type="password"
               required
@@ -140,7 +140,7 @@ function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full text-xs uppercase tracking-[0.18em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+            className="w-full text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
           >
             {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>

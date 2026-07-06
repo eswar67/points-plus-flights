@@ -115,7 +115,7 @@ function WatchlistsPage() {
           <button
             onClick={() => setShowForm((s) => !s)}
             disabled={!hasPlus && items.length >= 1 && !showForm}
-            className="text-xs uppercase tracking-[0.18em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {showForm ? "Close" : "+ New watchlist"}
           </button>
@@ -124,14 +124,14 @@ function WatchlistsPage() {
         {!hasPlus && items.length >= 1 && !showForm && (
           <div className="mt-6 rounded-xl border border-gold/40 bg-gold/5 p-5 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <div className="text-[10px] uppercase tracking-[0.25em] text-gold mb-1">Free plan limit</div>
+              <div className="text-xs uppercase tracking-widest text-gold mb-1">Free plan limit</div>
               <p className="text-sm text-muted-foreground">
                 You're using your one free watchlist. Upgrade to <span className="text-foreground">Aureum Plus</span> for unlimited watchlists and priority alerts.
               </p>
             </div>
             <Link
               to="/pricing"
-              className="text-xs uppercase tracking-[0.25em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold whitespace-nowrap"
+              className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold whitespace-nowrap"
             >
               Upgrade
             </Link>
@@ -163,7 +163,7 @@ function WatchlistsPage() {
                 }`}
               >
                 <div className="flex-1 min-w-[220px]">
-                  <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">
                     {w.label || "Untitled"}
                   </div>
                   <div className="mt-1 font-display text-xl">
@@ -181,7 +181,7 @@ function WatchlistsPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => toggleActive(w)}
-                    className={`text-[10px] uppercase tracking-[0.2em] px-3 py-2 rounded-full hairline transition ${
+                    className={`text-xs uppercase tracking-widest px-3 py-2 rounded-full hairline transition ${
                       w.active ? "text-gold" : "text-muted-foreground"
                     }`}
                   >
@@ -189,7 +189,7 @@ function WatchlistsPage() {
                   </button>
                   <button
                     onClick={() => remove(w)}
-                    className="text-[10px] uppercase tracking-[0.2em] px-3 py-2 rounded-full text-muted-foreground hover:text-destructive transition"
+                    className="text-xs uppercase tracking-widest px-3 py-2 rounded-full text-muted-foreground hover:text-destructive transition"
                   >
                     Delete
                   </button>
@@ -244,7 +244,7 @@ function AlertHistory({ watchlistId }: { watchlistId: string }) {
       <button
         type="button"
         onClick={toggle}
-        className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition"
+        className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition"
       >
         {open ? "▾ Hide alert history" : "▸ Show alert history"}
       </button>
@@ -300,7 +300,7 @@ function CppSparkline({ alerts }: { alerts: AlertRow[] }) {
 
   return (
     <div className="mb-4">
-      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1.5">
+      <div className="text-xs uppercase tracking-widest text-muted-foreground mb-1.5">
         Alert value over time
       </div>
       <div className="h-16">
@@ -462,14 +462,14 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
         <button
           type="submit"
           disabled={submitting}
-          className="text-xs uppercase tracking-[0.18em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+          className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
         >
           {submitting ? "Saving…" : "Create watchlist"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="text-xs uppercase tracking-[0.18em] px-4 py-3 text-muted-foreground hover:text-foreground"
+          className="text-xs uppercase tracking-widest px-4 py-3 text-muted-foreground hover:text-foreground"
         >
           Cancel
         </button>
@@ -483,7 +483,7 @@ const inputCls = "mt-1 w-full rounded-lg bg-background border border-border px-3
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</span>
+      <span className="text-xs uppercase tracking-widest text-muted-foreground">{label}</span>
       {children}
     </label>
   );

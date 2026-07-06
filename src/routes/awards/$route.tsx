@@ -54,7 +54,7 @@ function AwardRoutePage() {
           </p>
           <Link
             to="/awards"
-            className="inline-block mt-6 text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+            className="inline-block mt-6 text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
           >
             Browse all routes
           </Link>
@@ -73,7 +73,7 @@ function AwardRoutePage() {
     <div className="min-h-screen bg-noir">
       <Header />
       <main className="mx-auto max-w-5xl px-6 py-16">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Route guide</span>
+        <span className="text-xs uppercase tracking-widest text-gold">Route guide</span>
         <h1 className="font-display text-5xl md:text-6xl mt-4">
           {from} <span className="text-gold">→</span> {to}
         </h1>
@@ -87,13 +87,13 @@ function AwardRoutePage() {
           <Link
             to="/"
             search={{ from, to, cabin: "business" }}
-            className="text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
+            className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
           >
             Search award space now
           </Link>
           <Link
             to="/awards"
-            className="text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+            className="text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
           >
             All routes
           </Link>
@@ -104,13 +104,13 @@ function AwardRoutePage() {
           <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
             {CABINS.map((c) => (
               <div key={c.value} className="rounded-xl border border-border bg-card p-5">
-                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">
                   {c.label}
                 </div>
                 <div className="font-display text-2xl mt-2 text-gold-gradient">
                   {fmtAud(fareEstimateAud(from, to, c.value))}
                 </div>
-                <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mt-1">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
                   one-way benchmark
                 </div>
               </div>
@@ -126,7 +126,7 @@ function AwardRoutePage() {
           </p>
           <div className="mt-4 rounded-xl border border-border overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-background/40 text-muted-foreground uppercase tracking-[0.18em] text-[10px]">
+              <thead className="bg-background/40 text-muted-foreground uppercase tracking-widest text-xs">
                 <tr>
                   <th className="text-left px-4 py-3">Program</th>
                   <th className="text-right px-4 py-3">Business</th>
@@ -142,7 +142,7 @@ function AwardRoutePage() {
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-2">
                           <span
-                            className="size-6 rounded-full grid place-items-center font-display text-[9px]"
+                            className="size-6 rounded-full grid place-items-center font-display text-xs"
                             style={{ background: `${p.accent}22`, color: p.accent, border: `1px solid ${p.accent}55` }}
                           >
                             {p.short}
@@ -173,7 +173,7 @@ function AwardRoutePage() {
                   key={`${r.from}-${r.to}`}
                   to="/awards/$route"
                   params={{ route: `${r.from.toLowerCase()}-${r.to.toLowerCase()}` }}
-                  className="text-xs uppercase tracking-[0.18em] px-4 py-2 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/40 transition"
+                  className="text-xs uppercase tracking-widest px-4 py-2 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/40 transition"
                 >
                   {r.from} → {r.to}
                 </Link>

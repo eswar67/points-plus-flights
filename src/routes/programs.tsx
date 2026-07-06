@@ -20,7 +20,7 @@ function ProgramsPage() {
     <div className="min-h-screen bg-noir">
       <Header />
       <section className="mx-auto max-w-7xl px-6 pt-20 pb-10">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Supported programs</span>
+        <span className="text-xs uppercase tracking-widest text-gold">Supported programs</span>
         <h1 className="font-display text-5xl md:text-6xl mt-4">
           Every program. <span className="text-gold-gradient">One vault.</span>
         </h1>
@@ -34,7 +34,7 @@ function ProgramsPage() {
           <div key={p.id} className="rounded-2xl border border-border bg-card p-6 hover:border-gold/40 transition">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{p.alliance}</div>
+                <div className="text-xs uppercase tracking-widest text-muted-foreground">{p.alliance}</div>
                 <div className="font-display text-2xl mt-1">{p.name}</div>
               </div>
               <span className="size-12 rounded-xl grid place-items-center font-display text-sm"
@@ -47,7 +47,7 @@ function ProgramsPage() {
               <Info label="Value" value={`${p.valueAudCents.toFixed(1)}¢ / pt`} accent />
               <Info label="Cabins" value="All" />
             </div>
-            <a href="/account" className="mt-6 block w-full text-center rounded-xl py-3 text-xs uppercase tracking-[0.2em] hairline text-gold hover:bg-gold/10 transition">
+            <a href="/account" className="mt-6 block w-full text-center rounded-xl py-3 text-xs uppercase tracking-widest hairline text-gold hover:bg-gold/10 transition">
               Add my balance
             </a>
           </div>
@@ -61,7 +61,7 @@ function ProgramsPage() {
 function Info({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className="rounded-lg bg-background/40 border border-border/60 p-3">
-      <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{label}</div>
+      <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className={`font-display text-base mt-1 ${accent ? "text-gold" : ""}`}>{value}</div>
     </div>
   );

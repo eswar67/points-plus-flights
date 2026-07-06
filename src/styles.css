@@ -8,6 +8,9 @@
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
+  /* Single letter-spacing step for all uppercase micro-labels */
+  --tracking-widest: 0.12em;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -59,7 +62,8 @@
   --secondary-foreground: oklch(0.96 0.01 90);
 
   --muted: oklch(0.20 0 0);
-  --muted-foreground: oklch(0.62 0.01 90);
+  /* WCAG AA on noir surfaces (was 0.62 — borderline on card backgrounds) */
+  --muted-foreground: oklch(0.72 0.01 90);
 
   --accent: oklch(0.88 0.10 88);          /* soft gold #f0d78c */
   --accent-foreground: oklch(0.13 0 0);
@@ -91,6 +95,49 @@
     -webkit-font-smoothing: antialiased;
   }
   h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.02em; }
+
+  /* One focus language everywhere; components never remove it, only inherit. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* --- Buttons: 3 variants, unified states ------------------------------- */
+
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  min-height: 2.75rem; /* 44px hit target */
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+  &:active:not(:disabled) { transform: translateY(1px); }
+}
+
+@utility btn-primary {
+  background: var(--gold);
+  color: var(--gold-foreground);
+  &:hover:not(:disabled) { background: var(--gold-soft); }
+}
+
+@utility btn-ghost {
+  border: 1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+  color: var(--gold);
+  &:hover:not(:disabled) { background: color-mix(in oklab, var(--gold) 10%, transparent); }
+}
+
+@utility btn-quiet {
+  color: var(--muted-foreground);
+  &:hover:not(:disabled) { color: var(--foreground); }
 }
 
 @utility text-gold-gradient {
@@ -148,7 +195,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer-x 6s linear infinite;
+  animation: shimmer-x 11s linear infinite;
 }
 
 /* --- Flight scene (hero) --- */
@@ -166,8 +213,8 @@
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.15; }
-  50%      { opacity: 0.9; }
+  0%, 100% { opacity: 0.08; }
+  50%      { opacity: 0.45; }
 }
 
 /* --- Entrances --- */

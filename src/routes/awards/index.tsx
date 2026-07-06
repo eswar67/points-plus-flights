@@ -24,7 +24,7 @@ function AwardsIndex() {
     <div className="min-h-screen bg-noir">
       <Header />
       <main className="mx-auto max-w-7xl px-6 py-16">
-        <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Route guides</span>
+        <span className="text-xs uppercase tracking-widest text-gold">Route guides</span>
         <h1 className="font-display text-5xl md:text-6xl mt-4 max-w-3xl">
           Where do you want your <span className="text-gold-gradient">points to take you?</span>
         </h1>
@@ -52,7 +52,7 @@ function AwardsIndex() {
                     Business cash fare ≈ <span className="text-foreground">{fmtAud(business)}</span>
                   </div>
                 )}
-                <div className="mt-4 text-[10px] uppercase tracking-[0.2em] text-gold opacity-0 group-hover:opacity-100 transition">
+                <div className="mt-4 text-xs uppercase tracking-widest text-gold opacity-0 group-hover:opacity-100 transition">
                   View route guide →
                 </div>
               </Link>

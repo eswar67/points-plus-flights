@@ -10,7 +10,7 @@ export function Footer() {
           <span className="font-display text-foreground">Aureum</span>
           <span className="opacity-60">— premium award travel.</span>
         </div>
-        <nav className="flex items-center gap-5 text-xs uppercase tracking-[0.15em]">
+        <nav className="flex items-center gap-5 text-xs uppercase tracking-widest">
           <Link to="/awards" className="hover:text-gold transition">Route guides</Link>
           <Link to="/how-it-works" className="hover:text-gold transition">How it works</Link>
           <Link to="/faq" className="hover:text-gold transition">FAQ</Link>

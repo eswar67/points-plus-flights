@@ -82,7 +82,7 @@ function RequestsPage() {
           </div>
           <Link
             to="/book"
-            className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition whitespace-nowrap"
+            className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition whitespace-nowrap"
           >
             + New request
           </Link>
@@ -106,7 +106,7 @@ function RequestsPage() {
               </p>
               <Link
                 to="/book"
-                className="inline-block mt-5 text-xs uppercase tracking-[0.25em] px-5 py-2.5 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
+                className="inline-block mt-5 text-xs uppercase tracking-widest px-5 py-2.5 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
               >
                 Request a booking
               </Link>
@@ -116,7 +116,7 @@ function RequestsPage() {
               <article key={r.id} className="rounded-xl border border-border bg-card p-5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    <div className="text-xs uppercase tracking-widest text-muted-foreground">
                       {new Date(r.created_at).toLocaleString()} · ref {r.id.slice(0, 8)}
                     </div>
                     <div className="font-display text-xl mt-1">
@@ -135,13 +135,13 @@ function RequestsPage() {
                   </div>
                   <div className="text-right">
                     <span
-                      className={`inline-flex text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border ${
+                      className={`inline-flex text-xs uppercase tracking-widest px-3 py-1.5 rounded-full border ${
                         STATUS_STYLES[r.status] ?? STATUS_STYLES.new
                       }`}
                     >
                       {r.status.replace("_", " ")}
                     </span>
-                    <p className="text-[11px] text-muted-foreground mt-2 max-w-[200px]">
+                    <p className="text-xs text-muted-foreground mt-2 max-w-[200px]">
                       {STATUS_HELP[r.status] ?? ""}
                     </p>
                   </div>

@@ -86,7 +86,7 @@ function ConciergeQueue() {
           </p>
           <button
             onClick={async () => { await supabase.auth.signOut(); nav({ to: "/agent-login" }); }}
-            className="mt-8 text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+            className="mt-8 text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
           >
             Sign in as an agent
           </button>
@@ -113,7 +113,7 @@ function ConciergeQueue() {
           </div>
           <button
             onClick={async () => { await supabase.auth.signOut(); nav({ to: "/agent-login" }); }}
-            className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
+            className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
           >
             Sign out
           </button>
@@ -137,7 +137,7 @@ function ConciergeQueue() {
               <div key={r.id} className="rounded-xl border border-border bg-card p-5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    <div className="text-xs uppercase tracking-widest text-muted-foreground">
                       {new Date(r.created_at).toLocaleString()} · ref {r.id.slice(0, 8)}
                     </div>
                     <div className="font-display text-xl mt-1">
@@ -163,7 +163,7 @@ function ConciergeQueue() {
                       <button
                         key={s}
                         onClick={() => setStatus(r.id, s, r.agent_notes)}
-                        className={`text-[10px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border transition ${
+                        className={`text-xs uppercase tracking-widest px-3 py-1.5 rounded-full border transition ${
                           r.status === s
                             ? "bg-gold text-gold-foreground border-gold"
                             : "border-border text-muted-foreground hover:text-foreground hover:border-gold/40"

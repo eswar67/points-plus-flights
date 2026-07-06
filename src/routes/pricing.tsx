@@ -46,7 +46,7 @@ function PricingPage() {
       <Header />
       <main className="mx-auto max-w-5xl px-6 py-16">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-3">Membership</div>
+          <div className="text-xs uppercase tracking-widest text-gold mb-3">Membership</div>
           <h1 className="font-display text-4xl md:text-5xl tracking-tight">
             Aureum Plus.
           </h1>
@@ -62,7 +62,7 @@ function PricingPage() {
               <div className="text-sm text-muted-foreground">
                 Aureum Plus — {open === "monthly" ? "AUD $12/mo" : "AUD $120/yr"}
               </div>
-              <button onClick={() => setOpen(null)} className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground">
+              <button onClick={() => setOpen(null)} className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
                 Cancel
               </button>
             </div>
@@ -97,7 +97,7 @@ function PricingPage() {
 
         {isActive && !open && (
           <div className="text-center mt-10">
-            <Link to="/account" className="text-xs uppercase tracking-[0.2em] text-gold hover:underline">
+            <Link to="/account" className="text-xs uppercase tracking-widest text-gold hover:underline">
               Manage billing in account →
             </Link>
           </div>
@@ -117,7 +117,7 @@ function PlanCard({
     <div className={`rounded-2xl border p-8 ${highlight ? "border-gold/60 bg-gold/5" : "border-border bg-card"}`}>
       <div className="flex items-baseline justify-between">
         <h3 className="font-display text-xl">{title}</h3>
-        {badge && <span className="text-[10px] uppercase tracking-[0.2em] text-gold">{badge}</span>}
+        {badge && <span className="text-xs uppercase tracking-widest text-gold">{badge}</span>}
       </div>
       <div className="mt-4">
         <span className="font-display text-4xl">{price}</span>
@@ -134,7 +134,7 @@ function PlanCard({
       <button
         onClick={onClick}
         disabled={disabled}
-        className={`mt-8 w-full text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full transition disabled:opacity-50 ${
+        className={`mt-8 w-full text-xs uppercase tracking-widest px-6 py-3 rounded-full transition disabled:opacity-50 ${
           highlight
             ? "bg-gold text-gold-foreground hover:bg-gold-soft shadow-gold"
             : "border border-gold/40 text-gold hover:bg-gold/10"

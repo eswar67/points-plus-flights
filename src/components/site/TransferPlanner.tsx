@@ -26,7 +26,7 @@ export function TransferPlanner() {
   if (heldBankPrograms.length === 0) {
     return (
       <section className="mt-16 pt-10 border-t border-border">
-        <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+        <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
           Transfer planner
         </h2>
         <p className="text-sm text-muted-foreground mt-2 max-w-prose">
@@ -45,7 +45,7 @@ export function TransferPlanner() {
 
   return (
     <section className="mt-16 pt-10 border-t border-border">
-      <h2 className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+      <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
         Transfer planner
       </h2>
       <p className="text-sm text-muted-foreground mt-2 max-w-prose">
@@ -69,7 +69,7 @@ export function TransferPlanner() {
                 </span>
                 <div>
                   <div className="font-display text-lg leading-tight">{b.program_name}</div>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">
                     {b.balance.toLocaleString()} points to deploy
                   </div>
                 </div>
@@ -104,7 +104,7 @@ export function TransferPlanner() {
                           href={r.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="ml-auto inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.18em] text-gold hover:underline"
+                          className="ml-auto inline-flex items-center gap-1 text-xs uppercase tracking-widest text-gold hover:underline"
                         >
                           {r.bank} <ExternalLink className="size-3" />
                         </a>
@@ -120,7 +120,7 @@ export function TransferPlanner() {
 
       {boostedPrograms.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
+          <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
             Effective reach per program
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -132,14 +132,14 @@ export function TransferPlanner() {
                   <div className="font-display text-2xl text-gold-gradient mt-1">
                     {v.total.toLocaleString()}
                   </div>
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground mt-1">
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
                     {v.direct.toLocaleString()} held + {v.viaTransfer.toLocaleString()} via transfer
                   </div>
                 </div>
               );
             })}
           </div>
-          <p className="text-[11px] text-muted-foreground mt-3">
+          <p className="text-xs text-muted-foreground mt-3">
             Reach is per program — the same bank points can only fund one transfer.
           </p>
         </div>

@@ -95,7 +95,7 @@ function BookPage() {
       <Header />
       <main className="mx-auto max-w-3xl px-6 py-16">
         <div className="mb-10">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-3">
+          <div className="text-xs uppercase tracking-widest text-gold mb-3">
             Concierge booking
           </div>
           <h1 className="font-display text-4xl md:text-5xl tracking-tight">
@@ -110,7 +110,7 @@ function BookPage() {
 
         {gated ? (
           <div className="rounded-2xl border border-gold/40 bg-gradient-to-b from-gold/10 to-transparent p-8">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-2">
+            <div className="text-xs uppercase tracking-widest text-gold mb-2">
               Aureum Plus members only
             </div>
             <h2 className="font-display text-2xl">Concierge ticketing is a member benefit.</h2>
@@ -122,21 +122,21 @@ function BookPage() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/pricing"
-                className="text-xs uppercase tracking-[0.25em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
+                className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
               >
                 Upgrade to Aureum Plus
               </Link>
               {!user && (
                 <Link
                   to="/auth"
-                  className="text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+                  className="text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
                 >
                   Sign in
                 </Link>
               )}
               <Link
                 to="/"
-                className="text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full text-muted-foreground hover:text-foreground transition"
+                className="text-xs uppercase tracking-widest px-5 py-3 rounded-full text-muted-foreground hover:text-foreground transition"
               >
                 Back to search
               </Link>
@@ -144,7 +144,7 @@ function BookPage() {
           </div>
         ) : success ? (
           <div className="rounded-2xl border border-gold/40 bg-gold/5 p-8">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-2">
+            <div className="text-xs uppercase tracking-widest text-gold mb-2">
               Request received
             </div>
             <h2 className="font-display text-2xl">We're on it.</h2>
@@ -160,7 +160,7 @@ function BookPage() {
             <div className="mt-6 flex gap-3">
               <Link
                 to="/"
-                className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
               >
                 Back to search
               </Link>
@@ -169,7 +169,7 @@ function BookPage() {
                   setSuccess(null);
                   setForm((f) => ({ ...f, route_from: "", route_to: "", travel_date: "", notes: "" }));
                 }}
-                className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
               >
                 Submit another
               </button>
@@ -211,7 +211,7 @@ function BookPage() {
                     maxLength={4}
                     value={form.route_from}
                     onChange={(e) => set("route_from", e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
-                    className={`${inputCls} uppercase tracking-[0.2em]`}
+                    className={`${inputCls} uppercase tracking-widest`}
                     placeholder="SYD"
                   />
                 </Field>
@@ -221,7 +221,7 @@ function BookPage() {
                     maxLength={4}
                     value={form.route_to}
                     onChange={(e) => set("route_to", e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
-                    className={`${inputCls} uppercase tracking-[0.2em]`}
+                    className={`${inputCls} uppercase tracking-widest`}
                     placeholder="LHR"
                   />
                 </Field>
@@ -323,7 +323,7 @@ function BookPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft disabled:opacity-50 transition shadow-gold"
+                className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft disabled:opacity-50 transition shadow-gold"
               >
                 {submitting ? "Sending…" : "Send request"}
               </button>
@@ -341,7 +341,7 @@ const inputCls =
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
+      <span className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">
         {label}
       </span>
       {children}
