@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
+import { SkeletonRows } from "@/components/site/Skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { PROGRAMS } from "@/lib/programs";
 import { useServerFn } from "@tanstack/react-start";
@@ -101,7 +102,10 @@ function AccountPage() {
     return (
       <div className="min-h-screen bg-noir">
         <Header />
-        <main className="mx-auto max-w-3xl px-6 py-16 text-sm text-muted-foreground">Loading…</main>
+        <main className="mx-auto max-w-3xl px-6 py-16">
+          <div className="h-8 w-48 rounded-md bg-card/80 animate-pulse mb-10" />
+          <SkeletonRows rows={3} height="h-28" />
+        </main>
       </div>
     );
   }
@@ -194,7 +198,7 @@ function AccountPage() {
             <button
               type="submit"
               disabled={saving}
-              className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+              className="btn btn-primary"
             >
               {saving ? "Saving…" : "Save changes"}
             </button>
@@ -483,7 +487,7 @@ function AdminPollerRunsSection() {
                   .map((e) => e.message)
                   .filter(Boolean) as string[];
                 return (
-                  <tr key={r.id} className="border-t border-border/60">
+                  <tr key={r.id} className="border-t border-border/60 hover:bg-background/40 transition-colors tabular-nums">
                     <td className="px-3 py-2 font-mono text-xs">
                       {new Date(r.started_at).toLocaleString()}
                     </td>
@@ -603,7 +607,7 @@ function BalancesEditor() {
   return (
     <div className="space-y-5">
       {loading ? (
-        <div className="text-xs text-muted-foreground">Loading balances…</div>
+        <SkeletonRows rows={2} height="h-14" />
       ) : balances.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border px-4 py-5 text-sm text-muted-foreground">
           No balances yet. Add your first program below.

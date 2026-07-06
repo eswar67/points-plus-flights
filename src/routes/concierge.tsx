@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
+import { SkeletonRows } from "@/components/site/Skeleton";
 import { listBookingRequests, updateBookingRequest } from "@/lib/booking/agent.functions";
 
 export const Route = createFileRoute("/concierge")({
@@ -126,7 +127,7 @@ function ConciergeQueue() {
         )}
 
         {!requests ? (
-          <div className="text-muted-foreground text-sm">Loading…</div>
+          <SkeletonRows rows={4} height="h-24" />
         ) : requests.length === 0 ? (
           <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground">
             No booking requests yet.

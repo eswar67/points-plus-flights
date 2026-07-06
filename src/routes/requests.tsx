@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
+import { SkeletonRows } from "@/components/site/Skeleton";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -96,7 +97,7 @@ function RequestsPage() {
 
         <div className="mt-10 space-y-3">
           {requests === null ? (
-            <div className="text-sm text-muted-foreground">Loading…</div>
+            <SkeletonRows rows={3} height="h-28" />
           ) : requests.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-10 text-center">
               <h2 className="font-display text-xl">No requests yet.</h2>

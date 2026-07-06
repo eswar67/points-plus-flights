@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
+import { SkeletonRows } from "@/components/site/Skeleton";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
 import type { Cabin } from "@/lib/awards/types";
@@ -96,7 +97,10 @@ function WatchlistsPage() {
     return (
       <div className="min-h-screen bg-noir">
         <Header />
-        <main className="mx-auto max-w-4xl px-6 py-16 text-sm text-muted-foreground">Loading…</main>
+        <main className="mx-auto max-w-4xl px-6 py-16">
+          <div className="h-8 w-48 rounded-md bg-card/80 animate-pulse mb-10" />
+          <SkeletonRows rows={3} height="h-28" />
+        </main>
       </div>
     );
   }
@@ -115,7 +119,7 @@ function WatchlistsPage() {
           <button
             onClick={() => setShowForm((s) => !s)}
             disabled={!hasPlus && items.length >= 1 && !showForm}
-            className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            className="btn btn-primary"
           >
             {showForm ? "Close" : "+ New watchlist"}
           </button>
@@ -149,7 +153,7 @@ function WatchlistsPage() {
 
         <div className="mt-10 space-y-3">
           {loading ? (
-            <div className="text-sm text-muted-foreground">Loading watchlists…</div>
+            <SkeletonRows rows={3} height="h-28" />
           ) : items.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
               No watchlists yet. Add one above to start getting alerts.
@@ -462,14 +466,14 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
         <button
           type="submit"
           disabled={submitting}
-          className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+          className="btn btn-primary"
         >
           {submitting ? "Saving…" : "Create watchlist"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="text-xs uppercase tracking-widest px-4 py-3 text-muted-foreground hover:text-foreground"
+          className="btn btn-quiet"
         >
           Cancel
         </button>

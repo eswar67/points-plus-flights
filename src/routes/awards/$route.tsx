@@ -138,11 +138,11 @@ function AwardRoutePage() {
                   const milesFor = (cabin: Cabin) =>
                     Math.round(fareEstimateAud(from, to, cabin) * 100 / p.valueAudCents / 1000) * 1000;
                   return (
-                    <tr key={p.id} className="border-t border-border/60">
+                    <tr key={p.id} className="border-t border-border/60 hover:bg-background/40 transition-colors">
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-2">
                           <span
-                            className="size-6 rounded-full grid place-items-center font-display text-xs"
+                            className="size-7 rounded-full grid place-items-center font-display text-xs"
                             style={{ background: `${p.accent}22`, color: p.accent, border: `1px solid ${p.accent}55` }}
                           >
                             {p.short}
@@ -150,10 +150,10 @@ function AwardRoutePage() {
                           {p.name}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-xs">
+                      <td className="px-4 py-3 text-right font-mono text-xs tabular-nums">
                         ~{milesFor("business").toLocaleString()}
                       </td>
-                      <td className="px-4 py-3 text-right font-mono text-xs">
+                      <td className="px-4 py-3 text-right font-mono text-xs tabular-nums">
                         ~{milesFor("first").toLocaleString()}
                       </td>
                     </tr>

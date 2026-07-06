@@ -323,7 +323,7 @@ function BookPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft disabled:opacity-50 transition shadow-gold"
+                className="btn btn-primary shadow-gold"
               >
                 {submitting ? "Sending…" : "Send request"}
               </button>

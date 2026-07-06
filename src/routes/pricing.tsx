@@ -134,11 +134,7 @@ function PlanCard({
       <button
         onClick={onClick}
         disabled={disabled}
-        className={`mt-8 w-full text-xs uppercase tracking-widest px-6 py-3 rounded-full transition disabled:opacity-50 ${
-          highlight
-            ? "bg-gold text-gold-foreground hover:bg-gold-soft shadow-gold"
-            : "border border-gold/40 text-gold hover:bg-gold/10"
-        }`}
+        className={`mt-8 w-full ${highlight ? "btn btn-primary shadow-gold" : "btn btn-ghost"}`}
       >
         {cta}
       </button>
