@@ -80,7 +80,7 @@ export function SearchingState({ from, to }: { from: string; to: string }) {
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="h-20 rounded-xl border border-border/60 bg-background/40 animate-pulse"
+              className="h-20 rounded-xl border border-border-soft bg-background/40 animate-pulse"
               style={{ animationDelay: `${i * 180}ms` }}
             />
           ))}

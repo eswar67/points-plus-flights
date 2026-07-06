@@ -163,7 +163,7 @@ function WatchlistsPage() {
               <article
                 key={w.id}
                 className={`rounded-xl border p-5 flex flex-wrap items-center gap-4 ${
-                  w.active ? "border-border bg-background/40" : "border-border/50 bg-background/20 opacity-70"
+                  w.active ? "border-border bg-background/40" : "border-border-soft bg-background/20 opacity-70"
                 }`}
               >
                 <div className="flex-1 min-w-[220px]">
@@ -244,7 +244,7 @@ function AlertHistory({ watchlistId }: { watchlistId: string }) {
   }
 
   return (
-    <div className="basis-full mt-2 pt-3 border-t border-border/40">
+    <div className="basis-full mt-2 pt-3 border-t border-border-soft">
       <button
         type="button"
         onClick={toggle}

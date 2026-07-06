@@ -2,7 +2,7 @@ import { PROGRAMS } from "@/lib/programs";
 
 export function ProgramRail() {
   return (
-    <div className="border-y border-border/60 bg-card/30">
+    <div className="border-y border-border-soft bg-card/30">
       <div className="mx-auto max-w-7xl px-6 py-5 flex items-center gap-8 overflow-x-auto">
         <span className="text-xs uppercase tracking-widest text-muted-foreground whitespace-nowrap">
           Programs we support

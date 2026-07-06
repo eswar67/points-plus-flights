@@ -31,7 +31,7 @@ function ProgramsPage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-24 grid grid-cols-1 md:grid-cols-2 gap-3">
         {PROGRAMS.map((p) => (
-          <div key={p.id} className="rounded-2xl border border-border bg-card p-6 hover:border-gold/40 transition">
+          <div key={p.id} className="rounded-2xl border border-border bg-card p-6 hover:border-border-strong transition">
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-xs uppercase tracking-widest text-muted-foreground">{p.alliance}</div>
@@ -60,7 +60,7 @@ function ProgramsPage() {
 
 function Info({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="rounded-lg bg-background/40 border border-border/60 p-3">
+    <div className="rounded-lg bg-background/40 border border-border-soft p-3">
       <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className={`font-display text-base mt-1 ${accent ? "text-gold" : ""}`}>{value}</div>
     </div>

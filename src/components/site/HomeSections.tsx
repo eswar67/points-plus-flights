@@ -23,6 +23,37 @@ const PROPS = [
   },
 ];
 
+const STRIP_STEPS = [
+  { n: "1", t: "Search once", d: "Every program, cabin and alliance in one query — with freshness badges on each seat." },
+  { n: "2", t: "See true value", d: "Cents-per-point grading against real one-way fares tells you book or skip." },
+  { n: "3", t: "Follow the playbook", d: "Transfer timing, booking links, step by step — or hand it to our concierge." },
+];
+
+export function HowItWorksStrip() {
+  return (
+    <section className="mx-auto max-w-7xl px-6 py-14 md:py-20">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {STRIP_STEPS.map((s, i) => (
+          <Reveal key={s.n} stagger={i}>
+            <Link
+              to="/how-it-works"
+              className="group flex h-full items-start gap-4 rounded-2xl border border-border bg-card/40 p-6 hover:border-border-strong transition"
+            >
+              <span className="shrink-0 size-9 rounded-full grid place-items-center font-display text-sm bg-gold/10 text-gold border border-gold/30">
+                {s.n}
+              </span>
+              <span>
+                <span className="block font-display text-lg">{s.t}</span>
+                <span className="block text-sm text-muted-foreground mt-1 leading-relaxed">{s.d}</span>
+              </span>
+            </Link>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function ValueProps() {
   return (
     <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
@@ -39,7 +70,7 @@ export function ValueProps() {
         {PROPS.map((p, i) => (
           <Reveal key={p.title} stagger={i}>
           <article
-            className="group rounded-2xl overflow-hidden border border-border bg-card hover:border-gold/40 hover:-translate-y-1 transition duration-300"
+            className="group rounded-2xl overflow-hidden border border-border bg-card hover:border-border-strong hover:-translate-y-1 transition duration-300"
           >
             <div className="aspect-[4/3] overflow-hidden">
               <img
@@ -86,7 +117,7 @@ const TESTIMONIALS = [
 
 export function Testimonials() {
   return (
-    <section className="border-y border-border/60 bg-card/30">
+    <section className="border-y border-border-soft bg-card/30">
       <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
         <div className="max-w-2xl mb-12">
           <span className="text-xs uppercase tracking-widest text-gold">Members</span>
@@ -104,7 +135,7 @@ export function Testimonials() {
               <blockquote className="text-sm text-foreground/90 leading-relaxed flex-1">
                 {t.quote}
               </blockquote>
-              <figcaption className="mt-5 pt-5 border-t border-border/60">
+              <figcaption className="mt-5 pt-5 border-t border-border-soft">
                 <div className="font-display text-sm">{t.name}</div>
                 <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
                   {t.detail}
@@ -157,7 +188,7 @@ export function FAQ({ limit }: { limit?: number }) {
           Questions, answered.
         </h2>
       </div>
-      <div className="divide-y divide-border/60 border-y border-border/60">
+      <div className="divide-y divide-border-soft border-y border-border-soft">
         {items.map((item, i) => {
           const isOpen = open === i;
           return (

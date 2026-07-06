@@ -167,7 +167,7 @@ function ConciergeQueue() {
                         className={`text-xs uppercase tracking-widest px-3 py-1.5 rounded-full border transition ${
                           r.status === s
                             ? "bg-gold text-gold-foreground border-gold"
-                            : "border-border text-muted-foreground hover:text-foreground hover:border-gold/40"
+                            : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
                         }`}
                       >
                         {s.replace("_", " ")}

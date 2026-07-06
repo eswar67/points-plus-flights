@@ -37,6 +37,9 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  /* 3-step border hierarchy: soft (dividers) / border (default) / strong (emphasis) */
+  --color-border-soft: oklch(0.25 0 0 / 0.35);
+  --color-border-strong: color-mix(in oklab, var(--gold) 30%, oklch(0.25 0 0));
   --color-input: var(--input);
   --color-ring: var(--ring);
 

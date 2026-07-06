@@ -138,7 +138,7 @@ function AwardRoutePage() {
                   const milesFor = (cabin: Cabin) =>
                     Math.round(fareEstimateAud(from, to, cabin) * 100 / p.valueAudCents / 1000) * 1000;
                   return (
-                    <tr key={p.id} className="border-t border-border/60 hover:bg-background/40 transition-colors">
+                    <tr key={p.id} className="border-t border-border-soft hover:bg-background/40 transition-colors">
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-2">
                           <span
@@ -173,7 +173,7 @@ function AwardRoutePage() {
                   key={`${r.from}-${r.to}`}
                   to="/awards/$route"
                   params={{ route: `${r.from.toLowerCase()}-${r.to.toLowerCase()}` }}
-                  className="text-xs uppercase tracking-widest px-4 py-2 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/40 transition"
+                  className="text-xs uppercase tracking-widest px-4 py-2 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-border-strong transition"
                 >
                   {r.from} → {r.to}
                 </Link>

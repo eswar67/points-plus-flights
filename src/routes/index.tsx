@@ -10,7 +10,7 @@ import { FlightScene } from "@/components/site/FlightScene";
 import { SearchingState } from "@/components/site/SearchingState";
 import { useCountUp } from "@/hooks/useCountUp";
 import { ProgramRail } from "@/components/site/ProgramRail";
-import { ValueProps, Testimonials, FAQ, ConciergeCTA } from "@/components/site/HomeSections";
+import { ValueProps, Testimonials, FAQ, ConciergeCTA, HowItWorksStrip } from "@/components/site/HomeSections";
 import { searchAwards } from "@/lib/awards/awards.functions";
 import type { AwardItinerary, Cabin, SearchResult } from "@/lib/awards/types";
 import { PROGRAMS, getProgram } from "@/lib/programs";
@@ -76,6 +76,11 @@ function Index() {
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
+  // Results toolbar (point.me-grade result controls)
+  const [sortBy, setSortBy] = useState<"value" | "points" | "seats">("value");
+  const [programFilter, setProgramFilter] = useState<Set<string> | null>(null);
+  const [nonstopOnly, setNonstopOnly] = useState(false);
+
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
   useEffect(() => {
@@ -96,6 +101,9 @@ function Index() {
     setQuery(q);
     setError(null);
     setSelectedDate(null);
+    setSortBy("value");
+    setProgramFilter(null);
+    setNonstopOnly(false);
     startTransition(async () => {
       try {
         const range = rangeFor(q);
@@ -113,10 +121,46 @@ function Index() {
   const itineraries: AwardItinerary[] = result?.itineraries ?? [];
   const ranked = rankItineraries(itineraries, byProgramId);
 
-  // Group by departure date (ranked is best-CPP-first, so each group's first
-  // entry is that day's best value).
-  const byDate = new Map<string, RankedItinerary[]>();
+  // Program facets (from unfiltered results, so counts stay stable)
+  const programFacets = new Map<string, { name: string; accent: string; count: number }>();
   for (const a of ranked) {
+    const p = getProgram(a.programId);
+    const cur = programFacets.get(a.programId) ?? {
+      name: p?.name ?? a.programName,
+      accent: p?.accent ?? "#c9a84c",
+      count: 0,
+    };
+    cur.count += 1;
+    programFacets.set(a.programId, cur);
+  }
+
+  const filtered = ranked.filter(
+    (a) =>
+      (!nonstopOnly || a.direct || a.stops === 0) &&
+      (!programFilter || programFilter.size === 0 || programFilter.has(a.programId)),
+  );
+  const sorted =
+    sortBy === "points"
+      ? [...filtered].sort((a, b) => a.miles - b.miles)
+      : sortBy === "seats"
+        ? [...filtered].sort((a, b) => b.seats - a.seats || b.cpp - a.cpp)
+        : filtered; // "value" keeps the CPP-first ranking
+
+  const minMiles = filtered.length ? Math.min(...filtered.map((a) => a.miles)) : 0;
+
+  function toggleProgram(pid: string) {
+    setProgramFilter((cur) => {
+      const next = new Set(cur ?? []);
+      if (next.has(pid)) next.delete(pid);
+      else next.add(pid);
+      return next.size === 0 ? null : next;
+    });
+  }
+
+  // Group by departure date (each group's first entry is its best by the
+  // active sort).
+  const byDate = new Map<string, RankedItinerary[]>();
+  for (const a of sorted) {
     const d = (a.depart || "").slice(0, 10);
     const list = byDate.get(d) ?? [];
     list.push(a);
@@ -190,16 +234,22 @@ function Index() {
                 <h2 className="font-display text-3xl">
                   {query.from} <span className="text-gold">→</span> {query.to}
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground mt-1 tabular-nums">
                   {pending
                     ? "Scanning award space across alliances…"
-                    : `${itineraries.length} award itineraries · ${query.cabin} · ${query.pax} pax · ${
+                    : [
+                        `${sorted.length} option${sorted.length === 1 ? "" : "s"}`,
+                        minMiles ? `from ${minMiles.toLocaleString()} pts` : null,
+                        `${programFacets.size} program${programFacets.size === 1 ? "" : "s"}`,
+                        `${query.cabin} · ${query.pax} pax`,
                         query.mode === "month"
                           ? new Date(monthStart + "T00:00:00").toLocaleDateString([], { month: "long", year: "numeric" })
                           : query.mode === "flex"
                             ? `${query.date} ± 3 days`
-                            : query.date
-                      }`}
+                            : query.date,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
                 </p>
               </div>
               {result && (
@@ -221,6 +271,70 @@ function Index() {
               </div>
             )}
 
+            {/* Results toolbar: sort, stops, program facets */}
+            {!pending && !error && query.mode !== "month" && ranked.length > 0 && (
+              <div className="mb-6 space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted-foreground mr-1">Sort</span>
+                  {([["value", "Best value"], ["points", "Fewest points"], ["seats", "Most seats"]] as const).map(
+                    ([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        aria-pressed={sortBy === key}
+                        onClick={() => setSortBy(key)}
+                        className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                          sortBy === key
+                            ? "bg-gold/15 text-gold border-gold/50"
+                            : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ),
+                  )}
+                  <button
+                    type="button"
+                    aria-pressed={nonstopOnly}
+                    onClick={() => setNonstopOnly((v) => !v)}
+                    className={`ml-auto text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                      nonstopOnly
+                        ? "bg-gold/15 text-gold border-gold/50"
+                        : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                    }`}
+                  >
+                    Nonstop only
+                  </button>
+                </div>
+                {programFacets.size > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Filter by program">
+                    {[...programFacets.entries()]
+                      .sort((a, b) => b[1].count - a[1].count)
+                      .map(([pid, f]) => {
+                        const active = programFilter?.has(pid) ?? false;
+                        return (
+                          <button
+                            key={pid}
+                            type="button"
+                            aria-pressed={active}
+                            onClick={() => toggleProgram(pid)}
+                            className={`shrink-0 inline-flex items-center gap-2 text-xs px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
+                              active
+                                ? "bg-gold/15 text-gold border-gold/50"
+                                : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                            }`}
+                          >
+                            <span className="size-1.5 rounded-full" style={{ background: f.accent }} />
+                            {f.name}
+                            <span className="opacity-60">{f.count}</span>
+                          </button>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
+            )}
+
             {pending ? (
               <SearchingState from={query.from} to={query.to} />
             ) : query.mode === "month" ? (
@@ -235,6 +349,17 @@ function Index() {
             ) : itineraries.length === 0 && !error ? (
               <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground">
                 No award space found for this route and date. Try a different cabin or nearby dates.
+              </div>
+            ) : sorted.length === 0 && !error ? (
+              <div className="rounded-xl border border-border bg-card p-10 text-center">
+                <p className="text-muted-foreground">No results match your filters.</p>
+                <button
+                  type="button"
+                  onClick={() => { setProgramFilter(null); setNonstopOnly(false); }}
+                  className="mt-4 btn btn-ghost"
+                >
+                  Clear filters
+                </button>
               </div>
             ) : (
               <>
@@ -287,6 +412,7 @@ function Index() {
 
       {!query && (
         <>
+          <HowItWorksStrip />
           <ValueProps />
           <Testimonials />
           <FAQ limit={4} />
@@ -309,7 +435,7 @@ function DateChip({ active, onClick, label }: { active: boolean; onClick: () => 
       className={`shrink-0 text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
         active
           ? "bg-gold/15 text-gold border-gold/50"
-          : "border-border text-muted-foreground hover:text-foreground hover:border-gold/40"
+          : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
       }`}
     >
       {label}
@@ -319,7 +445,7 @@ function DateChip({ active, onClick, label }: { active: boolean; onClick: () => 
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-card/40 backdrop-blur px-4 py-3">
+    <div className="rounded-xl border border-border-soft bg-card/40 backdrop-blur px-4 py-3">
       <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className="font-display text-2xl mt-1 tabular-nums">{value}</div>
     </div>
@@ -432,7 +558,7 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
               return (
                 <div
                   key={b.id}
-                  className="group rounded-xl border border-border bg-card hover:border-gold/40 transition p-5"
+                  className="group rounded-xl border border-border bg-card hover:border-border-strong transition p-5"
                 >
                   <div className="flex items-start justify-between mb-5">
                     <div>

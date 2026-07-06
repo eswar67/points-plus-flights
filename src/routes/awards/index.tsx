@@ -42,7 +42,7 @@ function AwardsIndex() {
                 key={`${from}-${to}`}
                 to="/awards/$route"
                 params={{ route: `${from.toLowerCase()}-${to.toLowerCase()}` }}
-                className="group rounded-2xl border border-border bg-card p-6 hover:border-gold/40 transition"
+                className="group rounded-2xl border border-border bg-card p-6 hover:border-border-strong transition"
               >
                 <div className="font-display text-2xl">
                   {from} <span className="text-gold">→</span> {to}

@@ -11,12 +11,31 @@ type Mode = "playbook" | "concierge" | "submitted";
 export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onClose: () => void }) {
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Dialog semantics: focus the panel on open, close on Escape, restore focus.
+  // Dialog semantics: focus on open, Escape closes, Tab cycles inside the
+  // panel (hard trap), and focus returns to the opener on close.
   useEffect(() => {
     const opener = document.activeElement as HTMLElement | null;
     panelRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !panelRef.current) return;
+      const focusables = panelRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === panelRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => {

@@ -22,6 +22,19 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+
+  function validate(): boolean {
+    const errs: { email?: string; password?: string } = {};
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      errs.email = "Enter a valid email address, e.g. jane@example.com.";
+    }
+    if (password.length < 8) {
+      errs.password = "Password must be at least 8 characters.";
+    }
+    setFieldErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
 
   // Bounce already-authenticated users to /account
   useEffect(() => {
@@ -34,6 +47,7 @@ function AuthPage() {
     e.preventDefault();
     setError(null);
     setInfo(null);
+    if (!validate()) return;
     setLoading(true);
     try {
       if (mode === "signup") {
@@ -115,32 +129,48 @@ function AuthPage() {
             </div>
           )}
           <div>
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">Email</label>
+            <label htmlFor="auth-email" className="text-xs uppercase tracking-widest text-muted-foreground">Email</label>
             <input
+              id="auth-email"
               type="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60"
+              aria-invalid={!!fieldErrors.email}
+              aria-describedby={fieldErrors.email ? "auth-email-error" : undefined}
+              onChange={(e) => { setEmail(e.target.value); setFieldErrors((f) => ({ ...f, email: undefined })); }}
+              className={`mt-1 w-full rounded-lg bg-background border px-3 py-2.5 text-sm focus:border-gold/60 ${fieldErrors.email ? "border-destructive/60" : "border-border"}`}
             />
+            {fieldErrors.email && (
+              <p id="auth-email-error" role="alert" className="mt-1.5 text-xs text-destructive">{fieldErrors.email}</p>
+            )}
           </div>
           <div>
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">Password</label>
+            <label htmlFor="auth-password" className="text-xs uppercase tracking-widest text-muted-foreground">Password</label>
             <input
+              id="auth-password"
               type="password"
               required
               minLength={8}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60"
+              aria-invalid={!!fieldErrors.password}
+              aria-describedby={fieldErrors.password ? "auth-password-error" : "auth-password-help"}
+              onChange={(e) => { setPassword(e.target.value); setFieldErrors((f) => ({ ...f, password: undefined })); }}
+              className={`mt-1 w-full rounded-lg bg-background border px-3 py-2.5 text-sm focus:border-gold/60 ${fieldErrors.password ? "border-destructive/60" : "border-border"}`}
             />
+            {fieldErrors.password ? (
+              <p id="auth-password-error" role="alert" className="mt-1.5 text-xs text-destructive">{fieldErrors.password}</p>
+            ) : (
+              mode === "signup" && (
+                <p id="auth-password-help" className="mt-1.5 text-xs text-muted-foreground">At least 8 characters.</p>
+              )
+            )}
           </div>
           {error && <div className="text-sm text-destructive">{error}</div>}
           {info && <div className="text-sm text-gold">{info}</div>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+            className="w-full btn btn-primary"
           >
             {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
           </button>

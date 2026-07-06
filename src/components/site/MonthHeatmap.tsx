@@ -6,7 +6,7 @@ export type DaySummary = { cpp: number; grade: ValueGrade; count: number };
 const GRADE_BG: Record<ValueGrade, string> = {
   exceptional: "bg-emerald-500/25 border-emerald-500/50 hover:border-emerald-400",
   great: "bg-gold/20 border-gold/50 hover:border-gold",
-  fair: "bg-muted/60 border-border hover:border-gold/40",
+  fair: "bg-muted/60 border-border hover:border-border-strong",
   skip: "bg-destructive/10 border-destructive/20 hover:border-destructive/40",
 };
 
@@ -99,7 +99,7 @@ export function MonthHeatmap({
             return (
               <div
                 key={cell.date}
-                className={`aspect-square rounded-lg border border-border/40 grid place-items-center text-xs ${
+                className={`aspect-square rounded-lg border border-border-soft grid place-items-center text-xs ${
                   past ? "opacity-30 text-muted-foreground" : "text-muted-foreground/60"
                 }`}
               >

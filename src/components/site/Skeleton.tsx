@@ -13,7 +13,7 @@ export function SkeletonRows({
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className={`${height} rounded-xl border border-border/60 bg-card/60 animate-pulse`}
+          className={`${height} rounded-xl border border-border-soft bg-card/60 animate-pulse`}
           style={{ animationDelay: `${i * 150}ms` }}
         />
       ))}

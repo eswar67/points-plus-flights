@@ -2,8 +2,8 @@ import { useState } from "react";
 import type { AwardItinerary } from "@/lib/awards/types";
 import { PROGRAMS } from "@/lib/programs";
 import { PlaybookDrawer } from "./PlaybookDrawer";
-import { calcCppAud, confidenceFor, gradeCpp, fmtCpp, fmtAud, fmtAge, fareEstimateAud, transfersFor } from "@/lib/intelligence";
-import { AlertTriangle, Plane, Sparkles, Zap } from "lucide-react";
+import { calcCppAud, confidenceFor, gradeCpp, fmtCpp, fmtAud, fmtAge, fareEstimateAud, transfersFor, effectiveBalances } from "@/lib/intelligence";
+import { AlertTriangle, Check, Plane, Sparkles, Zap } from "lucide-react";
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -47,6 +47,18 @@ export function AwardCard({
   const fastest = shortfall > 0 ? transfersFor(award.programId)[0] : undefined;
   const transferTooSlow = !!fastest && fastest.etaMin > 60 && confidence.ageMin < 30;
 
+  // Bookability against the user's tracked balances (direct + transfer reach)
+  const hasAnyBalance = Object.keys(byProgramId).length > 0;
+  const reach = hasAnyBalance ? effectiveBalances(byProgramId) : {};
+  const effective = reach[award.programId]?.total ?? balance;
+  const bookable: "direct" | "transfer" | "short" | null = !hasAnyBalance
+    ? null
+    : balance >= award.miles
+      ? "direct"
+      : effective >= award.miles
+        ? "transfer"
+        : "short";
+
   const gradeStyles: Record<typeof grade, string> = {
     exceptional: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
     great:       "bg-gold/15 text-gold border-gold/40",
@@ -71,10 +83,10 @@ export function AwardCard({
   };
 
   return (
-    <div className="group relative rounded-xl border border-border bg-card hover:border-gold/40 transition overflow-hidden">
+    <div className="group relative rounded-xl border border-border bg-card hover:border-border-strong transition overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent opacity-0 group-hover:opacity-100 transition" />
       {/* Intelligence strip */}
-      <div className="px-5 pt-3 pb-2 flex flex-wrap items-center gap-2 border-b border-border/50">
+      <div className="px-5 pt-3 pb-2 flex flex-wrap items-center gap-2 border-b border-border-soft">
         <span className={`inline-flex items-center gap-1 text-xs uppercase tracking-widest px-2.5 py-1 rounded-full border tabular-nums ${gradeStyles[grade]}`}>
           {grade === "exceptional" && <Sparkles className="size-3" />}
           {grade.toUpperCase()} · {fmtCpp(cpp)}
@@ -137,6 +149,21 @@ export function AwardCard({
             <span className="text-sm">{programName}</span>
           </div>
           <div className="text-xs text-muted-foreground mt-1">{alliance}</div>
+          {bookable === "direct" && (
+            <div className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-300">
+              <Check className="size-3" /> Covered by your balance
+            </div>
+          )}
+          {bookable === "transfer" && (
+            <div className="mt-2 inline-flex items-center gap-1 text-xs text-gold tabular-nums">
+              <Check className="size-3" /> In reach via transfer
+            </div>
+          )}
+          {bookable === "short" && (
+            <div className="mt-2 text-xs text-muted-foreground tabular-nums">
+              {(award.miles - effective).toLocaleString()} pts short
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-4 md:block md:text-right">

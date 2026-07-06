@@ -32,7 +32,7 @@ function HowItWorks() {
       </section>
       <section className="mx-auto max-w-7xl px-6 pb-24 grid grid-cols-1 md:grid-cols-3 gap-3">
         {STEPS.map((s) => (
-          <div key={s.n} className="rounded-2xl border border-border bg-card p-8 hover:border-gold/40 transition">
+          <div key={s.n} className="rounded-2xl border border-border bg-card p-8 hover:border-border-strong transition">
             <div className="font-display text-5xl text-gold-gradient">{s.n}</div>
             <h3 className="font-display text-2xl mt-6">{s.t}</h3>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{s.d}</p>

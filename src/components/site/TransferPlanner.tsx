@@ -80,7 +80,7 @@ export function TransferPlanner() {
                   No airline transfer routes on file for this currency yet.
                 </p>
               ) : (
-                <ul className="divide-y divide-border/50">
+                <ul className="divide-y divide-border-soft">
                   {routes.map((r) => {
                     const target = getProgram(r.programId);
                     const yielded = Math.floor(b.balance * ratioMultiplier(r.ratio));

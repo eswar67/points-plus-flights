@@ -487,7 +487,7 @@ function AdminPollerRunsSection() {
                   .map((e) => e.message)
                   .filter(Boolean) as string[];
                 return (
-                  <tr key={r.id} className="border-t border-border/60 hover:bg-background/40 transition-colors tabular-nums">
+                  <tr key={r.id} className="border-t border-border-soft hover:bg-background/40 transition-colors tabular-nums">
                     <td className="px-3 py-2 font-mono text-xs">
                       {new Date(r.started_at).toLocaleString()}
                     </td>
@@ -613,7 +613,7 @@ function BalancesEditor() {
           No balances yet. Add your first program below.
         </div>
       ) : (
-        <ul className="divide-y divide-border/60 border border-border rounded-lg overflow-hidden">
+        <ul className="divide-y divide-border-soft border border-border rounded-lg overflow-hidden">
           {balances.map((b) => {
             const p = PROGRAMS.find((x) => x.id === b.program_id);
             return (
