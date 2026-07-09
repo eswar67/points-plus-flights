@@ -1,27 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
-import { Header } from "@/components/site/Header";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+// Miles Expert is login-free. Any lingering /auth links bounce home.
 export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: "Sign in or sign up — Miles Expert" },
-      {
-        name: "description",
-        content:
-          "Create an Miles Expert account to save watchlists and get alerts when great award seats open.",
-      },
-    ],
-  }),
-  validateSearch: (s: Record<string, unknown>) => ({
-    redirect:
-      typeof s.redirect === "string" && /^\/[a-zA-Z0-9\-/]*$/.test(s.redirect)
-        ? s.redirect
-        : undefined,
-  }),
-  component: AuthPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/" });
+  },
+  component: () => null,
 });
 
 function AuthPage() {
