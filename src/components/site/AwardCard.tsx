@@ -37,9 +37,11 @@ function fmtTime(value: string) {
 export function AwardCard({
   award,
   balances = {},
+  reason,
 }: {
   award: AwardItinerary;
   balances?: Record<string, number>;
+  reason?: string;
 }) {
   const [open, setOpen] = useState(false);
   const byProgramId = balances;
@@ -119,6 +121,14 @@ export function AwardCard({
           {confidence.label} · {fmtAge(confidence.ageMin)}
         </span>
       </div>
+
+      {/* Why this ranks here — reflects the active sort */}
+      {reason && (
+        <div className="px-5 py-2 border-b border-border-soft text-xs text-muted-foreground">
+          <span className="text-gold/80 uppercase tracking-widest mr-2">Why</span>
+          {reason}
+        </div>
+      )}
 
       {/* Value meter */}
       <div className="h-0.5 bg-border/30" aria-hidden="true">
