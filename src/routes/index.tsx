@@ -434,7 +434,7 @@ function Index() {
                 <span className="absolute inline-flex h-full w-full rounded-full bg-gold/70 opacity-75 animate-ping" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-gold" />
               </span>
-              Australia's #1 award flight engine
+              A smarter way to find award flights from Australia
             </div>
             <h1 className="font-display text-4xl md:text-6xl font-semibold tracking-tight leading-[1.02]">
               Turn your points into{" "}
