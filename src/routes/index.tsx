@@ -355,6 +355,10 @@ function Index() {
                       ["points", "Fewest points"],
                       ["taxes", "Lowest taxes"],
                       ["seats", "Most seats"],
+                      ["duration", "Shortest"],
+                      ["stops", "Fewest stops"],
+                      ["depart", "Earliest depart"],
+                      ["fresh", "Freshest data"],
                     ] as const
                   ).map(([key, label]) => (
                     <button
