@@ -686,11 +686,37 @@ function Index() {
                       {label}
                     </button>
                   ))}
+                  <div
+                    className="ml-auto inline-flex rounded-full border border-border p-0.5"
+                    role="group"
+                    aria-label="Results view"
+                  >
+                    {(
+                      [
+                        ["cards", "Cards"],
+                        ["table", "Table"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        aria-pressed={viewMode === key}
+                        onClick={() => setViewMode(key)}
+                        className={`text-[10px] uppercase tracking-widest px-3 py-2 rounded-full transition ${
+                          viewMode === key
+                            ? "bg-gold/15 text-gold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                   <button
                     type="button"
                     aria-pressed={nonstopOnly}
                     onClick={() => setNonstopOnly((v) => !v)}
-                    className={`ml-auto text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
                       nonstopOnly
                         ? "bg-gold/15 text-gold border-gold/50"
                         : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
