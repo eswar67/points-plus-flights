@@ -8,6 +8,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
 import { AwardCard } from "@/components/site/AwardCard";
+import { AwardTable } from "@/components/site/AwardTable";
 import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
 import { FlightScene } from "@/components/site/FlightScene";
 import { SearchingState } from "@/components/site/SearchingState";
@@ -134,6 +135,7 @@ function Index() {
   const [bookableOnly, setBookableOnly] = useState(false);
   const [sweetOnly, setSweetOnly] = useState(false);
   const [hideZeroAvailability, setHideZeroAvailability] = useState(true);
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
