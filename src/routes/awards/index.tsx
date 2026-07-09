@@ -294,7 +294,9 @@ function AwardsIndex() {
           Australian Frequent Flyer. Miles and taxes are indicative — always confirm in-program before transferring.
         </p>
       </main>
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </TooltipProvider>
   );
 }
+
