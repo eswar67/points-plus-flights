@@ -12,13 +12,13 @@ const SearchSchema = z
       .string()
       .trim()
       .min(3)
-      .max(7)
+      .max(400)
       .regex(/^[A-Za-z,]+$/, "IATA codes only"),
     to: z
       .string()
       .trim()
       .min(3)
-      .max(7)
+      .max(400)
       .regex(/^[A-Za-z,]+$/, "IATA codes only"),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD"),
     dateTo: z
