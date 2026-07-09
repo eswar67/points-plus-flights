@@ -47,7 +47,7 @@ function regionFor(from: string, to: string): keyof typeof REGION_DEFAULTS_AUD {
 }
 
 /** [lat, lon] for fare modeling. Unknown airports fall back to region defaults. */
-const AIRPORT_COORDS: Record<string, [number, number]> = {
+export const AIRPORT_COORDS: Record<string, [number, number]> = {
   // Australia / NZ / Pacific
   SYD: [-33.95, 151.18],
   MEL: [-37.67, 144.84],
@@ -190,6 +190,11 @@ export function knownRoutes(): { from: string; to: string }[] {
     const [from, to] = k.split("-");
     return { from, to };
   });
+}
+
+/** True when both airports are in our supported catalog. */
+export function isKnownAirport(code: string): boolean {
+  return code.toUpperCase() in AIRPORT_COORDS;
 }
 
 /** Curated per-cabin fare benchmarks for a route, if we have them. */
