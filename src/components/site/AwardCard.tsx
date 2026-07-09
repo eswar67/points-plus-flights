@@ -117,10 +117,24 @@ export function AwardCard({
   };
 
   return (
-    <div className="group relative rounded-lg border border-border bg-card hover:border-border-strong transition overflow-hidden">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent opacity-0 group-hover:opacity-100 transition" />
+    <div
+      className={`group relative border bg-card/60 transition overflow-hidden ${
+        isSweetSpot
+          ? "border-gold shadow-[0_20px_60px_-30px_color-mix(in_oklab,var(--gold)_45%,transparent)]"
+          : "border-border-soft hover:border-gold/40"
+      }`}
+    >
+      {/* Editorial hairline sweep on hover */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent opacity-0 group-hover:opacity-100 transition" />
 
-      {/* Save (shortlist) toggle — top-right corner */}
+      {/* Editor's pick tag — only on the sweet-spot / top pick */}
+      {isSweetSpot && (
+        <div className="absolute top-0 right-0 z-10 bg-gold text-[color:var(--gold-foreground)] px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em]">
+          Editor's Best Value Pick
+        </div>
+      )}
+
+      {/* Save (shortlist) toggle — top-right, shifts left when the pick tag is present */}
       <button
         type="button"
         onClick={(e) => {
@@ -134,7 +148,9 @@ export function AwardCard({
         aria-pressed={saved}
         aria-label={saved ? "Remove from shortlist" : "Save to shortlist"}
         title={saved ? "Saved · click to remove" : "Save for later"}
-        className={`absolute top-2 right-2 z-10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-widest transition ${
+        className={`absolute top-2 z-20 inline-flex items-center gap-1.5 border px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] transition ${
+          isSweetSpot ? "right-[190px]" : "right-2"
+        } ${
           saved
             ? "border-gold/50 bg-gold/15 text-gold"
             : "border-border-soft bg-card/70 backdrop-blur text-muted-foreground hover:text-gold hover:border-gold/40"
@@ -171,7 +187,9 @@ export function AwardCard({
               ? "Comparison full (max 3) — remove one first"
               : "Add to comparison"
         }
-        className={`absolute top-2 right-[92px] z-10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-widest transition ${
+        className={`absolute top-2 z-20 inline-flex items-center gap-1.5 border px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] transition ${
+          isSweetSpot ? "right-[290px]" : "right-[92px]"
+        } ${
           compareSelected
             ? "border-gold/50 bg-gold/15 text-gold"
             : compare.full
@@ -183,112 +201,155 @@ export function AwardCard({
         {compareSelected ? "Comparing" : "Compare"}
       </button>
 
-      {/* Sweet-spot ribbon (Phase 1) */}
-      {isSweetSpot && savingsMiles && savingsMiles > 0 && (
-        <div className="px-5 pt-3 pb-1 flex items-center gap-2 border-b border-gold/20 bg-gradient-to-r from-gold/10 via-gold/5 to-transparent">
-          <Sparkles className="size-3.5 text-gold" />
-          <span className="text-xs uppercase tracking-widest text-gold font-medium">
-            Sweet spot
+      {/* Editorial masthead: program monogram + name + status */}
+      <div className={`flex items-start gap-4 ${isSweetSpot ? "px-8 pt-8" : "px-6 pt-6"}`}>
+        <div
+          className={`shrink-0 grid place-items-center rounded-full border font-semibold tracking-tight ${
+            isSweetSpot ? "size-14 text-lg" : "size-11 text-sm"
+          }`}
+          style={{
+            borderColor: "color-mix(in oklab, " + accent + " 55%, transparent)",
+            color: accent,
+            background: "color-mix(in oklab, " + accent + " 6%, transparent)",
+          }}
+          aria-hidden="true"
+        >
+          {(program?.id ?? award.programId).slice(0, 2).toUpperCase()}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className={`font-display truncate ${isSweetSpot ? "text-2xl" : "text-lg"}`}>
+            {programName}
+          </div>
+          <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-0.5 truncate">
+            {alliance} · {award.carrier}
+            {award.flightNo ? ` ${award.flightNo}` : ""}
+          </div>
+        </div>
+        <span
+          className={`inline-flex items-center gap-1.5 text-[10px] tabular-nums shrink-0 ${confStyles[confidence.label]}`}
+        >
+          <span
+            className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-live" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`}
+          />
+          <span className="uppercase tracking-[0.2em]">
+            {confidence.label} · {fmtAge(confidence.ageMin)}
           </span>
-          <span className="text-xs text-foreground/80 tabular-nums">
-            saves {savingsMiles.toLocaleString()} pts vs typical{" "}
+        </span>
+      </div>
+
+      {/* Sweet-spot savings strapline (only on featured card) */}
+      {isSweetSpot && savingsMiles && savingsMiles > 0 && (
+        <div className="px-8 mt-4 flex items-center gap-2 text-xs text-gold">
+          <Sparkles className="size-3.5" />
+          <span className="tabular-nums">
+            Saves {savingsMiles.toLocaleString()} pts vs typical{" "}
             {(baselineMiles ?? 0).toLocaleString()}
             {discountPct ? ` · ${Math.round(discountPct * 100)}% off` : ""}
           </span>
         </div>
       )}
 
-      {/* Intelligence strip */}
-      <div className="px-5 pt-3 pb-2 flex flex-wrap items-center gap-2 border-b border-border-soft">
+      {/* Grade + cash-comparison strip */}
+      <div
+        className={`flex flex-wrap items-center gap-2 mt-4 ${
+          isSweetSpot ? "px-8 pb-4" : "px-6 pb-3"
+        }`}
+      >
         <span
-          className={`inline-flex items-center gap-1 text-xs uppercase tracking-widest px-2.5 py-1 rounded-full border tabular-nums ${gradeStyles[grade]}`}
+          className={`inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.2em] px-2.5 py-1 border tabular-nums ${gradeStyles[grade]}`}
         >
           {grade === "exceptional" && <Sparkles className="size-3" />}
-          {grade.toUpperCase()} · {fmtCpp(cpp)}
+          {grade} · {fmtCpp(cpp)}
         </span>
-        <span className="text-xs text-muted-foreground tabular-nums">vs {fmtAud(fare)} cash</span>
-        <span
-          className={`inline-flex items-center gap-1 text-xs ml-auto tabular-nums ${confStyles[confidence.label]}`}
-        >
-          <span
-            className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-live" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`}
-          />
-          {confidence.label} · {fmtAge(confidence.ageMin)}
+        <span className="text-[11px] text-muted-foreground tabular-nums">
+          vs {fmtAud(fare)} cash
+        </span>
+        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/80 tabular-nums ml-auto">
+          {award.seats > 0
+            ? `${award.seats} seat${award.seats > 1 ? "s" : ""}`
+            : "Availability confirmed"}
         </span>
       </div>
 
       {/* Why this ranks here — reflects the active sort */}
       {reason && (
-        <div className="px-5 py-2 border-b border-border-soft text-xs text-muted-foreground">
-          <span className="text-gold/80 uppercase tracking-widest mr-2">Why</span>
+        <div
+          className={`py-2 border-t border-border-soft text-xs text-muted-foreground ${
+            isSweetSpot ? "px-8" : "px-6"
+          }`}
+        >
+          <span className="text-gold/80 uppercase tracking-[0.2em] mr-2">Why</span>
           {reason}
         </div>
       )}
 
-      {/* Value meter */}
-      <div className="h-0.5 bg-border/30" aria-hidden="true">
+      {/* Hairline value meter */}
+      <div className="h-px bg-border-soft" aria-hidden="true">
         <div
           className="h-full transition-[width] duration-700 ease-out"
           style={{ width: `${meterPct}%`, background: meterColor[grade], opacity: 0.85 }}
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr_auto] gap-6 p-5 items-center">
-        <div>
-          <div className="text-sm text-foreground/90">{award.carrier}</div>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            {award.flightNo || "Award seat"}
-          </div>
-          <div className="text-xs text-muted-foreground mt-1 tabular-nums">
-            {award.seats > 0
-              ? `${award.seats} seat${award.seats > 1 ? "s" : ""} remaining`
-              : "Availability confirmed"}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <div className="text-center">
-            <div className="font-display text-xl tabular-nums">{fmtTime(award.depart)}</div>
-            <div className="text-xs text-muted-foreground tracking-widest">{award.from}</div>
-          </div>
-          <div className="flex-1">
-            <div className="text-xs text-center text-muted-foreground mb-1">
-              {award.durationMin ? `${fmtDuration(award.durationMin)} · ` : ""}
-              {award.direct
-                ? "Nonstop"
-                : award.stops === 0
-                  ? "Direct"
-                  : `${award.stops} stop${award.stops > 1 ? "s" : ""}`}
+      {/* Editorial body: route timeline + tabular numerics */}
+      <div
+        className={`grid grid-cols-1 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-8 ${
+          isSweetSpot ? "px-8 py-8" : "px-6 py-6"
+        }`}
+      >
+        {/* Route timeline */}
+        <div className="min-w-0">
+          <div className="flex items-center gap-4">
+            <div className="text-left">
+              <div
+                className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}
+              >
+                {fmtTime(award.depart)}
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                {award.from}
+              </div>
             </div>
-            <div className="relative h-px bg-gradient-to-r from-border via-gold/50 to-border">
-              <span className="absolute -top-[3px] left-0 size-1.5 rounded-full bg-gold" />
-              <span className="absolute -top-[3px] right-0 size-1.5 rounded-full bg-gold" />
-              <Plane
-                className="absolute -top-[8px] size-4 text-gold rotate-45 hidden group-hover:block animate-fly"
-                aria-hidden="true"
-              />
+            <div className="flex-1 relative">
+              <div className="text-[10px] text-center text-muted-foreground/80 uppercase tracking-[0.2em] mb-2">
+                {award.durationMin ? fmtDuration(award.durationMin) : ""}
+                {award.durationMin && (award.direct || award.stops === 0 || award.stops) ? " · " : ""}
+                {award.direct
+                  ? "Nonstop"
+                  : award.stops === 0
+                    ? "Direct"
+                    : `${award.stops} stop${award.stops > 1 ? "s" : ""}`}
+              </div>
+              <div className="relative h-px bg-gradient-to-r from-gold/20 via-gold/60 to-gold/20">
+                <span className="absolute -top-[3px] left-0 size-1.5 rounded-full bg-gold" />
+                <span className="absolute -top-[3px] right-0 size-1.5 rounded-full bg-gold" />
+                <Plane
+                  className="absolute -top-[8px] size-4 text-gold rotate-45 hidden group-hover:block animate-fly"
+                  aria-hidden="true"
+                />
+              </div>
+            </div>
+            <div className="text-right">
+              <div
+                className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}
+              >
+                {fmtTime(award.arrive)}
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                {award.to}
+              </div>
             </div>
           </div>
-          <div className="text-center">
-            <div className="font-display text-xl tabular-nums">{fmtTime(award.arrive)}</div>
-            <div className="text-xs text-muted-foreground tracking-widest">{award.to}</div>
-          </div>
-        </div>
 
-        <div>
-          <div className="text-xs text-muted-foreground mb-1">Redeem with</div>
-          <div className="flex items-center gap-2">
-            <span className="size-2 rounded-full" style={{ background: accent }} />
-            <span className="text-sm">{programName}</span>
-          </div>
-          <div className="text-xs text-muted-foreground mt-1">{alliance}</div>
+          {/* Bookability line */}
+          <div className="mt-5">
           {bookable === "direct" && (
-            <div className="mt-2 inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-2.5 py-1 rounded-full border border-emerald-400/40 bg-emerald-500/15 text-emerald-300">
+            <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] px-2.5 py-1 border border-emerald-400/40 bg-emerald-500/10 text-emerald-300">
               <Check className="size-3" /> Book now
             </div>
           )}
           {bookable === "transfer" && fastest && (
-            <div className="mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-gold/40 bg-gold/10 text-gold tabular-nums">
+            <div className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 border border-gold/40 bg-gold/5 text-gold tabular-nums">
               <ArrowRightLeft className="size-3" />
               Transfer {Math.max(0, award.miles - balance).toLocaleString()} from{" "}
               {fastest.bank}
@@ -298,29 +359,64 @@ export function AwardCard({
             </div>
           )}
           {bookable === "short" && (
-            <div className="mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-border bg-muted/40 text-muted-foreground tabular-nums">
+            <div className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 border border-border-soft bg-muted/30 text-muted-foreground tabular-nums">
               Short {(award.miles - effective).toLocaleString()} pts
             </div>
           )}
+          </div>
         </div>
 
-        <div className="flex items-center justify-between gap-4 md:block md:text-right">
-          <div>
-            <div className="font-display text-3xl tabular-nums text-gold-gradient">
-              {award.miles.toLocaleString()}
+        {/* Tabular figures: points / taxes / cpp — right-aligned editorial */}
+        <div className="min-w-0 md:border-l md:border-border-soft md:pl-8 flex flex-col justify-between gap-6">
+          <div className="grid grid-cols-2 gap-6 md:text-right">
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
+                Points
+              </div>
+              <div
+                className={`font-display tabular-nums ${
+                  isSweetSpot ? "text-4xl text-gold-gradient" : "text-2xl"
+                }`}
+              >
+                {award.miles.toLocaleString()}
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground tabular-nums">
-              miles{award.taxesUsd ? ` + $${award.taxesUsd} taxes` : ""}
+            <div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1">
+                Taxes
+              </div>
+              <div className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}>
+                {award.taxesUsd ? `$${award.taxesUsd}` : "—"}
+                {award.taxesUsd ? (
+                  <span className="text-[11px] font-sans align-top ml-1 opacity-40 uppercase tracking-normal">
+                    usd
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
-          <button onClick={() => setOpen(true)} className="md:mt-3 btn btn-primary">
-            Plan & redeem
-          </button>
+
+          <div className="flex items-center justify-between gap-4 pt-4 border-t border-border-soft">
+            <div className="min-w-0">
+              <div className="text-gold font-display text-xl tabular-nums leading-none">
+                {fmtCpp(cpp)}
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                Redemption value
+              </div>
+            </div>
+            <button
+              onClick={() => setOpen(true)}
+              className={`shrink-0 ${isSweetSpot ? "btn btn-primary" : "btn btn-ghost"}`}
+            >
+              Plan & redeem
+            </button>
+          </div>
         </div>
       </div>
 
       {(transferTooSlow || award.seats <= 1) && (
-        <div className="px-5 pb-3 -mt-1">
+        <div className={`pb-4 -mt-2 ${isSweetSpot ? "px-8" : "px-6"}`}>
           <div className="inline-flex items-start gap-2 text-xs text-amber-300/90 bg-amber-500/5 border border-amber-500/20 rounded-md px-2.5 py-1.5">
             <AlertTriangle className="size-3.5 mt-px flex-shrink-0" />
             {transferTooSlow ? (
@@ -336,7 +432,7 @@ export function AwardCard({
       )}
 
       {grade === "exceptional" && (
-        <div className="px-5 pb-3 -mt-1">
+        <div className={`pb-4 -mt-2 ${isSweetSpot ? "px-8" : "px-6"}`}>
           <div className="inline-flex items-center gap-1.5 text-xs text-emerald-300/90">
             <Zap className="size-3.5" /> Top-decile value for this route. Book now.
           </div>
