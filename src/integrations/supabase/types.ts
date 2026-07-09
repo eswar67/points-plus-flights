@@ -333,6 +333,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      active_watchlist_count: {
+        Args: { exclude_id?: string; uid: string }
+        Returns: number
+      }
       admin_get_cron_secret_meta: {
         Args: never
         Returns: {
@@ -355,6 +359,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      user_has_plus: { Args: { uid: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "agent"
