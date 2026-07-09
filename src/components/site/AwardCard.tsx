@@ -13,8 +13,9 @@ import {
   transfersFor,
   effectiveBalances,
 } from "@/lib/intelligence";
-import { AlertTriangle, Bookmark, BookmarkCheck, Check, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
+import { AlertTriangle, Bookmark, BookmarkCheck, Check, GitCompare, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
 import { useShortlist } from "@/hooks/useShortlist";
+import { useCompare } from "@/hooks/useCompare";
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -56,6 +57,9 @@ export function AwardCard({
   const { has, toggle } = useShortlist();
   const saved = has(award.id);
   const [flash, setFlash] = useState(false);
+  const compare = useCompare();
+  const compareSelected = compare.has(award.id);
+  const [compareShake, setCompareShake] = useState(false);
   const byProgramId = balances;
   const program = PROGRAMS.find((p) => p.id === award.programId);
   const accent = program?.accent ?? "#c9a84c";
@@ -145,6 +149,38 @@ export function AwardCard({
             <Bookmark className="size-3.5" /> Save
           </>
         )}
+      </button>
+
+      {/* Compare toggle — sits next to Save */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          const result = compare.toggle(award);
+          if (result === "full") {
+            setCompareShake(true);
+            setTimeout(() => setCompareShake(false), 500);
+          }
+        }}
+        aria-pressed={compareSelected}
+        aria-label={compareSelected ? "Remove from comparison" : "Add to comparison"}
+        title={
+          compareSelected
+            ? "In comparison"
+            : compare.full
+              ? "Comparison full (max 3) — remove one first"
+              : "Add to comparison"
+        }
+        className={`absolute top-2 right-[92px] z-10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-widest transition ${
+          compareSelected
+            ? "border-gold/50 bg-gold/15 text-gold"
+            : compare.full
+              ? "border-border-soft bg-card/70 backdrop-blur text-muted-foreground/50"
+              : "border-border-soft bg-card/70 backdrop-blur text-muted-foreground hover:text-gold hover:border-gold/40"
+        } ${compareShake ? "animate-scale-in" : ""}`}
+      >
+        <GitCompare className="size-3.5" />
+        {compareSelected ? "Comparing" : "Compare"}
       </button>
 
       {/* Sweet-spot ribbon (Phase 1) */}
