@@ -113,23 +113,23 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Do I need to give you my frequent flyer logins?",
-    a: "No. You tell us which programs you hold and roughly how many points. For concierge bookings, our agents walk you through the ticketing call or use our authorised booking channels — your credentials stay with you.",
+    a: "No. You tell us which programs you hold and roughly how many points — your login credentials stay with you. Miles Expert only reads cached award availability; you book the seat yourself through your program's website or call centre using the step-by-step playbook we generate for each result.",
   },
   {
-    q: "What does Miles Expert Plus cost?",
-    a: "Miles Expert Plus is a flat monthly subscription that unlocks unlimited watchlists, instant Telegram alerts on new award space, and concierge ticketing. See the Pricing page for current rates.",
+    q: "How much does Miles Expert cost?",
+    a: "Miles Expert is free to use. Search award availability, save watchlists, and receive alerts at no charge.",
   },
   {
     q: "What if you can't find what I'm looking for?",
-    a: "If our concierge can't ticket your requested redemption within 14 days of submission, we refund that month's subscription. No questions, no friction.",
+    a: "Award space moves constantly. If nothing matches today, save a watchlist — we'll re-check seats.aero on a schedule and alert you the moment a seat opens that beats your cents-per-point target.",
   },
   {
     q: "Which airlines and programs do you cover?",
     a: "All major Oneworld, Star Alliance and SkyTeam carriers plus Virgin Australia, Emirates, Etihad and partner award charts. Browse the full list on the Programs page.",
   },
   {
-    q: "How quickly do you respond to a booking request?",
-    a: "Most concierge requests are acknowledged within an hour and ticketed inside 24 hours — often the same day if award space is at risk of disappearing.",
+    q: "How fresh is the award availability?",
+    a: "Every result carries a freshness badge showing when that seat was last confirmed with the program. We continuously re-poll popular routes; less-travelled routes refresh on demand when you search them.",
   },
 ];
 
