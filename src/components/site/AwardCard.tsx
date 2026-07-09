@@ -394,7 +394,7 @@ export function AwardCard({
                 {award.taxesUsd ? `$${award.taxesUsd}` : "—"}
                 {award.taxesUsd ? (
                   <span className="text-[11px] font-sans align-top ml-1 opacity-40 uppercase tracking-normal">
-                    usd
+                    aud
                   </span>
                 ) : null}
               </div>
