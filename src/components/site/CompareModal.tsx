@@ -48,8 +48,11 @@ export function CompareModal({
       ...a,
       cpp,
       grade: gradeCpp(cpp, a.cabin),
-      confidence: confidenceFor(a).score,
-    } as RankedItinerary;
+      confidence: confidenceFor(a),
+      shortfallMiles: Math.max(0, a.miles - (balances[a.programId] ?? 0)),
+      effectiveBalance: balances[a.programId] ?? 0,
+      hasBalance: (balances[a.programId] ?? 0) > 0,
+    };
   });
   const enriched = annotateSweetSpots(ranked);
 
