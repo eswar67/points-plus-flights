@@ -27,6 +27,10 @@ import {
 } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useAuth } from "@/hooks/useAuth";
+import { useRecentSearches } from "@/hooks/useRecentSearches";
+import { RecentSearches } from "@/components/site/RecentSearches";
+import { TopPickBanner } from "@/components/site/TopPickBanner";
+import { ShareSearchButton } from "@/components/site/ShareSearchButton";
 
 const CABIN_VALUES = ["economy", "premium", "business", "first"] as const;
 
@@ -89,6 +93,7 @@ function Index() {
   const { balances, byProgramId } = useUserBalances();
   const totalBalance = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
   const resultsRef = useRef<HTMLElement | null>(null);
+  const { items: recent, push: pushRecent, clear: clearRecent } = useRecentSearches();
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -131,6 +136,7 @@ function Index() {
 
   function runSearch(q: Query) {
     setQuery(q);
+    pushRecent(q);
     setError(null);
     setSelectedDate(null);
     setSortBy("points");
