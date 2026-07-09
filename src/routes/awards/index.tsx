@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { SavingTooltip } from "@/components/awards/SavingTooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { knownRoutes, fareTableFor, fmtAud } from "@/lib/intelligence";
 import {
   sweetSpotsFor,
@@ -9,6 +11,7 @@ import {
   type Region,
 } from "@/lib/awards/sweetSpots";
 import { PROGRAMS } from "@/lib/programs";
+
 
 export const Route = createFileRoute("/awards/")({
   head: () => ({
