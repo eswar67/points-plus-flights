@@ -478,6 +478,75 @@ function Index() {
               </div>
             )}
 
+            {/* Personalised banner: bookable-now + sweet-spot summary */}
+            {!pending && !error && ranked.length > 0 && (
+              <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {hasAnyBalance ? (
+                  <button
+                    type="button"
+                    onClick={() => setBookableOnly((v) => !v)}
+                    aria-pressed={bookableOnly}
+                    className={`text-left rounded-lg border p-4 transition ${
+                      bookableOnly
+                        ? "border-emerald-400/50 bg-emerald-500/10"
+                        : "border-border hover:border-border-strong bg-card"
+                    }`}
+                  >
+                    <div className="text-xs uppercase tracking-widest text-emerald-300/90">
+                      You can book today
+                    </div>
+                    <div className="mt-1 text-sm">
+                      <span className="font-display text-2xl tabular-nums text-foreground">
+                        {bookableNow.length}
+                      </span>{" "}
+                      of {ranked.length} results are covered by miles you already hold
+                      {bookableOnly ? " — filtered" : ". Click to filter."}
+                    </div>
+                  </button>
+                ) : (
+                  <Link
+                    to="/auth"
+                    className="text-left rounded-lg border border-border hover:border-border-strong bg-card p-4 transition"
+                  >
+                    <div className="text-xs uppercase tracking-widest text-gold">
+                      See which of these you can book
+                    </div>
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      Sign in and paste your balances — takes 60 seconds. We'll flag every
+                      seat you can redeem directly or via a fast transfer.
+                    </div>
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setSweetOnly((v) => !v)}
+                  aria-pressed={sweetOnly}
+                  disabled={sweetSpotCount === 0}
+                  className={`text-left rounded-lg border p-4 transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                    sweetOnly
+                      ? "border-gold/60 bg-gold/10"
+                      : "border-border hover:border-border-strong bg-card"
+                  }`}
+                >
+                  <div className="text-xs uppercase tracking-widest text-gold">
+                    Sweet spots today
+                  </div>
+                  <div className="mt-1 text-sm">
+                    <span className="font-display text-2xl tabular-nums text-foreground">
+                      {sweetSpotCount}
+                    </span>{" "}
+                    {sweetSpotCount === 1 ? "outlier" : "outliers"} priced ≥25% below the
+                    typical rate for this cabin
+                    {sweetSpotCount > 0
+                      ? sweetOnly
+                        ? " — filtered"
+                        : ". Click to filter."
+                      : "."}
+                  </div>
+                </button>
+              </div>
+            )}
+
             {/* Results toolbar: sort, stops, program facets */}
             {!pending && !error && query.mode !== "month" && ranked.length > 0 && (
               <div className="mb-6 space-y-3">
