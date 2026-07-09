@@ -141,6 +141,7 @@ function Index() {
     setTwoPlusSeats(false);
     setBookableOnly(false);
     setSweetOnly(false);
+    setHideZeroAvailability(true);
     // Smoothly reveal the results section so the user sees the transition.
     requestAnimationFrame(() => {
       resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
