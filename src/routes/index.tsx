@@ -90,7 +90,9 @@ function Index() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   // Results toolbar (point.me-grade result controls)
-  const [sortBy, setSortBy] = useState<"value" | "points" | "taxes" | "seats">("points");
+  const [sortBy, setSortBy] = useState<
+    "value" | "points" | "taxes" | "seats" | "duration" | "stops" | "depart" | "fresh"
+  >("points");
   const [programFilter, setProgramFilter] = useState<Set<string> | null>(null);
   const [gradeFilter, setGradeFilter] = useState<Set<string> | null>(null);
   const [nonstopOnly, setNonstopOnly] = useState(false);
