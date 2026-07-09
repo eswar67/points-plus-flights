@@ -779,7 +779,15 @@ function Index() {
                             className="animate-card-in"
                             style={{ "--stagger": Math.min(i, 8) } as React.CSSProperties}
                           >
-                            <AwardCard award={a} balances={byProgramId} reason={reasonFor(a)} />
+                            <AwardCard
+                              award={a}
+                              balances={byProgramId}
+                              reason={reasonFor(a)}
+                              isSweetSpot={a.isSweetSpot}
+                              baselineMiles={a.baselineMiles}
+                              savingsMiles={a.savingsMiles}
+                              discountPct={a.discountPct}
+                            />
                           </div>
                         ))}
                       </div>
