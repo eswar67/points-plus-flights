@@ -269,6 +269,16 @@ export function AwardCard({
         <span className="text-[11px] text-muted-foreground tabular-nums">
           vs {fmtAud(fare)} cash
         </span>
+        <span
+          className={`hidden lg:inline-flex items-center gap-1.5 text-[10px] tabular-nums ${confStyles[confidence.label]}`}
+        >
+          <span
+            className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-live" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`}
+          />
+          <span className="uppercase tracking-[0.2em]">
+            {confidence.label} · {fmtAge(confidence.ageMin)}
+          </span>
+        </span>
         <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/80 tabular-nums ml-auto">
           {award.seats > 0
             ? `${award.seats} seat${award.seats > 1 ? "s" : ""}`
