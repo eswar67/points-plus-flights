@@ -406,13 +406,22 @@ function Index() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img
-            src={heroWing}
-            alt=""
-            width={1600}
-            height={1200}
-            className="w-full h-full object-cover opacity-40"
-          />
+          <picture>
+            <source
+              type="image/webp"
+              srcSet={`${heroWing800} 800w, ${heroWing1600} 1600w`}
+              sizes="(max-width: 768px) 100vw, 1600px"
+            />
+            <img
+              src={heroWingJpg}
+              alt=""
+              width={1600}
+              height={1067}
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-full object-cover opacity-40"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
           <FlightScene />
         </div>
