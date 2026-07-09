@@ -748,6 +748,7 @@ function Index() {
                     setGradeFilter(null);
                     setNonstopOnly(false);
                     setTwoPlusSeats(false);
+                    setHideZeroAvailability(true);
                   }}
                   className="mt-4 btn btn-ghost"
                 >
