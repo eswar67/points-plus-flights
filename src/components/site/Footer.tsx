@@ -8,7 +8,7 @@ export function Footer() {
         <div className="flex items-center gap-2">
           <LogoMark className="size-6" />
           <span className="font-display text-foreground">Miles Expert</span>
-          <span className="opacity-60">— premium award travel.</span>
+          <span className="opacity-60">— award seat search.</span>
         </div>
         <nav className="flex items-center gap-5 text-xs uppercase tracking-widest">
           <Link to="/awards" className="hover:text-gold transition">
