@@ -1,5 +1,6 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { ShortlistDock } from "@/components/site/ShortlistDock";
+import { CompareBar } from "@/components/site/CompareBar";
 
 import appCss from "../styles.css?url";
 
@@ -100,6 +101,7 @@ function RootComponent() {
     <>
       <Outlet />
       <ShortlistDock />
+      <CompareBar />
     </>
   );
 }
