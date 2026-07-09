@@ -13,7 +13,6 @@ import { useCountUp } from "@/hooks/useCountUp";
 import { ProgramRail } from "@/components/site/ProgramRail";
 import {
   ValueProps,
-  Testimonials,
   FAQ,
   ConciergeCTA,
   HowItWorksStrip,
