@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
-import { AIRPORTS } from "@/lib/airports";
+import { AIRPORTS, CONTINENTS } from "@/lib/airports";
 
 const CABINS: { value: Cabin; label: string }[] = [
   { value: "economy", label: "Economy" },
@@ -29,6 +29,26 @@ const PRESETS: { from: string; to: string }[] = [
   { from: "BNE", to: "LAX" },
   { from: "PER", to: "CDG" },
 ];
+
+/** Sanitize free-form input into a comma-joined list of 3-letter IATA codes. */
+function normalizeCodes(raw: string): string {
+  return raw
+    .toUpperCase()
+    .replace(/[^A-Z,]/g, "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(",");
+}
+
+/** Valid = one or more comma-separated 3-letter codes, no duplicates. */
+function isValidCodes(v: string): boolean {
+  if (!v) return false;
+  const parts = v.split(",").filter(Boolean);
+  if (parts.length === 0) return false;
+  if (!parts.every((p) => /^[A-Z]{3}$/.test(p))) return false;
+  return new Set(parts).size === parts.length;
+}
 
 export type SearchFormQuery = {
   from: string;
@@ -61,12 +81,25 @@ export function SearchForm({
   function submit(e: FormEvent) {
     e.preventDefault();
     const errs: { from?: string; to?: string } = {};
-    if (!/^[A-Z]{3}$/.test(from)) errs.from = "3-letter airport code, e.g. SYD.";
-    if (!/^[A-Z]{3}$/.test(to)) errs.to = "3-letter airport code, e.g. LHR.";
-    if (!errs.from && !errs.to && from === to) errs.to = "Destination must differ from origin.";
+    if (!isValidCodes(from)) errs.from = "3-letter codes, comma-separated. e.g. SYD,MEL";
+    if (!isValidCodes(to)) errs.to = "3-letter codes, comma-separated. e.g. LHR,CDG";
+    if (!errs.from && !errs.to) {
+      const fromSet = new Set(from.split(","));
+      const toSet = new Set(to.split(","));
+      const overlap = [...fromSet].some((c) => toSet.has(c));
+      if (overlap) errs.to = "Origin and destination cannot share an airport.";
+    }
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
     onSearch({ from, to, date, cabin, pax: Math.min(9, Math.max(1, pax || 1)), mode });
+  }
+
+  function addContinent(side: "from" | "to", codes: string[]) {
+    const setter = side === "from" ? setFrom : setTo;
+    const current = (side === "from" ? from : to).split(",").filter(Boolean);
+    const merged = Array.from(new Set([...current, ...codes]));
+    setter(merged.join(","));
+    setErrors((x) => ({ ...x, [side]: undefined }));
   }
 
   return (
@@ -79,34 +112,34 @@ export function SearchForm({
           <input
             value={from}
             onChange={(e) => {
-              setFrom(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""));
+              setFrom(normalizeCodes(e.target.value));
               setErrors((x) => ({ ...x, from: undefined }));
             }}
-            maxLength={3}
+            maxLength={400}
             required
             aria-invalid={!!errors.from}
-            title="3-letter IATA airport code, e.g. SYD"
+            title="One or more 3-letter IATA codes, comma-separated. e.g. SYD,MEL"
             list="ml-airports"
             autoComplete="off"
             spellCheck={false}
-            className="w-full bg-transparent text-2xl font-display tracking-wider text-foreground outline-none"
+            className="w-full bg-transparent text-xl md:text-2xl font-display tracking-wider text-foreground outline-none"
           />
         </Field>
         <Field label="To" error={errors.to}>
           <input
             value={to}
             onChange={(e) => {
-              setTo(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""));
+              setTo(normalizeCodes(e.target.value));
               setErrors((x) => ({ ...x, to: undefined }));
             }}
-            maxLength={3}
+            maxLength={400}
             required
             aria-invalid={!!errors.to}
-            title="3-letter IATA airport code, e.g. SIN"
+            title="One or more 3-letter IATA codes, comma-separated. e.g. LHR,CDG"
             list="ml-airports"
             autoComplete="off"
             spellCheck={false}
-            className="w-full bg-transparent text-2xl font-display tracking-wider text-foreground outline-none"
+            className="w-full bg-transparent text-xl md:text-2xl font-display tracking-wider text-foreground outline-none"
           />
         </Field>
         <Field label="Depart">
@@ -197,12 +230,50 @@ export function SearchForm({
         ))}
       </div>
 
+      <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 px-1">
+        <ContinentRow
+          label="From continent"
+          onPick={(codes) => addContinent("from", codes)}
+        />
+        <ContinentRow
+          label="To continent"
+          onPick={(codes) => addContinent("to", codes)}
+        />
+      </div>
+
       <datalist id="ml-airports">
         {AIRPORTS.map((a) => (
           <option key={a.code} value={a.code} label={`${a.city} · ${a.country}`} />
         ))}
       </datalist>
     </form>
+  );
+}
+
+function ContinentRow({
+  label,
+  onPick,
+}: {
+  label: string;
+  onPick: (codes: string[]) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5" aria-label={label}>
+      <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">
+        {label}
+      </span>
+      {CONTINENTS.map((c) => (
+        <button
+          key={c.value}
+          type="button"
+          onClick={() => onPick(c.codes)}
+          title={`Add all ${c.codes.length} airports in ${c.label}`}
+          className="text-xs px-2.5 py-1.5 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/50 transition"
+        >
+          {c.label}
+        </button>
+      ))}
+    </div>
   );
 }
 
