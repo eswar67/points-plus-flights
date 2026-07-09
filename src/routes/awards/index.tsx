@@ -247,11 +247,18 @@ function AwardsIndex() {
                                   Economy reward inside →
                                 </div>
                               )}
-                              {ecoSavingPct !== null && (
-                                <div className="text-[10px] uppercase tracking-widest text-gold">
+                              {ecoSavingPct !== null && bestEco?.taxesAud !== undefined && (
+                                <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gold">
                                   Save {ecoSavingPct}% vs cash
+                                  <SavingTooltip
+                                    cash={eco ?? 0}
+                                    taxes={bestEco.taxesAud ?? 0}
+                                    pct={ecoSavingPct}
+                                    cabin="economy"
+                                  />
                                 </div>
                               )}
+
                             </div>
                           )}
                           <div className="mt-4 text-[10px] uppercase tracking-widest text-gold opacity-0 group-hover:opacity-100 transition">
