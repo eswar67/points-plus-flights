@@ -192,6 +192,11 @@ export function knownRoutes(): { from: string; to: string }[] {
   });
 }
 
+/** True when both airports are in our supported catalog. */
+export function isKnownAirport(code: string): boolean {
+  return code.toUpperCase() in AIRPORT_COORDS;
+}
+
 /** Curated per-cabin fare benchmarks for a route, if we have them. */
 export function fareTableFor(from: string, to: string): Partial<Record<Cabin, number>> | undefined {
   return FARE_AUD[`${from}-${to}`] ?? FARE_AUD[`${to}-${from}`];
