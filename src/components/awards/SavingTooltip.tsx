@@ -24,18 +24,26 @@ export function SavingTooltip({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <button
-          type="button"
+        <span
+          role="button"
+          tabIndex={0}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
           }}
-          className="inline-flex items-center justify-center size-4 rounded-full bg-card border border-gold/50 text-gold hover:border-gold hover:text-gold-soft transition"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }}
+          className="inline-flex items-center justify-center size-4 rounded-full bg-card border border-gold/50 text-gold hover:border-gold hover:text-gold-soft transition cursor-pointer"
           aria-label={`How the ${cabin} Save ${pct}% figure is calculated`}
         >
           <Info className="size-3" strokeWidth={2.5} />
-        </button>
+        </span>
       </TooltipTrigger>
+
       <TooltipContent
         side="top"
         align="center"
