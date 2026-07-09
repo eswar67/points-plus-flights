@@ -230,16 +230,6 @@ export function AwardCard({
             {award.flightNo ? ` ${award.flightNo}` : ""}
           </div>
         </div>
-        <span
-          className={`hidden lg:inline-flex items-center gap-1.5 text-[10px] tabular-nums shrink-0 ${confStyles[confidence.label]}`}
-        >
-          <span
-            className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-live" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`}
-          />
-          <span className="uppercase tracking-[0.2em]">
-            {confidence.label} · {fmtAge(confidence.ageMin)}
-          </span>
-        </span>
       </div>
 
       {/* Sweet-spot savings strapline (only on featured card) */}
@@ -270,7 +260,7 @@ export function AwardCard({
           vs {fmtAud(fare)} cash
         </span>
         <span
-          className={`hidden lg:inline-flex items-center gap-1.5 text-[10px] tabular-nums ${confStyles[confidence.label]}`}
+          className={`inline-flex items-center gap-1.5 text-[10px] tabular-nums ${confStyles[confidence.label]}`}
         >
           <span
             className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-live" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`}
