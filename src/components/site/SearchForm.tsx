@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
-import { AIRPORTS, CONTINENTS } from "@/lib/airports";
+import { AIRPORTS, CONTINENTS, METROS } from "@/lib/airports";
 
 const CABINS: { value: Cabin; label: string }[] = [
   { value: "economy", label: "Economy" },
@@ -17,6 +17,26 @@ const MODES: { value: SearchMode; label: string }[] = [
   { value: "flex", label: "± 3 days" },
   { value: "month", label: "Whole month" },
 ];
+
+/** Map any metro shortcuts inside a code list to their member airports. */
+function expandMetros(codes: string): string {
+  const parts = codes.split(",").filter(Boolean);
+  const out: string[] = [];
+  for (const p of parts) {
+    const metro = METROS.find((m) => m.code === p);
+    if (metro) out.push(...metro.airports);
+    else out.push(p);
+  }
+  return Array.from(new Set(out)).join(",");
+}
+
+const DEFAULTS: Pick<SearchFormQuery, "from" | "to" | "cabin" | "pax" | "mode"> = {
+  from: "SYD",
+  to: "SIN",
+  cabin: "business",
+  pax: 1,
+  mode: "exact",
+};
 
 /** Popular ex-Australia award routes, one tap to fill. */
 const PRESETS: { from: string; to: string }[] = [
@@ -80,18 +100,30 @@ export function SearchForm({
 
   function submit(e: FormEvent) {
     e.preventDefault();
+    // Expand any metro codes (NYC → JFK,EWR,LGA) just before validation/search.
+    const fromExpanded = expandMetros(from);
+    const toExpanded = expandMetros(to);
+    if (fromExpanded !== from) setFrom(fromExpanded);
+    if (toExpanded !== to) setTo(toExpanded);
     const errs: { from?: string; to?: string } = {};
-    if (!isValidCodes(from)) errs.from = "3-letter codes, comma-separated. e.g. SYD,MEL";
-    if (!isValidCodes(to)) errs.to = "3-letter codes, comma-separated. e.g. LHR,CDG";
+    if (!isValidCodes(fromExpanded)) errs.from = "3-letter codes, comma-separated. e.g. SYD,MEL";
+    if (!isValidCodes(toExpanded)) errs.to = "3-letter codes, comma-separated. e.g. LHR,CDG";
     if (!errs.from && !errs.to) {
-      const fromSet = new Set(from.split(","));
-      const toSet = new Set(to.split(","));
+      const fromSet = new Set(fromExpanded.split(","));
+      const toSet = new Set(toExpanded.split(","));
       const overlap = [...fromSet].some((c) => toSet.has(c));
       if (overlap) errs.to = "Origin and destination cannot share an airport.";
     }
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
-    onSearch({ from, to, date, cabin, pax: Math.min(9, Math.max(1, pax || 1)), mode });
+    onSearch({
+      from: fromExpanded,
+      to: toExpanded,
+      date,
+      cabin,
+      pax: Math.min(9, Math.max(1, pax || 1)),
+      mode,
+    });
   }
 
   function addContinent(side: "from" | "to", codes: string[]) {
@@ -102,11 +134,49 @@ export function SearchForm({
     setErrors((x) => ({ ...x, [side]: undefined }));
   }
 
+  function swap() {
+    setFrom(to);
+    setTo(from);
+    setErrors({});
+  }
+
+  function reset() {
+    setFrom(DEFAULTS.from);
+    setTo(DEFAULTS.to);
+    setDate(new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10));
+    setCabin(DEFAULTS.cabin);
+    setPax(DEFAULTS.pax);
+    setMode(DEFAULTS.mode);
+    setErrors({});
+  }
+
   return (
     <form
       onSubmit={submit}
       className="relative rounded-lg bg-card/80 backdrop-blur-xl border border-border shadow-elevated p-3 md:p-4"
     >
+      <div className="mb-2 flex flex-wrap items-center gap-1.5 px-1">
+        <button
+          type="button"
+          onClick={swap}
+          title="Swap origin and destination"
+          aria-label="Swap origin and destination"
+          className="text-xs px-2.5 py-1.5 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/50 transition inline-flex items-center gap-1.5"
+        >
+          <span aria-hidden>⇄</span> Swap
+        </button>
+        <button
+          type="button"
+          onClick={reset}
+          title="Reset all search fields"
+          className="text-xs px-2.5 py-1.5 rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-border-strong transition"
+        >
+          Reset
+        </button>
+        <span className="text-xs text-muted-foreground ml-1 hidden sm:inline">
+          Tip: combine codes with commas (e.g. <span className="tabular-nums">SYD,MEL</span>) or tap a metro / continent below.
+        </span>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1.2fr_1fr_1fr_0.8fr_auto] gap-2">
         <Field label="From" error={errors.from}>
           <input
@@ -239,6 +309,46 @@ export function SearchForm({
           label="To continent"
           onPick={(codes) => addContinent("to", codes)}
         />
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-1.5 px-1" aria-label="Metro shortcuts">
+        <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">
+          Metros
+        </span>
+        {METROS.map((m) => (
+          <span
+            key={m.code}
+            className="inline-flex rounded-full border border-border overflow-hidden"
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setFrom((cur) =>
+                  Array.from(new Set([...cur.split(",").filter(Boolean), ...m.airports])).join(","),
+                )
+              }
+              title={`Add ${m.label} (${m.airports.join(", ")}) to origin`}
+              className="text-xs px-2 py-1.5 text-muted-foreground hover:text-gold hover:bg-gold/5 transition"
+            >
+              +From
+            </button>
+            <span className="text-xs px-2 py-1.5 text-foreground bg-background/40 tabular-nums">
+              {m.code}
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                setTo((cur) =>
+                  Array.from(new Set([...cur.split(",").filter(Boolean), ...m.airports])).join(","),
+                )
+              }
+              title={`Add ${m.label} (${m.airports.join(", ")}) to destination`}
+              className="text-xs px-2 py-1.5 text-muted-foreground hover:text-gold hover:bg-gold/5 transition"
+            >
+              +To
+            </button>
+          </span>
+        ))}
       </div>
 
       <datalist id="ml-airports">
