@@ -25,11 +25,11 @@ export function LogoMark({ className = "size-7" }: { className?: string }) {
         strokeOpacity="0.45"
         strokeWidth="1"
       />
-      {/* A-frame peak */}
-      <path d="M16 6.5 L25.4 25.5 h-3.5 L16 13.2 10.1 25.5 H6.6 Z" fill="url(#aureum-gold)" />
-      {/* Contrail crossing the A like a flight path */}
+      {/* M mark for Miles Expert */}
+      <path d="M5.5 25.5 V7 L11.2 7 L16 16.5 L20.8 7 L26.5 7 V25.5 H23.2 V12.4 L17.4 23.6 H14.6 L8.8 12.4 V25.5 Z" fill="url(#aureum-gold)" />
+      {/* Contrail crossing the M like a flight path */}
       <path
-        d="M4.5 20.5 C 11 19, 19 15.5, 26.5 9.5"
+        d="M4.5 22.5 C 11 21, 19 17.5, 26.5 11.5"
         fill="none"
         stroke="url(#aureum-gold)"
         strokeWidth="1.4"
@@ -38,7 +38,7 @@ export function LogoMark({ className = "size-7" }: { className?: string }) {
         opacity="0.9"
       />
       {/* Plane dot at the end of the contrail */}
-      <circle cx="26.5" cy="9.5" r="1.6" fill="var(--gold-soft)" />
+      <circle cx="26.5" cy="11.5" r="1.6" fill="var(--gold-soft)" />
     </svg>
   );
 }
