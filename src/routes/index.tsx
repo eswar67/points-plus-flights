@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
-import heroWing from "@/assets/hero-wing.jpg";
+import heroWingJpg from "@/assets/hero-wing.jpg";
+import heroWing1600 from "@/assets/hero-wing-1600.webp";
+import heroWing800 from "@/assets/hero-wing-800.webp";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
@@ -37,6 +39,19 @@ import { exportResultsPdf } from "@/lib/exportResultsPdf";
 const CABIN_VALUES = ["economy", "premium", "business", "first"] as const;
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    links: [
+      // Preload the LCP hero (WebP, mobile size is a safe default; browsers
+      // upgrade via the <picture> srcset when the DOM parses).
+      {
+        rel: "preload",
+        as: "image",
+        href: heroWing800,
+        type: "image/webp",
+        fetchpriority: "high",
+      },
+    ],
+  }),
   // Pre-filled searches arrive from the /awards landing pages.
   validateSearch: (s: Record<string, unknown>) => ({
     from:
@@ -391,13 +406,22 @@ function Index() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img
-            src={heroWing}
-            alt=""
-            width={1600}
-            height={1200}
-            className="w-full h-full object-cover opacity-40"
-          />
+          <picture>
+            <source
+              type="image/webp"
+              srcSet={`${heroWing800} 800w, ${heroWing1600} 1600w`}
+              sizes="(max-width: 768px) 100vw, 1600px"
+            />
+            <img
+              src={heroWingJpg}
+              alt=""
+              width={1600}
+              height={1067}
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-full object-cover opacity-40"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
           <FlightScene />
         </div>

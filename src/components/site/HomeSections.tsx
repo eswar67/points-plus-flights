@@ -1,23 +1,29 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import luxuryImg from "@/assets/lifestyle-luxury.jpg";
-import familyImg from "@/assets/lifestyle-family.jpg";
-import weekendImg from "@/assets/lifestyle-weekend.jpg";
+import luxuryJpg from "@/assets/lifestyle-luxury.jpg";
+import luxuryWebp from "@/assets/lifestyle-luxury-800.webp";
+import familyJpg from "@/assets/lifestyle-family.jpg";
+import familyWebp from "@/assets/lifestyle-family-800.webp";
+import weekendJpg from "@/assets/lifestyle-weekend.jpg";
+import weekendWebp from "@/assets/lifestyle-weekend-800.webp";
 import { Reveal } from "./Reveal";
 
 const PROPS = [
   {
-    img: luxuryImg,
+    jpg: luxuryJpg,
+    webp: luxuryWebp,
     title: "Luxury at the front of the plane",
     body: "Lie-flat suites, caviar service and arrivals lounges — for a small slice of your points balance.",
   },
   {
-    img: familyImg,
+    jpg: familyJpg,
+    webp: familyWebp,
     title: "Family holidays for less",
     body: "Stretch your points across four (or more) seats and turn an aspiration into a boarding pass.",
   },
   {
-    img: weekendImg,
+    jpg: weekendJpg,
+    webp: weekendWebp,
     title: "Effortless weekend escapes",
     body: "Short-haul premium cabins and city breaks, with a ready-to-follow playbook in under a minute.",
   },
@@ -85,14 +91,18 @@ export function ValueProps() {
           <Reveal key={p.title} stagger={i}>
             <article className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border-strong hover:-translate-y-1 transition duration-300">
               <div className="aspect-[4/3] overflow-hidden">
-                <img
-                  src={p.img}
-                  alt=""
-                  width={1024}
-                  height={768}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition duration-700 group-hover:scale-[1.04]"
-                />
+                <picture>
+                  <source srcSet={p.webp} type="image/webp" />
+                  <img
+                    src={p.jpg}
+                    alt=""
+                    width={800}
+                    height={600}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                  />
+                </picture>
               </div>
               <div className="p-6">
                 <h3 className="font-display text-xl">{p.title}</h3>
