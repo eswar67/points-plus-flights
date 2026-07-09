@@ -31,6 +31,8 @@ import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { RecentSearches } from "@/components/site/RecentSearches";
 import { TopPickBanner } from "@/components/site/TopPickBanner";
 import { ShareSearchButton } from "@/components/site/ShareSearchButton";
+import { Download } from "lucide-react";
+import { exportResultsPdf } from "@/lib/exportResultsPdf";
 
 const CABIN_VALUES = ["economy", "premium", "business", "first"] as const;
 
