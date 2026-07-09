@@ -615,6 +615,18 @@ function Index() {
                   >
                     2+ seats
                   </button>
+                  <button
+                    type="button"
+                    aria-pressed={!hideZeroAvailability}
+                    onClick={() => setHideZeroAvailability((v) => !v)}
+                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                      !hideZeroAvailability
+                        ? "bg-gold/15 text-gold border-gold/50"
+                        : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                    }`}
+                  >
+                    Zero availability
+                  </button>
                 </div>
                 <div
                   className="flex flex-wrap items-center gap-2"
