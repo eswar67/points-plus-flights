@@ -410,6 +410,21 @@ function Index() {
             <SearchForm onSearch={runSearch} initial={query ?? undefined} />
           </div>
 
+          {!query && (
+            <RecentSearches
+              items={recent}
+              onPick={(r) => runSearch({
+                from: r.from,
+                to: r.to,
+                date: r.date,
+                cabin: r.cabin,
+                pax: r.pax,
+                mode: r.mode,
+              })}
+              onClear={clearRecent}
+            />
+          )}
+
           <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
             <Stat label="Programs supported" value={`${PROGRAMS.length}`} />
             <Stat
@@ -465,6 +480,9 @@ function Index() {
                     <span className="size-1.5 rounded-full bg-live" />
                     Live · {result.source}
                   </div>
+                )}
+                {!pending && ranked.length > 0 && (
+                  <ShareSearchButton from={query.from} to={query.to} cabin={query.cabin} />
                 )}
                 {!pending && ranked.length > 0 && (
                   <Link
