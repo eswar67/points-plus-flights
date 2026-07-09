@@ -781,6 +781,9 @@ function Index() {
               </div>
             ) : (
               <>
+                {sorted.length > 0 && (
+                  <TopPickBanner items={sorted} pax={query.pax} />
+                )}
                 {multiDate && (
                   <div
                     className="mb-6 flex gap-2 overflow-x-auto pb-1"
