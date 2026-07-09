@@ -212,18 +212,23 @@ export function AwardCard({
           </div>
           <div className="text-xs text-muted-foreground mt-1">{alliance}</div>
           {bookable === "direct" && (
-            <div className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-300">
-              <Check className="size-3" /> Covered by your balance
+            <div className="mt-2 inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-2.5 py-1 rounded-full border border-emerald-400/40 bg-emerald-500/15 text-emerald-300">
+              <Check className="size-3" /> Book now
             </div>
           )}
-          {bookable === "transfer" && (
-            <div className="mt-2 inline-flex items-center gap-1 text-xs text-gold tabular-nums">
-              <Check className="size-3" /> In reach via transfer
+          {bookable === "transfer" && fastest && (
+            <div className="mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-gold/40 bg-gold/10 text-gold tabular-nums">
+              <ArrowRightLeft className="size-3" />
+              Transfer {Math.max(0, award.miles - balance).toLocaleString()} from{" "}
+              {fastest.bank}
+              <span className="opacity-70">
+                · {fastest.etaMin < 60 ? "instant" : `~${Math.round(fastest.etaMin / 60)}h`}
+              </span>
             </div>
           )}
           {bookable === "short" && (
-            <div className="mt-2 text-xs text-muted-foreground tabular-nums">
-              {(award.miles - effective).toLocaleString()} pts short
+            <div className="mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-border bg-muted/40 text-muted-foreground tabular-nums">
+              Short {(award.miles - effective).toLocaleString()} pts
             </div>
           )}
         </div>
