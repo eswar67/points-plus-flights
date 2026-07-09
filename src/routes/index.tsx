@@ -805,7 +805,7 @@ function Index() {
                 </div>
               </>
             )}
-          </>
+          </div>
         ) : (
           <Portfolio balances={balances} />
         )}
