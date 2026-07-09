@@ -111,6 +111,22 @@ export function AwardCard({
   return (
     <div className="group relative rounded-lg border border-border bg-card hover:border-border-strong transition overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent opacity-0 group-hover:opacity-100 transition" />
+
+      {/* Sweet-spot ribbon (Phase 1) */}
+      {isSweetSpot && savingsMiles && savingsMiles > 0 && (
+        <div className="px-5 pt-3 pb-1 flex items-center gap-2 border-b border-gold/20 bg-gradient-to-r from-gold/10 via-gold/5 to-transparent">
+          <Sparkles className="size-3.5 text-gold" />
+          <span className="text-xs uppercase tracking-widest text-gold font-medium">
+            Sweet spot
+          </span>
+          <span className="text-xs text-foreground/80 tabular-nums">
+            saves {savingsMiles.toLocaleString()} pts vs typical{" "}
+            {(baselineMiles ?? 0).toLocaleString()}
+            {discountPct ? ` · ${Math.round(discountPct * 100)}% off` : ""}
+          </span>
+        </div>
+      )}
+
       {/* Intelligence strip */}
       <div className="px-5 pt-3 pb-2 flex flex-wrap items-center gap-2 border-b border-border-soft">
         <span
