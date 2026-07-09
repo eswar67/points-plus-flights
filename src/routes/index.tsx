@@ -27,6 +27,10 @@ import {
 } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useAuth } from "@/hooks/useAuth";
+import { useRecentSearches } from "@/hooks/useRecentSearches";
+import { RecentSearches } from "@/components/site/RecentSearches";
+import { TopPickBanner } from "@/components/site/TopPickBanner";
+import { ShareSearchButton } from "@/components/site/ShareSearchButton";
 
 const CABIN_VALUES = ["economy", "premium", "business", "first"] as const;
 
@@ -89,6 +93,7 @@ function Index() {
   const { balances, byProgramId } = useUserBalances();
   const totalBalance = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
   const resultsRef = useRef<HTMLElement | null>(null);
+  const { items: recent, push: pushRecent, clear: clearRecent } = useRecentSearches();
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -131,6 +136,7 @@ function Index() {
 
   function runSearch(q: Query) {
     setQuery(q);
+    pushRecent(q);
     setError(null);
     setSelectedDate(null);
     setSortBy("points");
@@ -404,6 +410,21 @@ function Index() {
             <SearchForm onSearch={runSearch} initial={query ?? undefined} />
           </div>
 
+          {!query && (
+            <RecentSearches
+              items={recent}
+              onPick={(r) => runSearch({
+                from: r.from,
+                to: r.to,
+                date: r.date,
+                cabin: r.cabin,
+                pax: r.pax,
+                mode: r.mode,
+              })}
+              onClear={clearRecent}
+            />
+          )}
+
           <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
             <Stat label="Programs supported" value={`${PROGRAMS.length}`} />
             <Stat
@@ -459,6 +480,9 @@ function Index() {
                     <span className="size-1.5 rounded-full bg-live" />
                     Live · {result.source}
                   </div>
+                )}
+                {!pending && ranked.length > 0 && (
+                  <ShareSearchButton from={query.from} to={query.to} cabin={query.cabin} />
                 )}
                 {!pending && ranked.length > 0 && (
                   <Link
@@ -757,6 +781,9 @@ function Index() {
               </div>
             ) : (
               <>
+                {sorted.length > 0 && (
+                  <TopPickBanner items={sorted} pax={query.pax} />
+                )}
                 {multiDate && (
                   <div
                     className="mb-6 flex gap-2 overflow-x-auto pb-1"
