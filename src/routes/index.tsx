@@ -214,6 +214,7 @@ function Index() {
       (!programFilter || programFilter.size === 0 || programFilter.has(a.programId)) &&
       (!carrierFilter || carrierFilter.size === 0 || carrierFilter.has((a.carrier || "").trim())) &&
       (!sweetOnly || a.isSweetSpot) &&
+      (!hideZeroAvailability || a.seats > 0) &&
       (!bookableOnly || (() => {
         const k = bookableKind(a);
         return k === "direct" || k === "transfer";
