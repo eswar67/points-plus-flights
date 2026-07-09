@@ -193,7 +193,7 @@ export function ConciergeCTA() {
     <section className="mx-auto max-w-7xl px-6 pb-20 md:pb-28">
       <div className="relative overflow-hidden rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-16">
         <div className="max-w-2xl">
-          <span className="text-xs uppercase tracking-widest text-gold">Miles Expert Plus</span>
+          <span className="text-xs uppercase tracking-widest text-gold">Concierge</span>
           <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
             Hand the search to us.
           </h2>
@@ -207,12 +207,6 @@ export function ConciergeCTA() {
               className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
             >
               Submit a request
-            </Link>
-            <Link
-              to="/pricing"
-              className="text-xs uppercase tracking-widest px-6 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
-            >
-              See pricing
             </Link>
           </div>
         </div>

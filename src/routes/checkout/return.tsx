@@ -22,7 +22,7 @@ function ReturnPage() {
         <p className="text-muted-foreground mt-4">
           {session_id
             ? "Your subscription is active. Start setting up watchlists and we'll alert you the moment seats open."
-            : "Looks like you arrived here without completing checkout. Try again from the pricing page."}
+            : "Looks like you arrived here without completing checkout."}
         </p>
         <div className="mt-8 flex gap-3 justify-center">
           <Link

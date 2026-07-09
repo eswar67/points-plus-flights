@@ -10,7 +10,6 @@ const NAV_LINKS = [
   { to: "/watchlists", label: "Watchlists", authed: true },
   { to: "/requests", label: "Requests", authed: true },
   { to: "/how-it-works", label: "How it works", authed: false },
-  { to: "/pricing", label: "Pricing", authed: false },
   { to: "/faq", label: "FAQ", authed: false },
   { to: "/book", label: "Book", authed: false },
 ] as const;

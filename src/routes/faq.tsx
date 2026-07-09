@@ -10,7 +10,7 @@ export const Route = createFileRoute("/faq")({
       {
         name: "description",
         content:
-          "How Miles Expert finds award seats, what Miles Expert Plus costs, which programs we cover, and how the concierge ticketing works.",
+          "How Miles Expert finds award seats, which programs we cover, and how the concierge ticketing works.",
       },
       { property: "og:title", content: "FAQ — Miles Expert" },
       {
