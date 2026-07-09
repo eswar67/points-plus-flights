@@ -526,3 +526,64 @@ export function fmtAge(min: number) {
   if (min < 1440) return `${Math.round(min / 60)}h ago`;
   return `${Math.round(min / 1440)}d ago`;
 }
+
+// ---------------------------------------------------------------------------
+// Sweet-spot detection: flag itineraries priced meaningfully below the group
+// median for the same cabin (route is fixed across a single search).
+// ---------------------------------------------------------------------------
+export type SweetSpotInfo = {
+  /** Median miles across the group this itinerary belongs to (same cabin). */
+  baselineMiles: number;
+  /** True when miles are >=25% below baselineMiles. */
+  isSweetSpot: boolean;
+  /** max(0, baselineMiles - miles). */
+  savingsMiles: number;
+  /** 0..1, how far below the baseline this itinerary sits. */
+  discountPct: number;
+};
+
+/** Sweet-spot threshold: at least 25% below the cabin baseline. */
+export const SWEET_SPOT_THRESHOLD = 0.25;
+
+function median(nums: number[]): number {
+  if (!nums.length) return 0;
+  const s = [...nums].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+
+/**
+ * Annotate ranked itineraries with sweet-spot info. The baseline is the
+ * median miles in the same cabin — a small statistical anchor that surfaces
+ * asymmetric-value redemptions (e.g. ANA 75k J to Europe when the group
+ * median is 120k).
+ */
+export function annotateSweetSpots<T extends AwardItinerary>(
+  items: T[],
+): (T & SweetSpotInfo)[] {
+  const groups = new Map<Cabin, number[]>();
+  for (const a of items) {
+    const arr = groups.get(a.cabin) ?? [];
+    arr.push(a.miles);
+    groups.set(a.cabin, arr);
+  }
+  const medianByCabin = new Map<Cabin, number>();
+  for (const [cabin, arr] of groups) medianByCabin.set(cabin, median(arr));
+
+  return items.map((a) => {
+    const baselineMiles = medianByCabin.get(a.cabin) ?? a.miles;
+    const discountPct =
+      baselineMiles > 0 ? Math.max(0, (baselineMiles - a.miles) / baselineMiles) : 0;
+    const isSweetSpot =
+      // Need at least 3 comparable entries in the cabin to trust the median,
+      // otherwise a lone cheap fare would always trigger.
+      (groups.get(a.cabin)?.length ?? 0) >= 3 && discountPct >= SWEET_SPOT_THRESHOLD;
+    return {
+      ...a,
+      baselineMiles,
+      isSweetSpot,
+      savingsMiles: Math.max(0, baselineMiles - a.miles),
+      discountPct,
+    };
+  });
+}
