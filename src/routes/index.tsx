@@ -211,6 +211,7 @@ function Index() {
     return k === "direct" || k === "transfer";
   });
   const sweetSpotCount = ranked.filter((a) => a.isSweetSpot).length;
+  const zeroAvailabilityCount = ranked.filter((a) => a.seats === 0).length;
 
   const filtered = ranked.filter(
     (a) =>
@@ -270,6 +271,10 @@ function Index() {
   }
 
   const minMiles = filtered.length ? Math.min(...filtered.map((a) => a.miles)) : 0;
+  // Smoothly animate the results count and the zero-availability badge so
+  // toggling the filter feels like the number is being tallied live.
+  const animatedCount = useCountUp(sorted.length, 450);
+  const animatedZeroCount = useCountUp(zeroAvailabilityCount, 450);
 
   function toggleProgram(pid: string) {
     setProgramFilter((cur) => {
@@ -455,7 +460,7 @@ function Index() {
                   {pending
                     ? "Scanning award space across alliances…"
                     : [
-                        `${sorted.length} option${sorted.length === 1 ? "" : "s"}`,
+                        `${animatedCount.toLocaleString()} option${sorted.length === 1 ? "" : "s"}`,
                         minMiles ? `from ${minMiles.toLocaleString()} pts` : null,
                         `${programFacets.size} program${programFacets.size === 1 ? "" : "s"}`,
                         `${query.cabin} · ${query.pax} pax`,
@@ -643,13 +648,30 @@ function Index() {
                     type="button"
                     aria-pressed={!hideZeroAvailability}
                     onClick={() => setHideZeroAvailability((v) => !v)}
-                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition inline-flex items-center gap-2 ${
                       !hideZeroAvailability
                         ? "bg-gold/15 text-gold border-gold/50"
                         : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
                     }`}
                   >
                     Zero availability
+                    {zeroAvailabilityCount > 0 && (
+                      <span
+                        key={`zero-${hideZeroAvailability ? "hidden" : "shown"}`}
+                        aria-label={
+                          hideZeroAvailability
+                            ? `${zeroAvailabilityCount} hidden`
+                            : `${zeroAvailabilityCount} shown`
+                        }
+                        className={`animate-scale-in tabular-nums text-[10px] px-1.5 py-0.5 rounded-full border ${
+                          !hideZeroAvailability
+                            ? "bg-gold/25 border-gold/50 text-gold"
+                            : "bg-muted/40 border-border-soft text-muted-foreground"
+                        }`}
+                      >
+                        {animatedZeroCount.toLocaleString()}
+                      </span>
+                    )}
                   </button>
                 </div>
                 <div
