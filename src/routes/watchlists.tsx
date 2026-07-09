@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { SkeletonRows } from "@/components/site/Skeleton";
-import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/hooks/useAuth";
 import type { Cabin } from "@/lib/awards/types";
 import { useServerFn } from "@tanstack/react-start";
@@ -82,7 +81,6 @@ const CABINS: Cabin[] = ["economy", "premium", "business", "first"];
 function WatchlistsPage() {
   const nav = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { isActive: hasPlus } = useSubscription();
   const prefill: Prefill = Route.useSearch();
   const [items, setItems] = useState<Watchlist[]>([]);
   const [lastMatch, setLastMatch] = useState<Record<string, string>>({});
@@ -132,11 +130,7 @@ function WatchlistsPage() {
       .update({ active: !w.active })
       .eq("id", w.id);
     if (error) {
-      setError(
-        error.message.includes("row-level security")
-          ? "The free plan includes one active watchlist. Pause the other one or upgrade to Miles Expert Plus."
-          : error.message,
-      );
+      setError(error.message);
       return;
     }
     setItems((prev) => prev.map((x) => (x.id === w.id ? { ...x, active: !x.active } : x)));
@@ -177,33 +171,11 @@ function WatchlistsPage() {
           </div>
           <button
             onClick={() => setShowForm((s) => !s)}
-            disabled={!hasPlus && items.length >= 1 && !showForm}
             className="btn btn-primary"
           >
             {showForm ? "Close" : "+ New watchlist"}
           </button>
         </div>
-
-        {!hasPlus && items.length >= 1 && !showForm && (
-          <div className="mt-6 rounded-lg border border-gold/40 bg-gold/5 p-5 flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="text-xs uppercase tracking-widest text-gold mb-1">
-                Free plan limit
-              </div>
-              <p className="text-sm text-muted-foreground">
-                You're using your one free watchlist. Upgrade to{" "}
-                <span className="text-foreground">Miles Expert Plus</span> for unlimited watchlists and
-                priority alerts.
-              </p>
-            </div>
-            <Link
-              to="/pricing"
-              className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold whitespace-nowrap"
-            >
-              Upgrade
-            </Link>
-          </div>
-        )}
 
         {showForm && (
           <NewWatchlistForm
@@ -503,11 +475,7 @@ function NewWatchlistForm({
     const { error } = await supabase.from("watchlists").insert(payload);
     setSubmitting(false);
     if (error) {
-      setErr(
-        error.message.includes("row-level security")
-          ? "The free plan includes one active watchlist. Upgrade to Miles Expert Plus for unlimited watchlists."
-          : error.message,
-      );
+      setErr(error.message);
       return;
     }
     onCreated();

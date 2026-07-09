@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/site/Header";
 import { submitBookingRequest } from "@/lib/booking/booking.functions";
 import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
 
 export const Route = createFileRoute("/book")({
   head: () => ({
@@ -37,8 +36,7 @@ type Cabin = (typeof CABINS)[number]["value"];
 
 function BookPage() {
   const { user, loading: authLoading } = useAuth();
-  const { isActive, loading: subLoading } = useSubscription();
-  const gated = !authLoading && !subLoading && (!user || !isActive);
+  const gated = !authLoading && !user;
 
   const submit = useServerFn(submitBookingRequest);
   const [submitting, setSubmitting] = useState(false);
@@ -105,30 +103,20 @@ function BookPage() {
 
         {gated ? (
           <div className="rounded-lg border border-gold/40 bg-gradient-to-b from-gold/10 to-transparent p-8">
-            <div className="text-xs uppercase tracking-widest text-gold mb-2">
-              Miles Expert Plus members only
-            </div>
-            <h2 className="font-display text-2xl">Concierge ticketing is a member benefit.</h2>
+            <div className="text-xs uppercase tracking-widest text-gold mb-2">Sign in required</div>
+            <h2 className="font-display text-2xl">Sign in to request concierge ticketing.</h2>
             <p className="text-muted-foreground mt-3 max-w-xl">
               An award specialist hunts the seats, holds them, and tickets on your behalf — across
-              30+ programs. Available to Miles Expert Plus members for A$12/month or A$120/year.
+              30+ programs. Sign in and we'll get to work.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
-                to="/pricing"
+                to="/auth"
+                search={{ redirect: "/book" }}
                 className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
               >
-                Upgrade to Miles Expert Plus
+                Sign in
               </Link>
-              {!user && (
-                <Link
-                  to="/auth"
-                  search={{ redirect: "/book" }}
-                  className="text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
-                >
-                  Sign in
-                </Link>
-              )}
               <Link
                 to="/"
                 className="text-xs uppercase tracking-widest px-5 py-3 rounded-full text-muted-foreground hover:text-foreground transition"
