@@ -4,7 +4,7 @@ export function LogoMark({ className = "size-7" }: { className?: string }) {
       viewBox="0 0 32 32"
       className={className}
       role="img"
-      aria-label="Aureum"
+      aria-label="Miles Expert"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>

@@ -6,8 +6,8 @@ import { Header } from "@/components/site/Header";
 export const Route = createFileRoute("/agent-login")({
   head: () => ({
     meta: [
-      { title: "Agent sign in — Aureum" },
-      { name: "description", content: "Concierge agent access for Aureum award booking queue." },
+      { title: "Agent sign in — Miles Expert" },
+      { name: "description", content: "Concierge agent access for Miles Expert award booking queue." },
       { name: "robots", content: "noindex" },
     ],
   }),

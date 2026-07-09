@@ -5,13 +5,13 @@ import { Footer } from "@/components/site/Footer";
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How Aureum Works — Award Search & Concierge" },
+      { title: "How Miles Expert Works — Award Search & Concierge" },
       {
         name: "description",
         content:
           "Track your points, search cached award space across programs — updated continuously — and follow a guided redemption playbook.",
       },
-      { property: "og:title", content: "How Aureum Works" },
+      { property: "og:title", content: "How Miles Expert Works" },
       { property: "og:description", content: "Three steps from points to premium cabin." },
     ],
   }),

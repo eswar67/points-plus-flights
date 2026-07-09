@@ -34,14 +34,14 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Aureum — Redeem Reward Points for Premium Flights" },
+      { title: "Miles Expert — Redeem Reward Points for Premium Flights" },
       {
         name: "description",
         content:
           "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook.",
       },
-      { name: "author", content: "Aureum" },
-      { property: "og:title", content: "Aureum — Redeem Reward Points for Premium Flights" },
+      { name: "author", content: "Miles Expert" },
+      { property: "og:title", content: "Miles Expert — Redeem Reward Points for Premium Flights" },
       {
         property: "og:description",
         content:
@@ -50,7 +50,7 @@ export const Route = createRootRoute({
       { property: "og:type", content: "website" },
       { name: "theme-color", content: "#0d0d0d" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Aureum — Redeem Reward Points for Premium Flights" },
+      { name: "twitter:title", content: "Miles Expert — Redeem Reward Points for Premium Flights" },
       {
         name: "twitter:description",
         content:

@@ -14,7 +14,7 @@ import { getAlertChannelAvailability } from "@/lib/alerts/alerts.functions";
 export const Route = createFileRoute("/watchlists")({
   head: () => ({
     meta: [
-      { title: "Watchlists — Aureum" },
+      { title: "Watchlists — Miles Expert" },
       {
         name: "description",
         content: "Save routes, set CPP thresholds and get alerted the moment award seats open.",
@@ -134,7 +134,7 @@ function WatchlistsPage() {
     if (error) {
       setError(
         error.message.includes("row-level security")
-          ? "The free plan includes one active watchlist. Pause the other one or upgrade to Aureum Plus."
+          ? "The free plan includes one active watchlist. Pause the other one or upgrade to Miles Expert Plus."
           : error.message,
       );
       return;
@@ -192,7 +192,7 @@ function WatchlistsPage() {
               </div>
               <p className="text-sm text-muted-foreground">
                 You're using your one free watchlist. Upgrade to{" "}
-                <span className="text-foreground">Aureum Plus</span> for unlimited watchlists and
+                <span className="text-foreground">Miles Expert Plus</span> for unlimited watchlists and
                 priority alerts.
               </p>
             </div>
@@ -505,7 +505,7 @@ function NewWatchlistForm({
     if (error) {
       setErr(
         error.message.includes("row-level security")
-          ? "The free plan includes one active watchlist. Upgrade to Aureum Plus for unlimited watchlists."
+          ? "The free plan includes one active watchlist. Upgrade to Miles Expert Plus for unlimited watchlists."
           : error.message,
       );
       return;

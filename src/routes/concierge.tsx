@@ -8,7 +8,7 @@ import { listBookingRequests, updateBookingRequest } from "@/lib/booking/agent.f
 
 export const Route = createFileRoute("/concierge")({
   head: () => ({
-    meta: [{ title: "Concierge queue — Aureum" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Concierge queue — Miles Expert" }, { name: "robots", content: "noindex" }],
   }),
   component: ConciergeQueue,
 });

@@ -6,13 +6,13 @@ import { PROGRAMS } from "@/lib/programs";
 export const Route = createFileRoute("/programs")({
   head: () => ({
     meta: [
-      { title: "Loyalty Programs — Aureum" },
+      { title: "Loyalty Programs — Miles Expert" },
       {
         name: "description",
         content:
           "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles balances and search cached award space, updated continuously.",
       },
-      { property: "og:title", content: "Loyalty Programs — Aureum" },
+      { property: "og:title", content: "Loyalty Programs — Miles Expert" },
       { property: "og:description", content: "Six premium loyalty programs, one vault." },
     ],
   }),
@@ -29,7 +29,7 @@ function ProgramsPage() {
           Every program. <span className="text-gold-gradient">One vault.</span>
         </h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
-          Add the programs you hold and let Aureum search cached award space across every cabin and
+          Add the programs you hold and let Miles Expert search cached award space across every cabin and
           alliance — updated continuously.
         </p>
       </section>

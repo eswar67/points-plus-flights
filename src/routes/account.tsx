@@ -14,7 +14,7 @@ import { listPollerRuns } from "@/lib/admin/observability.functions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
-    meta: [{ title: "Account — Aureum" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Account — Miles Expert" }, { name: "robots", content: "noindex" }],
   }),
   component: AccountPage,
 });
