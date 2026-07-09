@@ -486,6 +486,7 @@ function Index() {
                   {(
                     [
                       ["value", "Best value"],
+                      ["sweet", "Sweet spots"],
                       ["points", "Fewest points"],
                       ["taxes", "Lowest taxes"],
                       ["seats", "Most seats"],
