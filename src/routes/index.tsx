@@ -427,14 +427,22 @@ function Index() {
           <FlightScene />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-6 pt-10 pb-10 md:pt-16 md:pb-14">
+        <div className="relative mx-auto max-w-7xl px-6 pt-14 pb-10 md:pt-20 md:pb-14 text-center md:text-left">
           <div className="max-w-3xl">
-            <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight leading-[1.05]">
-              Your miles deserve <span className="text-gold-shimmer">a first-class seat.</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gold/25 bg-gold/10 text-gold text-[11px] uppercase tracking-widest mb-5">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-gold/70 opacity-75 animate-ping" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-gold" />
+              </span>
+              Australia's #1 award flight engine
+            </div>
+            <h1 className="font-display text-4xl md:text-6xl font-semibold tracking-tight leading-[1.02]">
+              Turn your points into{" "}
+              <span className="text-gold-shimmer">first-class</span> memories.
             </h1>
-            <p className="mt-3 text-base text-muted-foreground max-w-xl">
-              Search award space across Qantas, Velocity, KrisFlyer, Flying Blue and 20+ programs —
-              ranked by real cents-per-point value.
+            <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-xl md:mx-0 mx-auto">
+              The smartest way for Australians to search Qantas, Velocity, KrisFlyer,
+              Flying Blue and 20+ global programs — ranked in AUD by real cents-per-point value.
             </p>
           </div>
 
