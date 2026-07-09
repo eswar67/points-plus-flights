@@ -40,7 +40,6 @@ function AwardsIndex() {
     .filter((s) => s.cabin === "economy" || s.cabin === "premium")
     .slice(0, 3);
 
-  const programName = (id: string) => PROGRAMS.find((p) => p.id === id)?.name ?? id;
   const programAccent = (id: string) => PROGRAMS.find((p) => p.id === id)?.accent ?? "#c9a765";
   const programShort = (id: string) => PROGRAMS.find((p) => p.id === id)?.short ?? "?";
 
@@ -227,6 +226,3 @@ function AwardsIndex() {
     </div>
   );
 }
-
-// unused param placeholder — silence type checker for `programName`
-void programName;
