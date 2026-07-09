@@ -32,7 +32,7 @@ const STEPS = [
   {
     n: "03",
     t: "Follow the playbook",
-    d: "Every result comes with a step-by-step plan: which points to transfer, how long they take to land, and where to ticket — or hand the whole thing to our concierge.",
+    d: "Every result comes with a step-by-step plan: which points to transfer, how long they take to land, and where to ticket the seat yourself.",
   },
 ];
 
