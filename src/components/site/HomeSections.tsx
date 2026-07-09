@@ -9,7 +9,7 @@ const PROPS = [
   {
     img: luxuryImg,
     title: "Luxury at the front of the plane",
-    body: "Lie-flat suites, caviar service and arrivals lounges — for a fraction of the cash fare.",
+    body: "Lie-flat suites, caviar service and arrivals lounges — for a small slice of your points balance.",
   },
   {
     img: familyImg,
@@ -19,7 +19,7 @@ const PROPS = [
   {
     img: weekendImg,
     title: "Effortless weekend escapes",
-    body: "Short-haul premium cabins and city breaks, with a ready-to-book playbook in under a minute.",
+    body: "Short-haul premium cabins and city breaks, with a ready-to-follow playbook in under a minute.",
   },
 ];
 
@@ -37,7 +37,7 @@ const STRIP_STEPS = [
   {
     n: "3",
     t: "Follow the playbook",
-    d: "Transfer timing, booking links, step by step — or hand it to our concierge.",
+    d: "Transfer timing, booking links, step by step — everything you need to redeem yourself.",
   },
 ];
 
@@ -77,7 +77,7 @@ export function ValueProps() {
           Your points are worth <span className="text-gold-gradient">more</span> than you think.
         </h2>
         <p className="mt-4 text-muted-foreground">
-          Whatever the trip, we surface the smartest redemption — then book it for you.
+          Whatever the trip, we surface the smartest redemption so you can book it yourself.
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -189,28 +189,5 @@ export function FAQ({ limit }: { limit?: number }) {
 }
 
 export function ConciergeCTA() {
-  return (
-    <section className="mx-auto max-w-7xl px-6 pb-20 md:pb-28">
-      <div className="relative overflow-hidden rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-16">
-        <div className="max-w-2xl">
-          <span className="text-xs uppercase tracking-widest text-gold">Concierge</span>
-          <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
-            Hand the search to us.
-          </h2>
-          <p className="mt-4 text-muted-foreground max-w-lg">
-            Tell our concierge where you want to go. We'll find the seats, hold them, and ticket the
-            redemption — usually inside 24 hours.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              to="/book"
-              className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
-            >
-              Submit a request
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+  return null;
 }

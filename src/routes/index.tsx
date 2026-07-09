@@ -11,12 +11,7 @@ import { FlightScene } from "@/components/site/FlightScene";
 import { SearchingState } from "@/components/site/SearchingState";
 import { useCountUp } from "@/hooks/useCountUp";
 import { ProgramRail } from "@/components/site/ProgramRail";
-import {
-  ValueProps,
-  FAQ,
-  ConciergeCTA,
-  HowItWorksStrip,
-} from "@/components/site/HomeSections";
+import { ValueProps, FAQ, HowItWorksStrip } from "@/components/site/HomeSections";
 import { searchAwards } from "@/lib/awards/awards.functions";
 import type { AwardItinerary, Cabin, SearchResult } from "@/lib/awards/types";
 import { PROGRAMS, getProgram } from "@/lib/programs";
@@ -544,7 +539,6 @@ function Index() {
           <HowItWorksStrip />
           <ValueProps />
           <FAQ limit={4} />
-          <ConciergeCTA />
         </>
       )}
 

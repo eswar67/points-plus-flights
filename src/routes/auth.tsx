@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -262,12 +262,6 @@ function AuthPage() {
           )}
         </div>
 
-        <p className="mt-10 text-center text-xs text-muted-foreground">
-          Concierge agent?{" "}
-          <Link to="/agent-login" className="text-gold hover:underline">
-            Agent sign in
-          </Link>
-        </p>
       </main>
     </div>
   );

@@ -8,10 +8,8 @@ const NAV_LINKS = [
   { to: "/", label: "Search", authed: false },
   { to: "/programs", label: "Programs", authed: false },
   { to: "/watchlists", label: "Watchlists", authed: true },
-  { to: "/requests", label: "Requests", authed: true },
   { to: "/how-it-works", label: "How it works", authed: false },
   { to: "/faq", label: "FAQ", authed: false },
-  { to: "/book", label: "Book", authed: false },
 ] as const;
 
 export function Header() {
