@@ -158,7 +158,7 @@ export function TopPickBanner({
             <span className="text-muted-foreground text-sm">pts</span>
             <span className="text-muted-foreground text-sm"> · </span>
             <span className="text-muted-foreground text-sm tabular-nums">
-              +US${Math.round(pick.taxesUsd)} taxes
+              +A${Math.round(pick.taxesUsd * 1.55)} taxes
             </span>
           </div>
           <div className="mt-1 text-sm text-muted-foreground">

@@ -209,14 +209,6 @@ export const PROGRAMS: Program[] = [
     valueAudCents: 1.6,
   },
   {
-    id: "citi",
-    name: "Citi ThankYou Points",
-    short: "TY",
-    alliance: "Transferable",
-    accent: "#003b70",
-    valueAudCents: 1.4,
-  },
-  {
     id: "anz",
     name: "ANZ Rewards",
     short: "ANZ",

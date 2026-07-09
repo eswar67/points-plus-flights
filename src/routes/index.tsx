@@ -341,8 +341,9 @@ function Index() {
         return `+${diff.toLocaleString()} pts vs cheapest (${leader.miles.toLocaleString()})`;
       }
       case "taxes": {
-        if (a.taxesUsd === leader.taxes) return `Lowest taxes here — US$${Math.round(a.taxesUsd)}`;
-        return `US$${Math.round(a.taxesUsd - leader.taxes)} more taxes than lowest`;
+        if (a.taxesUsd === leader.taxes)
+          return `Lowest taxes here — A$${Math.round(a.taxesUsd * 1.55)}`;
+        return `A$${Math.round((a.taxesUsd - leader.taxes) * 1.55)} more taxes than lowest`;
       }
       case "seats": {
         if (a.seats === leader.seats) return `Most seats here — ${a.seats} available`;

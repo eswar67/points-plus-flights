@@ -97,7 +97,7 @@ export function exportResultsPdf(ctx: ExportContext): void {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.text(
-    `${pick.programName} · ${pick.miles.toLocaleString()} pts + US$${Math.round(pick.taxesUsd)} taxes`,
+    `${pick.programName} · ${pick.miles.toLocaleString()} pts + A$${Math.round(taxesAud)} taxes`,
     margin + 14,
     y + 40,
   );
@@ -177,7 +177,7 @@ export function exportResultsPdf(ctx: ExportContext): void {
     a.direct || a.stops === 0 ? "Nonstop" : `${a.stops} stop${a.stops === 1 ? "" : "s"}`,
     fmtHrs(a.durationMin || 0),
     `${a.miles.toLocaleString()}`,
-    `US$${Math.round(a.taxesUsd)}`,
+    `A$${Math.round(a.taxesUsd * 1.55)}`,
     `${a.cpp.toFixed(1)}¢`,
     a.isSweetSpot ? "★ Sweet" : a.grade,
   ]);

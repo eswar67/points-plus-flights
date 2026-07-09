@@ -12,6 +12,7 @@ import {
   fareEstimateAud,
   transfersFor,
   effectiveBalances,
+  taxesAudFromUsd,
 } from "@/lib/intelligence";
 import { AlertTriangle, Bookmark, BookmarkCheck, Check, GitCompare, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
 import { useShortlist } from "@/hooks/useShortlist";
@@ -391,10 +392,10 @@ export function AwardCard({
                 Taxes
               </div>
               <div className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}>
-                {award.taxesUsd ? `$${award.taxesUsd}` : "—"}
+                {award.taxesUsd ? `$${Math.round(taxesAudFromUsd(award.taxesUsd))}` : "—"}
                 {award.taxesUsd ? (
                   <span className="text-[11px] font-sans align-top ml-1 opacity-40 uppercase tracking-normal">
-                    usd
+                    aud
                   </span>
                 ) : null}
               </div>
@@ -427,7 +428,7 @@ export function AwardCard({
             {transferTooSlow ? (
               <span>
                 Risk: {fastest!.bank} → {programName} takes ~{Math.round(fastest!.etaMin / 60)}h.
-                Seat may be gone before points land. Use Bilt or Chase if you have them.
+                Seat may be gone before points land — consider a faster program if you have one.
               </span>
             ) : (
               <span>Only {award.seats} seat left — book within minutes once miles arrive.</span>

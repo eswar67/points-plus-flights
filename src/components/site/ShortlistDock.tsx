@@ -114,7 +114,7 @@ export function ShortlistDock() {
                       </div>
                       {a.taxesUsd > 0 && (
                         <div className="text-xs text-muted-foreground tabular-nums">
-                          + US${Math.round(a.taxesUsd)} taxes
+                          + A${Math.round(a.taxesUsd * 1.55)} taxes
                         </div>
                       )}
                     </div>

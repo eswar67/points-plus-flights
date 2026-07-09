@@ -13,8 +13,9 @@ function fmtEta(min: number) {
 }
 
 /**
- * Shows where the user's transferable currencies (Amex MR, Citi TYP, ANZ)
- * can go, at what ratio and speed — and the resulting per-program reach.
+ * Shows where the user's Australian transferable currencies (Amex MR AU,
+ * ANZ Rewards) can go, at what ratio and speed — and the resulting
+ * per-program reach.
  */
 export function TransferPlanner() {
   const { balances, byProgramId, loading } = useUserBalances();
@@ -30,9 +31,9 @@ export function TransferPlanner() {
           Transfer planner
         </h2>
         <p className="text-sm text-muted-foreground mt-2 max-w-prose">
-          Add a transferable currency above — Amex Membership Rewards or Citi ThankYou Points — and
-          we'll show every airline program you can reach, at what ratio, and how long the points
-          take to land.
+          Add an Australian transferable currency above — Amex Membership Rewards (AU) or ANZ
+          Rewards — and we'll show every airline program you can reach, at what ratio, and how
+          long the points take to land.
         </p>
       </section>
     );

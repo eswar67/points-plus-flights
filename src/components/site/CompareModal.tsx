@@ -82,8 +82,8 @@ export function CompareModal({
     {
       label: "Taxes / fees",
       dir: "low",
-      values: enriched.map((a) => `US$${Math.round(a.taxesUsd)}`),
-      raw: enriched.map((a) => a.taxesUsd),
+      values: taxesAud.map((t) => `A$${Math.round(t)}`),
+      raw: taxesAud,
     },
     {
       label: "Value (¢ / pt)",
