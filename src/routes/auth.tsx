@@ -6,11 +6,11 @@ import { Header } from "@/components/site/Header";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in or sign up — Aureum" },
+      { title: "Sign in or sign up — Miles Expert" },
       {
         name: "description",
         content:
-          "Create an Aureum account to save watchlists and get alerts when great award seats open.",
+          "Create an Miles Expert account to save watchlists and get alerts when great award seats open.",
       },
     ],
   }),

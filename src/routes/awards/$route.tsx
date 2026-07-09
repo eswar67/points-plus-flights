@@ -22,8 +22,8 @@ export const Route = createFileRoute("/awards/$route")({
   head: ({ params }) => {
     const parsed = parseRoute(params.route);
     const title = parsed
-      ? `${parsed.from} to ${parsed.to} Award Flights — miles needed & value | Aureum`
-      : "Award route — Aureum";
+      ? `${parsed.from} to ${parsed.to} Award Flights — miles needed & value | Miles Expert`
+      : "Award route — Miles Expert";
     const description = parsed
       ? `How many points a ${parsed.from} → ${parsed.to} award costs across Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles, benchmark cash fares per cabin, and cached award-space search.`
       : "Award route guide.";

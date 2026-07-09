@@ -6,7 +6,7 @@ export const Route = createFileRoute("/checkout/return")({
     session_id: typeof s.session_id === "string" ? s.session_id : undefined,
   }),
   head: () => ({
-    meta: [{ title: "Welcome to Aureum Plus" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Welcome to Miles Expert Plus" }, { name: "robots", content: "noindex" }],
   }),
   component: ReturnPage,
 });
@@ -18,7 +18,7 @@ function ReturnPage() {
       <Header />
       <main className="mx-auto max-w-xl px-6 py-24 text-center">
         <div className="text-xs uppercase tracking-widest text-gold mb-3">Welcome aboard</div>
-        <h1 className="font-display text-4xl">You're on Aureum Plus.</h1>
+        <h1 className="font-display text-4xl">You're on Miles Expert Plus.</h1>
         <p className="text-muted-foreground mt-4">
           {session_id
             ? "Your subscription is active. Start setting up watchlists and we'll alert you the moment seats open."

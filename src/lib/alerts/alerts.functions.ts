@@ -36,7 +36,7 @@ export const sendTestTelegramAlert = createServerFn({ method: "POST" })
     try {
       await sendTelegramMessage(
         chatId,
-        `🛫 <b>Aureum test alert</b>\nHi ${profile?.display_name ?? "there"} — your Telegram alerts are wired up. We'll ping you the moment a watchlist hits its CPP target.`,
+        `🛫 <b>Miles Expert test alert</b>\nHi ${profile?.display_name ?? "there"} — your Telegram alerts are wired up. We'll ping you the moment a watchlist hits its CPP target.`,
       );
       return { ok: true as const };
     } catch (e) {

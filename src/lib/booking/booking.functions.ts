@@ -33,7 +33,7 @@ export const submitBookingRequest = createServerFn({ method: "POST" })
     const { userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Gate: must have an active Aureum Plus subscription (sandbox or live).
+    // Gate: must have an active Miles Expert Plus subscription (sandbox or live).
     // Check both environments — the column defaults to 'sandbox' but we want
     // the gate to hold once the project goes live too.
     const { data: hasSandbox } = await supabaseAdmin.rpc("has_active_subscription", {
@@ -46,7 +46,7 @@ export const submitBookingRequest = createServerFn({ method: "POST" })
     });
     if (!hasSandbox && !hasLive) {
       throw new Error(
-        "Concierge booking is an Aureum Plus benefit. Upgrade at /pricing to submit a request.",
+        "Concierge booking is an Miles Expert Plus benefit. Upgrade at /pricing to submit a request.",
       );
     }
 
@@ -96,7 +96,7 @@ export const submitBookingRequest = createServerFn({ method: "POST" })
       try {
         await sendAlertEmail(
           data.contact_email,
-          `Aureum booking request received — ref ${ref}`,
+          `Miles Expert booking request received — ref ${ref}`,
           `<div style="font-family:sans-serif;max-width:520px">` +
             `<h2 style="margin:0 0 10px">We're on it.</h2>` +
             `<p style="margin:0 0 10px">Thanks ${escapeHtml(data.contact_name)} — your request is in the concierge queue as ` +

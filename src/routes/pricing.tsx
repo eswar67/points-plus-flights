@@ -9,13 +9,13 @@ import { useSubscription } from "@/hooks/useSubscription";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — Aureum Plus" },
+      { title: "Pricing — Miles Expert Plus" },
       {
         name: "description",
         content:
-          "Aureum Plus: unlimited award watchlists, instant Telegram alerts, and concierge ticketing.",
+          "Miles Expert Plus: unlimited award watchlists, instant Telegram alerts, and concierge ticketing.",
       },
-      { property: "og:title", content: "Pricing — Aureum Plus" },
+      { property: "og:title", content: "Pricing — Miles Expert Plus" },
       {
         property: "og:description",
         content: "AUD $12/month. Unlimited watchlists, alerts, concierge access. Cancel anytime.",
@@ -54,7 +54,7 @@ function PricingPage() {
       <main className="mx-auto max-w-5xl px-6 py-16">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <div className="text-xs uppercase tracking-widest text-gold mb-3">Membership</div>
-          <h1 className="font-display text-4xl md:text-5xl tracking-tight">Aureum Plus.</h1>
+          <h1 className="font-display text-4xl md:text-5xl tracking-tight">Miles Expert Plus.</h1>
           <p className="text-muted-foreground mt-4">
             Unlimited award hunting, instant alerts, human concierge backup. One flat membership —
             cancel any time.
@@ -65,7 +65,7 @@ function PricingPage() {
           <div className="max-w-2xl mx-auto rounded-lg border border-border bg-card p-4">
             <div className="flex items-center justify-between mb-4 px-2">
               <div className="text-sm text-muted-foreground">
-                Aureum Plus — {open === "monthly" ? "AUD $12/mo" : "AUD $120/yr"}
+                Miles Expert Plus — {open === "monthly" ? "AUD $12/mo" : "AUD $120/yr"}
               </div>
               <button
                 onClick={() => setOpen(null)}

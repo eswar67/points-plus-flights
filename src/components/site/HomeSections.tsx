@@ -72,7 +72,7 @@ export function ValueProps() {
   return (
     <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
       <div className="max-w-2xl mb-12">
-        <span className="text-xs uppercase tracking-widest text-gold">Why Aureum</span>
+        <span className="text-xs uppercase tracking-widest text-gold">Why Miles Expert</span>
         <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
           Your points are worth <span className="text-gold-gradient">more</span> than you think.
         </h2>
@@ -109,7 +109,7 @@ export function ValueProps() {
 const TESTIMONIALS = [
   {
     quote:
-      "Aureum found us four business-class seats to Tokyo on Velocity that were nowhere on the airline's own site. Saved us $18k in cash fares.",
+      "Miles Expert found us four business-class seats to Tokyo on Velocity that were nowhere on the airline's own site. Saved us $18k in cash fares.",
     name: "Hannah & James L.",
     detail: "Sydney → Tokyo · Virgin Australia Business",
   },
@@ -162,7 +162,7 @@ export function Testimonials() {
 
 export const FAQ_ITEMS = [
   {
-    q: "How does Aureum actually find seats?",
+    q: "How does Miles Expert actually find seats?",
     a: "We search cached award availability across frequent flyer programs (Qantas, Velocity, KrisFlyer, United, Emirates, LifeMiles and more) via seats.aero, updated continuously. You search once — we surface every program that has the route, ranked by cents-per-point value, with a freshness badge on every result so you know how current it is.",
   },
   {
@@ -170,8 +170,8 @@ export const FAQ_ITEMS = [
     a: "No. You tell us which programs you hold and roughly how many points. For concierge bookings, our agents walk you through the ticketing call or use our authorised booking channels — your credentials stay with you.",
   },
   {
-    q: "What does Aureum Plus cost?",
-    a: "Aureum Plus is a flat monthly subscription that unlocks unlimited watchlists, instant Telegram alerts on new award space, and concierge ticketing. See the Pricing page for current rates.",
+    q: "What does Miles Expert Plus cost?",
+    a: "Miles Expert Plus is a flat monthly subscription that unlocks unlimited watchlists, instant Telegram alerts on new award space, and concierge ticketing. See the Pricing page for current rates.",
   },
   {
     q: "What if you can't find what I'm looking for?",
@@ -247,7 +247,7 @@ export function ConciergeCTA() {
     <section className="mx-auto max-w-7xl px-6 pb-20 md:pb-28">
       <div className="relative overflow-hidden rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-16">
         <div className="max-w-2xl">
-          <span className="text-xs uppercase tracking-widest text-gold">Aureum Plus</span>
+          <span className="text-xs uppercase tracking-widest text-gold">Miles Expert Plus</span>
           <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
             Hand the search to us.
           </h2>

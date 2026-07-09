@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/requests")({
   head: () => ({
     meta: [
-      { title: "Your requests — Aureum" },
+      { title: "Your requests — Miles Expert" },
       { name: "description", content: "Track the status of your concierge booking requests." },
       { name: "robots", content: "noindex" },
     ],

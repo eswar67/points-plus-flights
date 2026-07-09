@@ -30,7 +30,7 @@
     <path d="M9 41 C 22 38, 38 31, 53 19" fill="none" stroke="url(#gold)" stroke-width="2.8" stroke-linecap="round" stroke-dasharray="5 4.4" opacity="0.9"/>
     <circle cx="53" cy="19" r="3.2" fill="#f0d78c"/>
   </g>
-  <text x="176" y="133" font-family="Georgia, 'Times New Roman', serif" font-size="44" font-weight="600" fill="#f5f2e9" letter-spacing="1">Aureum</text>
+  <text x="176" y="133" font-family="Georgia, 'Times New Roman', serif" font-size="44" font-weight="600" fill="#f5f2e9" letter-spacing="1">Miles Expert</text>
 
   <!-- Headline -->
   <text x="92" y="300" font-family="Georgia, 'Times New Roman', serif" font-size="76" font-weight="600" fill="#f5f2e9" letter-spacing="-1">Your miles deserve</text>

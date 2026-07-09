@@ -6,13 +6,13 @@ import { knownRoutes, fareTableFor, fmtAud } from "@/lib/intelligence";
 export const Route = createFileRoute("/awards/")({
   head: () => ({
     meta: [
-      { title: "Award Flight Routes — Aureum" },
+      { title: "Award Flight Routes — Miles Expert" },
       {
         name: "description",
         content:
           "Popular premium-cabin award routes from Australia: benchmark cash fares, indicative miles per program, and cached award-space search.",
       },
-      { property: "og:title", content: "Award Flight Routes — Aureum" },
+      { property: "og:title", content: "Award Flight Routes — Miles Expert" },
     ],
   }),
   component: AwardsIndex,

@@ -6,16 +6,16 @@ import { FAQ, ConciergeCTA } from "@/components/site/HomeSections";
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "FAQ — Aureum award booking concierge" },
+      { title: "FAQ — Miles Expert award booking concierge" },
       {
         name: "description",
         content:
-          "How Aureum finds award seats, what Aureum Plus costs, which programs we cover, and how the concierge ticketing works.",
+          "How Miles Expert finds award seats, what Miles Expert Plus costs, which programs we cover, and how the concierge ticketing works.",
       },
-      { property: "og:title", content: "FAQ — Aureum" },
+      { property: "og:title", content: "FAQ — Miles Expert" },
       {
         property: "og:description",
-        content: "Everything you need to know about Aureum's award seat search and concierge.",
+        content: "Everything you need to know about Miles Expert's award seat search and concierge.",
       },
     ],
   }),

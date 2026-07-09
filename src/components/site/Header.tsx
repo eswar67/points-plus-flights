@@ -26,7 +26,7 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
           <LogoMark className="size-8" />
-          <span className="font-display font-semibold tracking-tight text-lg">Aureum</span>
+          <span className="font-display font-semibold tracking-tight text-lg">Miles Expert</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           {links.map((l) => (

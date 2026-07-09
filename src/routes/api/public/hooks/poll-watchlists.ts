@@ -138,7 +138,7 @@ async function processWatchlist(
         `${a.miles.toLocaleString()} ${a.programName} miles${a.taxesUsd ? ` + ~$${a.taxesUsd} taxes` : ""}\n` +
         `${a.seats} seat${a.seats === 1 ? "" : "s"} · ${a.carrier}\n` +
         `<b>Value</b>: vs ${fmtAud(fare)} cash · confidence ${conf.label}\n\n` +
-        `Open Aureum to book before this disappears.`;
+        `Open Miles Expert to book before this disappears.`;
       try {
         await sendTelegramMessage(telegramChatId, text);
         delivered = true;
@@ -156,7 +156,7 @@ async function processWatchlist(
         `<p style="margin:0 0 4px">${a.miles.toLocaleString()} ${escapeHtml(a.programName)} miles${a.taxesUsd ? ` + ~$${a.taxesUsd} taxes` : ""}</p>` +
         `<p style="margin:0 0 4px">${a.seats} seat${a.seats === 1 ? "" : "s"} · ${escapeHtml(a.carrier)}</p>` +
         `<p style="margin:0 0 12px"><b>Value</b>: vs ${fmtAud(fare)} cash · confidence ${conf.label}</p>` +
-        `<p style="margin:0">Open Aureum to book before this disappears.</p>` +
+        `<p style="margin:0">Open Miles Expert to book before this disappears.</p>` +
         `</div>`;
       try {
         await sendAlertEmail(userEmail, subject, html);

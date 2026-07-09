@@ -7,7 +7,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-12 flex flex-col md:flex-row gap-6 items-center justify-between text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <LogoMark className="size-6" />
-          <span className="font-display text-foreground">Aureum</span>
+          <span className="font-display text-foreground">Miles Expert</span>
           <span className="opacity-60">— premium award travel.</span>
         </div>
         <nav className="flex items-center gap-5 text-xs uppercase tracking-widest">
@@ -22,7 +22,7 @@ export function Footer() {
           </Link>
         </nav>
         <p className="opacity-70">
-          © {new Date().getFullYear()} Aureum. Availability via seats.aero, refreshed continuously.
+          © {new Date().getFullYear()} Miles Expert. Availability via seats.aero, refreshed continuously.
         </p>
       </div>
     </footer>

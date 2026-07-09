@@ -9,13 +9,13 @@ import { useSubscription } from "@/hooks/useSubscription";
 export const Route = createFileRoute("/book")({
   head: () => ({
     meta: [
-      { title: "Request a booking — Aureum concierge" },
+      { title: "Request a booking — Miles Expert concierge" },
       {
         name: "description",
         content:
           "Tell our award concierge what you want — origin, destination, dates, cabin — and we'll hunt the seats and ticket them for you.",
       },
-      { property: "og:title", content: "Request a booking — Aureum concierge" },
+      { property: "og:title", content: "Request a booking — Miles Expert concierge" },
       {
         property: "og:description",
         content:
@@ -106,19 +106,19 @@ function BookPage() {
         {gated ? (
           <div className="rounded-lg border border-gold/40 bg-gradient-to-b from-gold/10 to-transparent p-8">
             <div className="text-xs uppercase tracking-widest text-gold mb-2">
-              Aureum Plus members only
+              Miles Expert Plus members only
             </div>
             <h2 className="font-display text-2xl">Concierge ticketing is a member benefit.</h2>
             <p className="text-muted-foreground mt-3 max-w-xl">
               An award specialist hunts the seats, holds them, and tickets on your behalf — across
-              30+ programs. Available to Aureum Plus members for A$12/month or A$120/year.
+              30+ programs. Available to Miles Expert Plus members for A$12/month or A$120/year.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/pricing"
                 className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
               >
-                Upgrade to Aureum Plus
+                Upgrade to Miles Expert Plus
               </Link>
               {!user && (
                 <Link
