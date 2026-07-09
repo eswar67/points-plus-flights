@@ -47,7 +47,7 @@ function regionFor(from: string, to: string): keyof typeof REGION_DEFAULTS_AUD {
 }
 
 /** [lat, lon] for fare modeling. Unknown airports fall back to region defaults. */
-const AIRPORT_COORDS: Record<string, [number, number]> = {
+export const AIRPORT_COORDS: Record<string, [number, number]> = {
   // Australia / NZ / Pacific
   SYD: [-33.95, 151.18],
   MEL: [-37.67, 144.84],
