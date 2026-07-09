@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import type { RankedItinerary, SweetSpotInfo } from "@/lib/intelligence";
 import { fmtAud, fmtCpp, fmtAge, taxesAudFromUsd } from "@/lib/intelligence";
 import { getProgram } from "@/lib/programs";
@@ -250,13 +249,12 @@ export function AwardTable({
                   {a.confidence?.ageMin != null ? fmtAge(a.confidence.ageMin) : "—"}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link
-                    to="/book"
-                    search={{ id: a.id }}
+                  <a
+                    href={`/book?id=${encodeURIComponent(a.id)}`}
                     className="text-[10px] uppercase tracking-widest text-gold hover:underline"
                   >
                     Book →
-                  </Link>
+                  </a>
                 </td>
               </tr>
             );
