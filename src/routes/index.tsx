@@ -107,7 +107,8 @@ function Index() {
   const [result, setResult] = useState<SearchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const { balances, byProgramId } = useUserBalances();
+  const balancesHook = useUserBalances();
+  const { balances, byProgramId } = balancesHook;
   const totalBalance = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
   const resultsRef = useRef<HTMLElement | null>(null);
   const { items: recent, push: pushRecent, clear: clearRecent } = useRecentSearches();
@@ -947,7 +948,7 @@ function Index() {
             )}
           </div>
         ) : (
-          <Portfolio balances={balances} />
+          <Portfolio balancesHook={balancesHook} />
         )}
       </section>
 
