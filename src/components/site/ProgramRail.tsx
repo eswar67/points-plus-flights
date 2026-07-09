@@ -2,9 +2,9 @@ import { PROGRAMS } from "@/lib/programs";
 
 export function ProgramRail() {
   return (
-    <div className="border-y border-border/60 bg-card/30">
+    <div className="border-y border-border-soft bg-card/30">
       <div className="mx-auto max-w-7xl px-6 py-5 flex items-center gap-8 overflow-x-auto">
-        <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground whitespace-nowrap">
+        <span className="text-xs uppercase tracking-widest text-muted-foreground whitespace-nowrap">
           Programs we support
         </span>
         {PROGRAMS.map((p) => (
@@ -13,7 +13,7 @@ export function ProgramRail() {
             className="group flex items-center gap-2.5 whitespace-nowrap text-sm text-muted-foreground hover:text-foreground transition"
           >
             <span
-              className="size-7 rounded-full grid place-items-center font-display text-[10px] font-semibold transition group-hover:scale-110"
+              className="size-7 rounded-full grid place-items-center font-display text-xs font-semibold transition group-hover:scale-110"
               style={{
                 background: `${p.accent}1f`,
                 color: p.accent,

@@ -61,7 +61,22 @@ export const getRouter = () => {
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
     defaultErrorComponent: DefaultErrorComponent,
+    defaultPendingComponent: DefaultPendingComponent,
+    // Browser View Transitions between routes (styles.css defines vt-in/vt-out;
+    // unsupported browsers and reduced-motion users get instant navigation).
+    defaultViewTransition: true,
   });
 
   return router;
 };
+
+function DefaultPendingComponent() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="text-center">
+        <div className="mx-auto size-10 rounded-full border-2 border-border border-t-[var(--gold)] animate-spin motion-reduce:animate-none" />
+        <p className="mt-4 text-xs uppercase tracking-widest text-muted-foreground">Loading</p>
+      </div>
+    </div>
+  );
+}

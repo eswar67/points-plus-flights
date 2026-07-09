@@ -8,6 +8,9 @@
   --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
+  /* Single letter-spacing step for all uppercase micro-labels */
+  --tracking-widest: 0.12em;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -29,11 +32,16 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-gold: var(--gold);
+  --color-live: var(--live);
+  --color-live-soft: var(--live-soft);
   --color-gold-soft: var(--gold-soft);
   --color-gold-foreground: var(--gold-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  /* 3-step border hierarchy: soft (dividers) / border (default) / strong (emphasis) */
+  --color-border-soft: oklch(0.25 0 0 / 0.35);
+  --color-border-strong: color-mix(in oklab, var(--gold) 30%, oklch(0.25 0 0));
   --color-input: var(--input);
   --color-ring: var(--ring);
 
@@ -42,31 +50,36 @@
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0.5rem;
 
   /* Noir & Gold */
-  --background: oklch(0.13 0 0);          /* #0d0d0d */
+  --background: oklch(0.13 0 0); /* #0d0d0d */
   --foreground: oklch(0.96 0.01 90);
-  --card: oklch(0.16 0 0);                /* #1a1a1a */
+  --card: oklch(0.16 0 0); /* #1a1a1a */
   --card-foreground: oklch(0.96 0.01 90);
   --popover: oklch(0.16 0 0);
   --popover-foreground: oklch(0.96 0.01 90);
 
-  --primary: oklch(0.78 0.13 85);         /* gold #c9a84c */
+  --primary: oklch(0.78 0.13 85); /* gold #c9a84c */
   --primary-foreground: oklch(0.13 0 0);
 
   --secondary: oklch(0.22 0 0);
   --secondary-foreground: oklch(0.96 0.01 90);
 
-  --muted: oklch(0.20 0 0);
-  --muted-foreground: oklch(0.62 0.01 90);
+  --muted: oklch(0.2 0 0);
+  /* WCAG AA on noir surfaces (was 0.62 — borderline on card backgrounds) */
+  --muted-foreground: oklch(0.72 0.01 90);
 
-  --accent: oklch(0.88 0.10 88);          /* soft gold #f0d78c */
+  --accent: oklch(0.88 0.1 88); /* soft gold #f0d78c */
   --accent-foreground: oklch(0.13 0 0);
 
   --gold: oklch(0.78 0.13 85);
-  --gold-soft: oklch(0.88 0.10 88);
+  --gold-soft: oklch(0.88 0.1 88);
   --gold-foreground: oklch(0.13 0 0);
+
+  /* Cool accent for live/status data (freshness, source, poller health) */
+  --live: oklch(0.8 0.11 200);
+  --live-soft: oklch(0.88 0.07 200);
 
   --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
@@ -75,22 +88,96 @@
   --input: oklch(0.22 0 0);
   --ring: oklch(0.78 0.13 85);
 
-  --gradient-gold: linear-gradient(135deg, oklch(0.88 0.10 88), oklch(0.72 0.13 80));
-  --gradient-noir: radial-gradient(ellipse at top, oklch(0.20 0.02 80 / 0.4), transparent 60%), linear-gradient(180deg, oklch(0.10 0 0), oklch(0.13 0 0));
+  --gradient-gold: linear-gradient(135deg, oklch(0.88 0.1 88), oklch(0.72 0.13 80));
+  --gradient-noir:
+    radial-gradient(ellipse at top, oklch(0.2 0.02 80 / 0.4), transparent 60%),
+    linear-gradient(180deg, oklch(0.1 0 0), oklch(0.13 0 0));
 }
 
-.dark { color-scheme: dark; }
+.dark {
+  color-scheme: dark;
+}
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { color-scheme: dark; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    color-scheme: dark;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* One focus language everywhere; components never remove it, only inherit. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+/* --- Buttons: 3 variants, unified states ------------------------------- */
+
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  padding: 0.75rem 1.5rem;
+  min-height: 2.75rem; /* 44px hit target */
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+}
+
+@utility btn-primary {
+  background: var(--gold);
+  color: var(--gold-foreground);
+  &:hover:not(:disabled) {
+    background: var(--gold-soft);
+  }
+}
+
+@utility btn-ghost {
+  border: 1px solid color-mix(in oklab, var(--gold) 35%, transparent);
+  color: var(--gold);
+  &:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--gold) 10%, transparent);
+  }
+}
+
+@utility btn-quiet {
+  color: var(--muted-foreground);
+  &:hover:not(:disabled) {
+    color: var(--foreground);
+  }
 }
 
 @utility text-gold-gradient {
@@ -111,20 +198,39 @@
 /* --- Motion --- */
 
 @keyframes fly-across {
-  0%   { left: 0%; opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { left: calc(100% - 16px); opacity: 0; }
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 16px);
+    opacity: 0;
+  }
 }
 
 @keyframes shimmer-x {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(0, -16px, 0); }
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -16px, 0);
+  }
 }
 
 @utility animate-fly {
@@ -138,19 +244,184 @@
 @utility text-gold-shimmer {
   background: linear-gradient(
     110deg,
-    oklch(0.88 0.10 88),
+    oklch(0.88 0.1 88),
     oklch(0.72 0.13 80) 35%,
     oklch(0.95 0.08 90) 50%,
     oklch(0.72 0.13 80) 65%,
-    oklch(0.88 0.10 88)
+    oklch(0.88 0.1 88)
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer-x 6s linear infinite;
+  animation: shimmer-x 11s linear infinite;
+}
+
+/* --- Flight scene (hero) --- */
+
+@keyframes hero-flight {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes beacon-ping {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* --- Entrances --- */
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@utility animate-card-in {
+  animation: card-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--stagger, 0) * 70ms);
+}
+
+@keyframes drawer-up {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-drawer-up {
+  animation: drawer-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility animate-backdrop-in {
+  animation: backdrop-in 0.25s ease-out both;
+}
+
+/* Scroll reveal: elements start hidden, .revealed animates them in */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.reveal-up.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--stagger, 0) * 110ms);
+}
+
+/* --- Radar scan (searching state) --- */
+
+@keyframes radar-ping {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@utility animate-radar-ping {
+  animation: radar-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes scan-fly {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+/* --- Route view transitions (browser View Transitions API) --- */
+
+@media not (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root) {
+    animation: vt-out 0.18s ease-in both;
+  }
+  ::view-transition-new(root) {
+    animation: vt-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fly, .animate-float-slow, .text-gold-shimmer { animation: none; }
+  .animate-fly,
+  .animate-float-slow,
+  .text-gold-shimmer,
+  .animate-card-in,
+  .animate-drawer-up,
+  .animate-backdrop-in,
+  .animate-radar-ping,
+  [style*="offset-path"] {
+    animation: none;
+  }
+  .reveal-up {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

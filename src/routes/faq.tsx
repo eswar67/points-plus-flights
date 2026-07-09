@@ -28,13 +28,13 @@ function FAQPage() {
       <Header />
       <main className="pt-10">
         <div className="mx-auto max-w-4xl px-6 pt-12 text-center">
-          <span className="text-[10px] uppercase tracking-[0.3em] text-gold">Help</span>
+          <span className="text-xs uppercase tracking-widest text-gold">Help</span>
           <h1 className="font-display text-5xl md:text-6xl mt-3 leading-[1.02]">
             Frequently asked.
           </h1>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Can't find what you're looking for? Submit a concierge request and we'll come back
-            to you personally.
+            Can't find what you're looking for? Submit a concierge request and we'll come back to
+            you personally.
           </p>
         </div>
         <FAQ />

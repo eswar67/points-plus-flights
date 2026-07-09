@@ -1,4 +1,5 @@
 import type { AwardItinerary, AwardProvider, Cabin, SearchInput } from "./types";
+import { getProgram } from "@/lib/programs";
 
 /**
  * seats.aero Partner API adapter.
@@ -15,29 +16,13 @@ import type { AwardItinerary, AwardProvider, Cabin, SearchInput } from "./types"
 
 const BASE_URL = "https://seats.aero/partnerapi/search";
 
-// Map our internal program ids -> seats.aero "source" identifiers.
-// (seats.aero source slugs: aeroplan, alaska, american, delta, united, lifemiles,
-//  emirates, etihad, virginatlantic, virginaustralia, qantas, singapore, ...)
-const PROGRAM_TO_SOURCE: Record<string, string> = {
-  qantas: "qantas",
-  velocity: "virginaustralia",
-  krisflyer: "singapore",
-  emirates: "emirates",
-  united: "united",
-  lifemiles: "lifemiles",
-};
-
-const SOURCE_TO_PROGRAM = Object.fromEntries(
-  Object.entries(PROGRAM_TO_SOURCE).map(([k, v]) => [v, k]),
-);
-
-const PROGRAM_NAMES: Record<string, string> = {
-  qantas: "Qantas Frequent Flyer",
-  velocity: "Virgin Velocity",
-  krisflyer: "Singapore KrisFlyer",
-  emirates: "Emirates Skywards",
-  united: "United MileagePlus",
-  lifemiles: "Avianca LifeMiles",
+// We query ALL seats.aero sources (no `sources` filter). Incoming source
+// slugs map to our program-catalog ids; slugs whose id differs are renamed
+// here, everything else uses the slug as the id. Unknown slugs still render
+// via the fallback (slug as id/name) so new seats.aero sources never vanish.
+const SOURCE_TO_PROGRAM: Record<string, string> = {
+  virginaustralia: "velocity",
+  singapore: "krisflyer",
 };
 
 type RawAvailability = {
@@ -46,11 +31,30 @@ type RawAvailability = {
   Date?: string;
   Source?: string;
   UpdatedAt?: string;
-  YAvailable?: boolean; YMileageCost?: string; YRemainingSeats?: number; YDirect?: boolean; YAirlines?: string;
-  WAvailable?: boolean; WMileageCost?: string; WRemainingSeats?: number; WDirect?: boolean; WAirlines?: string;
-  JAvailable?: boolean; JMileageCost?: string; JRemainingSeats?: number; JDirect?: boolean; JAirlines?: string;
-  FAvailable?: boolean; FMileageCost?: string; FRemainingSeats?: number; FDirect?: boolean; FAirlines?: string;
-  YTotalTaxes?: number; WTotalTaxes?: number; JTotalTaxes?: number; FTotalTaxes?: number;
+  YAvailable?: boolean;
+  YMileageCost?: string;
+  YRemainingSeats?: number;
+  YDirect?: boolean;
+  YAirlines?: string;
+  WAvailable?: boolean;
+  WMileageCost?: string;
+  WRemainingSeats?: number;
+  WDirect?: boolean;
+  WAirlines?: string;
+  JAvailable?: boolean;
+  JMileageCost?: string;
+  JRemainingSeats?: number;
+  JDirect?: boolean;
+  JAirlines?: string;
+  FAvailable?: boolean;
+  FMileageCost?: string;
+  FRemainingSeats?: number;
+  FDirect?: boolean;
+  FAirlines?: string;
+  YTotalTaxes?: number;
+  WTotalTaxes?: number;
+  JTotalTaxes?: number;
+  FTotalTaxes?: number;
   TaxesCurrency?: string; // usually "USD"
 };
 
@@ -74,15 +78,16 @@ export class SeatsAeroProvider implements AwardProvider {
   constructor(private readonly apiKey: string) {}
 
   async search(input: SearchInput): Promise<AwardItinerary[]> {
+    const endDate = input.dateTo ?? input.date;
     const params = new URLSearchParams({
       origin_airport: input.from.toUpperCase(),
       destination_airport: input.to.toUpperCase(),
       start_date: input.date,
-      end_date: input.date,
+      end_date: endDate,
       cabin: input.cabin,
-      take: "200",
+      // No `sources` filter: every program seats.aero tracks is searched.
+      take: "1000",
       order_by: "lowest_mileage",
-      sources: Object.values(PROGRAM_TO_SOURCE).join(","),
     });
 
     const url = `${BASE_URL}?${params.toString()}`;
@@ -119,6 +124,7 @@ export class SeatsAeroProvider implements AwardProvider {
 
     const sourceSlug = row.Source ?? "";
     const programId = SOURCE_TO_PROGRAM[sourceSlug] ?? sourceSlug;
+    const program = getProgram(programId);
 
     // seats.aero returns TotalTaxes in the smallest denomination of
     // TaxesCurrency (i.e. cents), so always divide by 100.
@@ -132,7 +138,7 @@ export class SeatsAeroProvider implements AwardProvider {
     return {
       id: `${row.ID}-${field}`,
       programId,
-      programName: PROGRAM_NAMES[programId] ?? sourceSlug,
+      programName: program?.name ?? sourceSlug,
       carrier,
       flightNo: "",
       from: row.Route?.OriginAirport ?? input.from.toUpperCase(),

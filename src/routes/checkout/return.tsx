@@ -6,10 +6,7 @@ export const Route = createFileRoute("/checkout/return")({
     session_id: typeof s.session_id === "string" ? s.session_id : undefined,
   }),
   head: () => ({
-    meta: [
-      { title: "Welcome to Aureum Plus" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Welcome to Aureum Plus" }, { name: "robots", content: "noindex" }],
   }),
   component: ReturnPage,
 });
@@ -20,7 +17,7 @@ function ReturnPage() {
     <div className="min-h-screen bg-noir">
       <Header />
       <main className="mx-auto max-w-xl px-6 py-24 text-center">
-        <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-3">Welcome aboard</div>
+        <div className="text-xs uppercase tracking-widest text-gold mb-3">Welcome aboard</div>
         <h1 className="font-display text-4xl">You're on Aureum Plus.</h1>
         <p className="text-muted-foreground mt-4">
           {session_id
@@ -30,13 +27,13 @@ function ReturnPage() {
         <div className="mt-8 flex gap-3 justify-center">
           <Link
             to="/watchlists"
-            className="text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
+            className="text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
           >
             Create a watchlist
           </Link>
           <Link
             to="/account"
-            className="text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full border border-gold/40 text-gold hover:bg-gold/10 transition"
+            className="text-xs uppercase tracking-widest px-6 py-3 rounded-full border border-gold/40 text-gold hover:bg-gold/10 transition"
           >
             Account
           </Link>

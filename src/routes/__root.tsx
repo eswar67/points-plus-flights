@@ -2,6 +2,11 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 
 import appCss from "../styles.css?url";
 
+// Absolute base for social-card URLs (scrapers ignore relative og:image).
+// Set VITE_SITE_URL to the deployed origin, e.g. https://aureum.example.com
+const SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, "") ?? "";
+const OG_IMAGE = `${SITE_URL}/og.png`;
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -30,17 +35,31 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Aureum — Redeem Reward Points for Premium Flights" },
-      { name: "description", content: "Connect Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles. Search live award availability and redeem your points in real time." },
+      {
+        name: "description",
+        content:
+          "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook.",
+      },
       { name: "author", content: "Aureum" },
       { property: "og:title", content: "Aureum — Redeem Reward Points for Premium Flights" },
-      { property: "og:description", content: "Connect Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles. Search live award availability and redeem your points in real time." },
+      {
+        property: "og:description",
+        content:
+          "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook.",
+      },
       { property: "og:type", content: "website" },
       { name: "theme-color", content: "#0d0d0d" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Aureum — Redeem Reward Points for Premium Flights" },
-      { name: "twitter:description", content: "Connect Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles. Search live award availability and redeem your points in real time." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4a4904d5-eb1a-4f89-b2c8-95fab043d374/id-preview-5b1b58cc--b115ba8d-a516-4282-8b1d-67964b225599.lovable.app-1777734897264.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4a4904d5-eb1a-4f89-b2c8-95fab043d374/id-preview-5b1b58cc--b115ba8d-a516-4282-8b1d-67964b225599.lovable.app-1777734897264.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook.",
+      },
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: OG_IMAGE },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },

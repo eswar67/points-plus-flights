@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
+import { SkeletonRows } from "@/components/site/Skeleton";
 import { listBookingRequests, updateBookingRequest } from "@/lib/booking/agent.functions";
 
 export const Route = createFileRoute("/concierge")({
   head: () => ({
-    meta: [
-      { title: "Concierge queue — Aureum" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Concierge queue — Aureum" }, { name: "robots", content: "noindex" }],
   }),
   component: ConciergeQueue,
 });
@@ -41,6 +39,7 @@ function ConciergeQueue() {
   const update = useServerFn(updateBookingRequest);
   const [requests, setRequests] = useState<Req[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   async function refresh() {
     try {
@@ -59,13 +58,51 @@ function ConciergeQueue() {
         nav({ to: "/agent-login" });
         return;
       }
-      if (alive) refresh();
+      // RLS protects the data regardless; this keeps non-agents out of the UI.
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.session.user.id);
+      const isAgent = !!roles?.some((r) => r.role === "agent" || r.role === "admin");
+      if (!alive) return;
+      setAuthorized(isAgent);
+      if (isAgent) refresh();
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function setStatus(id: string, status: typeof STATUSES[number], agent_notes?: string | null) {
+  if (authorized === false) {
+    return (
+      <div className="min-h-screen bg-noir">
+        <Header />
+        <main className="mx-auto max-w-md px-6 py-24 text-center">
+          <h1 className="font-display text-3xl">Agents only.</h1>
+          <p className="text-sm text-muted-foreground mt-3">
+            This queue is restricted to concierge agents. If you should have access, ask an admin to
+            assign you the <span className="font-mono">agent</span> role.
+          </p>
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              nav({ to: "/agent-login" });
+            }}
+            className="mt-8 text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+          >
+            Sign in as an agent
+          </button>
+        </main>
+      </div>
+    );
+  }
+
+  async function setStatus(
+    id: string,
+    status: (typeof STATUSES)[number],
+    agent_notes?: string | null,
+  ) {
     await update({ data: { id, status, agent_notes: agent_notes ?? null } });
     refresh();
   }
@@ -82,8 +119,11 @@ function ConciergeQueue() {
             </p>
           </div>
           <button
-            onClick={async () => { await supabase.auth.signOut(); nav({ to: "/agent-login" }); }}
-            className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              nav({ to: "/agent-login" });
+            }}
+            className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
           >
             Sign out
           </button>
@@ -91,23 +131,24 @@ function ConciergeQueue() {
 
         {error && (
           <div className="rounded-lg border border-destructive/40 bg-destructive/10 text-destructive p-4 text-sm mb-6">
-            {error}. You may need the <span className="font-mono">agent</span> role assigned to your user.
+            {error}. You may need the <span className="font-mono">agent</span> role assigned to your
+            user.
           </div>
         )}
 
         {!requests ? (
-          <div className="text-muted-foreground text-sm">Loading…</div>
+          <SkeletonRows rows={4} height="h-24" />
         ) : requests.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground">
+          <div className="rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">
             No booking requests yet.
           </div>
         ) : (
           <div className="space-y-3">
             {requests.map((r) => (
-              <div key={r.id} className="rounded-xl border border-border bg-card p-5">
+              <div key={r.id} className="rounded-lg border border-border bg-card p-5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    <div className="text-xs uppercase tracking-widest text-muted-foreground">
                       {new Date(r.created_at).toLocaleString()} · ref {r.id.slice(0, 8)}
                     </div>
                     <div className="font-display text-xl mt-1">
@@ -121,8 +162,19 @@ function ConciergeQueue() {
                     </div>
                     <div className="text-sm mt-2">
                       <span className="text-muted-foreground">Program:</span> {r.program}
-                      {r.carrier && <> · <span className="text-muted-foreground">Carrier:</span> {r.carrier}</>}
-                      {r.miles_required != null && <> · <span className="text-muted-foreground">Miles:</span> {r.miles_required.toLocaleString()}</>}
+                      {r.carrier && (
+                        <>
+                          {" "}
+                          · <span className="text-muted-foreground">Carrier:</span> {r.carrier}
+                        </>
+                      )}
+                      {r.miles_required != null && (
+                        <>
+                          {" "}
+                          · <span className="text-muted-foreground">Miles:</span>{" "}
+                          {r.miles_required.toLocaleString()}
+                        </>
+                      )}
                     </div>
                     {r.notes && (
                       <div className="text-sm text-muted-foreground mt-2 italic">"{r.notes}"</div>
@@ -133,10 +185,10 @@ function ConciergeQueue() {
                       <button
                         key={s}
                         onClick={() => setStatus(r.id, s, r.agent_notes)}
-                        className={`text-[10px] uppercase tracking-[0.18em] px-3 py-1.5 rounded-full border transition ${
+                        className={`text-xs uppercase tracking-widest px-3 py-1.5 rounded-full border transition ${
                           r.status === s
                             ? "bg-gold text-gold-foreground border-gold"
-                            : "border-border text-muted-foreground hover:text-foreground hover:border-gold/40"
+                            : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
                         }`}
                       >
                         {s.replace("_", " ")}

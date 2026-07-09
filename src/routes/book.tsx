@@ -95,81 +95,77 @@ function BookPage() {
       <Header />
       <main className="mx-auto max-w-3xl px-6 py-16">
         <div className="mb-10">
-          <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-3">
-            Concierge booking
-          </div>
-          <h1 className="font-display text-4xl md:text-5xl tracking-tight">
-            Hand it to a human.
-          </h1>
+          <div className="text-xs uppercase tracking-widest text-gold mb-3">Concierge booking</div>
+          <h1 className="font-display text-4xl md:text-5xl tracking-tight">Hand it to a human.</h1>
           <p className="text-muted-foreground mt-4 max-w-xl">
-            Tell us where you want to go and we'll hunt award space across 30+
-            programs, then ticket it on your behalf. No card charged until we
-            confirm a seat you approve.
+            Tell us where you want to go and we'll hunt award space across 30+ programs, then ticket
+            it on your behalf. No card charged until we confirm a seat you approve.
           </p>
         </div>
 
         {gated ? (
-          <div className="rounded-2xl border border-gold/40 bg-gradient-to-b from-gold/10 to-transparent p-8">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-2">
+          <div className="rounded-lg border border-gold/40 bg-gradient-to-b from-gold/10 to-transparent p-8">
+            <div className="text-xs uppercase tracking-widest text-gold mb-2">
               Aureum Plus members only
             </div>
             <h2 className="font-display text-2xl">Concierge ticketing is a member benefit.</h2>
             <p className="text-muted-foreground mt-3 max-w-xl">
-              An award specialist hunts the seats, holds them, and tickets on your
-              behalf — across 30+ programs. Available to Aureum Plus members for
-              A$12/month or A$120/year.
+              An award specialist hunts the seats, holds them, and tickets on your behalf — across
+              30+ programs. Available to Aureum Plus members for A$12/month or A$120/year.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/pricing"
-                className="text-xs uppercase tracking-[0.25em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
+                className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
               >
                 Upgrade to Aureum Plus
               </Link>
               {!user && (
                 <Link
                   to="/auth"
-                  className="text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+                  search={{ redirect: "/book" }}
+                  className="text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
                 >
                   Sign in
                 </Link>
               )}
               <Link
                 to="/"
-                className="text-xs uppercase tracking-[0.2em] px-5 py-3 rounded-full text-muted-foreground hover:text-foreground transition"
+                className="text-xs uppercase tracking-widest px-5 py-3 rounded-full text-muted-foreground hover:text-foreground transition"
               >
                 Back to search
               </Link>
             </div>
           </div>
         ) : success ? (
-          <div className="rounded-2xl border border-gold/40 bg-gold/5 p-8">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-gold mb-2">
-              Request received
-            </div>
+          <div className="rounded-lg border border-gold/40 bg-gold/5 p-8">
+            <div className="text-xs uppercase tracking-widest text-gold mb-2">Request received</div>
             <h2 className="font-display text-2xl">We're on it.</h2>
             <p className="text-muted-foreground mt-3">
-              Reference{" "}
-              <span className="font-mono text-foreground">
-                {success.id.slice(0, 8)}
-              </span>
-              . An award specialist will reply to{" "}
-              <span className="text-foreground">{form.contact_email}</span>{" "}
-              within a few hours with options.
+              Reference <span className="font-mono text-foreground">{success.id.slice(0, 8)}</span>.
+              An award specialist will reply to{" "}
+              <span className="text-foreground">{form.contact_email}</span> within a few hours with
+              options.
             </p>
             <div className="mt-6 flex gap-3">
               <Link
                 to="/"
-                className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
               >
                 Back to search
               </Link>
               <button
                 onClick={() => {
                   setSuccess(null);
-                  setForm((f) => ({ ...f, route_from: "", route_to: "", travel_date: "", notes: "" }));
+                  setForm((f) => ({
+                    ...f,
+                    route_from: "",
+                    route_to: "",
+                    travel_date: "",
+                    notes: "",
+                  }));
                 }}
-                className="text-xs uppercase tracking-[0.2em] px-4 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
+                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
               >
                 Submit another
               </button>
@@ -210,8 +206,10 @@ function BookPage() {
                     required
                     maxLength={4}
                     value={form.route_from}
-                    onChange={(e) => set("route_from", e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
-                    className={`${inputCls} uppercase tracking-[0.2em]`}
+                    onChange={(e) =>
+                      set("route_from", e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))
+                    }
+                    className={`${inputCls} uppercase tracking-widest`}
                     placeholder="SYD"
                   />
                 </Field>
@@ -220,8 +218,10 @@ function BookPage() {
                     required
                     maxLength={4}
                     value={form.route_to}
-                    onChange={(e) => set("route_to", e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
-                    className={`${inputCls} uppercase tracking-[0.2em]`}
+                    onChange={(e) =>
+                      set("route_to", e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))
+                    }
+                    className={`${inputCls} uppercase tracking-widest`}
                     placeholder="LHR"
                   />
                 </Field>
@@ -253,7 +253,9 @@ function BookPage() {
                     className={inputCls}
                   >
                     {CABINS.map((c) => (
-                      <option key={c.value} value={c.value}>{c.label}</option>
+                      <option key={c.value} value={c.value}>
+                        {c.label}
+                      </option>
                     ))}
                   </select>
                 </Field>
@@ -317,14 +319,10 @@ function BookPage() {
 
             <div className="flex items-center justify-between gap-4 pt-2">
               <p className="text-xs text-muted-foreground max-w-sm">
-                We'll only contact you about this request. No card on file —
-                you approve fares before we ticket.
+                We'll only contact you about this request. No card on file — you approve fares
+                before we ticket.
               </p>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="text-xs uppercase tracking-[0.25em] px-6 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft disabled:opacity-50 transition shadow-gold"
-              >
+              <button type="submit" disabled={submitting} className="btn btn-primary shadow-gold">
                 {submitting ? "Sending…" : "Send request"}
               </button>
             </div>
@@ -341,7 +339,7 @@ const inputCls =
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2">
+      <span className="block text-xs uppercase tracking-widest text-muted-foreground mb-2">
         {label}
       </span>
       {children}
@@ -351,7 +349,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-border bg-card/40 p-6">
+    <section className="rounded-lg border border-border bg-card/40 p-6">
       <h2 className="font-display text-lg mb-4">{title}</h2>
       <div className="space-y-4">{children}</div>
     </section>

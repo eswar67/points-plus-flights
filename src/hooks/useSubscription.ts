@@ -55,10 +55,12 @@ export function useSubscription() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "subscriptions", filter: `user_id=eq.${user.id}` },
-        () => refetch()
+        () => refetch(),
       )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, refetch]);
 
   return { subscription: sub, isActive: isActive(sub), loading, refetch };

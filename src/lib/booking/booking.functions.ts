@@ -6,8 +6,18 @@ const RequestSchema = z.object({
   contact_email: z.string().trim().email().max(255),
   contact_name: z.string().trim().min(1).max(120),
   passenger_count: z.number().int().min(1).max(9),
-  route_from: z.string().trim().min(3).max(7).regex(/^[A-Za-z]+$/),
-  route_to: z.string().trim().min(3).max(7).regex(/^[A-Za-z]+$/),
+  route_from: z
+    .string()
+    .trim()
+    .min(3)
+    .max(7)
+    .regex(/^[A-Za-z]+$/),
+  route_to: z
+    .string()
+    .trim()
+    .min(3)
+    .max(7)
+    .regex(/^[A-Za-z]+$/),
   travel_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   cabin: z.enum(["economy", "premium", "business", "first"]),
   program: z.string().trim().min(1).max(60),
@@ -36,7 +46,7 @@ export const submitBookingRequest = createServerFn({ method: "POST" })
     });
     if (!hasSandbox && !hasLive) {
       throw new Error(
-        "Concierge booking is an Aureum Plus benefit. Upgrade at /pricing to submit a request."
+        "Concierge booking is an Aureum Plus benefit. Upgrade at /pricing to submit a request.",
       );
     }
 
@@ -54,5 +64,55 @@ export const submitBookingRequest = createServerFn({ method: "POST" })
       console.error("[submitBookingRequest]", error);
       throw new Error("Could not submit request. Please try again.");
     }
+
+    // Best-effort notifications — a mail failure must never lose a booking.
+    const { emailAlertsConfigured, sendAlertEmail } = await import("@/lib/alerts/email.server");
+    if (emailAlertsConfigured()) {
+      const ref = String(row.id).slice(0, 8);
+      const summary =
+        `<p style="margin:0 0 4px"><b>${data.route_from.toUpperCase()} → ${data.route_to.toUpperCase()}</b>` +
+        ` · ${data.travel_date} · ${data.cabin} · ${data.passenger_count} pax</p>` +
+        `<p style="margin:0 0 4px">Program: ${escapeHtml(data.program)}` +
+        `${data.carrier ? ` · Carrier: ${escapeHtml(data.carrier)}` : ""}` +
+        `${data.miles_required != null ? ` · Miles: ${data.miles_required.toLocaleString()}` : ""}</p>` +
+        `${data.notes ? `<p style="margin:8px 0 0;font-style:italic">"${escapeHtml(data.notes)}"</p>` : ""}`;
+
+      const agentInbox = process.env.CONCIERGE_INBOX_EMAIL;
+      if (agentInbox) {
+        try {
+          await sendAlertEmail(
+            agentInbox,
+            `New booking request ${ref} — ${data.route_from.toUpperCase()} → ${data.route_to.toUpperCase()}`,
+            `<div style="font-family:sans-serif;max-width:520px">` +
+              `<h2 style="margin:0 0 10px">New concierge request ${ref}</h2>` +
+              `<p style="margin:0 0 4px">${escapeHtml(data.contact_name)} · ${escapeHtml(data.contact_email)}</p>` +
+              summary +
+              `</div>`,
+          );
+        } catch (e) {
+          console.error("[submitBookingRequest] agent notify failed:", (e as Error).message);
+        }
+      }
+      try {
+        await sendAlertEmail(
+          data.contact_email,
+          `Aureum booking request received — ref ${ref}`,
+          `<div style="font-family:sans-serif;max-width:520px">` +
+            `<h2 style="margin:0 0 10px">We're on it.</h2>` +
+            `<p style="margin:0 0 10px">Thanks ${escapeHtml(data.contact_name)} — your request is in the concierge queue as ` +
+            `<b>ref ${ref}</b>. An award specialist will reply with options.</p>` +
+            summary +
+            `<p style="margin:12px 0 0">Track it any time on your Requests page.</p>` +
+            `</div>`,
+        );
+      } catch (e) {
+        console.error("[submitBookingRequest] customer confirm failed:", (e as Error).message);
+      }
+    }
+
     return { id: row.id, created_at: row.created_at };
   });
+
+function escapeHtml(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}

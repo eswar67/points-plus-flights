@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WatchlistsRouteImport } from './routes/watchlists'
+import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
@@ -20,13 +21,20 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentLoginRouteImport } from './routes/agent-login'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AwardsIndexRouteImport } from './routes/awards/index'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout/return'
+import { Route as AwardsRouteRouteImport } from './routes/awards/$route'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksPollWatchlistsRouteImport } from './routes/api/public/hooks/poll-watchlists'
 
 const WatchlistsRoute = WatchlistsRouteImport.update({
   id: '/watchlists',
   path: '/watchlists',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestsRoute = RequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgramsRoute = ProgramsRouteImport.update({
@@ -79,9 +87,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AwardsIndexRoute = AwardsIndexRouteImport.update({
+  id: '/awards/',
+  path: '/awards/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   id: '/checkout/return',
   path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AwardsRouteRoute = AwardsRouteRouteImport.update({
+  id: '/awards/$route',
+  path: '/awards/$route',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPaymentsWebhookRoute =
@@ -108,8 +126,11 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
+  '/requests': typeof RequestsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/awards/$route': typeof AwardsRouteRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/awards/': typeof AwardsIndexRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -124,8 +145,11 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
+  '/requests': typeof RequestsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/awards/$route': typeof AwardsRouteRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/awards': typeof AwardsIndexRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -141,8 +165,11 @@ export interface FileRoutesById {
   '/how-it-works': typeof HowItWorksRoute
   '/pricing': typeof PricingRoute
   '/programs': typeof ProgramsRoute
+  '/requests': typeof RequestsRoute
   '/watchlists': typeof WatchlistsRoute
+  '/awards/$route': typeof AwardsRouteRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/awards/': typeof AwardsIndexRoute
   '/api/public/hooks/poll-watchlists': typeof ApiPublicHooksPollWatchlistsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -159,8 +186,11 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/programs'
+    | '/requests'
     | '/watchlists'
+    | '/awards/$route'
     | '/checkout/return'
+    | '/awards/'
     | '/api/public/hooks/poll-watchlists'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -175,8 +205,11 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/programs'
+    | '/requests'
     | '/watchlists'
+    | '/awards/$route'
     | '/checkout/return'
+    | '/awards'
     | '/api/public/hooks/poll-watchlists'
     | '/api/public/payments/webhook'
   id:
@@ -191,8 +224,11 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/pricing'
     | '/programs'
+    | '/requests'
     | '/watchlists'
+    | '/awards/$route'
     | '/checkout/return'
+    | '/awards/'
     | '/api/public/hooks/poll-watchlists'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -208,8 +244,11 @@ export interface RootRouteChildren {
   HowItWorksRoute: typeof HowItWorksRoute
   PricingRoute: typeof PricingRoute
   ProgramsRoute: typeof ProgramsRoute
+  RequestsRoute: typeof RequestsRoute
   WatchlistsRoute: typeof WatchlistsRoute
+  AwardsRouteRoute: typeof AwardsRouteRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  AwardsIndexRoute: typeof AwardsIndexRoute
   ApiPublicHooksPollWatchlistsRoute: typeof ApiPublicHooksPollWatchlistsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
@@ -221,6 +260,13 @@ declare module '@tanstack/react-router' {
       path: '/watchlists'
       fullPath: '/watchlists'
       preLoaderRoute: typeof WatchlistsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requests': {
+      id: '/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof RequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/programs': {
@@ -293,11 +339,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/awards/': {
+      id: '/awards/'
+      path: '/awards'
+      fullPath: '/awards/'
+      preLoaderRoute: typeof AwardsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/checkout/return': {
       id: '/checkout/return'
       path: '/checkout/return'
       fullPath: '/checkout/return'
       preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/awards/$route': {
+      id: '/awards/$route'
+      path: '/awards/$route'
+      fullPath: '/awards/$route'
+      preLoaderRoute: typeof AwardsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/payments/webhook': {
@@ -328,11 +388,23 @@ const rootRouteChildren: RootRouteChildren = {
   HowItWorksRoute: HowItWorksRoute,
   PricingRoute: PricingRoute,
   ProgramsRoute: ProgramsRoute,
+  RequestsRoute: RequestsRoute,
   WatchlistsRoute: WatchlistsRoute,
+  AwardsRouteRoute: AwardsRouteRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  AwardsIndexRoute: AwardsIndexRoute,
   ApiPublicHooksPollWatchlistsRoute: ApiPublicHooksPollWatchlistsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

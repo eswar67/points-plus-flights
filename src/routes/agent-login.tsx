@@ -44,7 +44,7 @@ function AgentLogin() {
         </p>
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
           <div>
-            <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Email</label>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">Email</label>
             <input
               type="email"
               required
@@ -54,7 +54,9 @@ function AgentLogin() {
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Password</label>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">
+              Password
+            </label>
             <input
               type="password"
               required
@@ -67,7 +69,7 @@ function AgentLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full text-xs uppercase tracking-[0.18em] px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+            className="w-full text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>

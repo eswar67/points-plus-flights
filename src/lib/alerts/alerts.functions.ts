@@ -2,6 +2,17 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { sendTelegramMessage } from "./telegram.server";
+import { emailAlertsConfigured } from "./email.server";
+
+/**
+ * Which alert channels are usable in this deployment. The watchlist form
+ * hides channels whose provider secrets are missing, so users never pick a
+ * channel that silently can't deliver.
+ */
+export const getAlertChannelAvailability = createServerFn({ method: "GET" }).handler(async () => ({
+  telegram: !!process.env.TELEGRAM_API_KEY && !!process.env.LOVABLE_API_KEY,
+  email: emailAlertsConfigured(),
+}));
 
 /**
  * Send a one-shot test message to the user's saved Telegram chat ID.
