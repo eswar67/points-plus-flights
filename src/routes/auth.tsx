@@ -73,8 +73,14 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        setInfo("Check your inbox to confirm your email, then sign in.");
-        setMode("signin");
+        // Auto-confirm is enabled: sign the user straight in.
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) {
+          setInfo("Account created. Sign in to continue.");
+          setMode("signin");
+        } else {
+          nav({ to: dest });
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
