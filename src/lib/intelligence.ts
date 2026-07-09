@@ -200,9 +200,14 @@ export function fareTableFor(from: string, to: string): Partial<Record<Cabin, nu
 /**
  * Cents per point/mile (AUD basis).
  * cpp = (cash fare AUD - taxes AUD) / miles  * 100
- * Taxes returned in USD; convert at a flat 1.50 AUD/USD buffer.
+ * Award taxes come from seats.aero denominated in USD; convert at a flat
+ * AUD/USD buffer so every figure the user sees is in AUD.
  */
-const USD_TO_AUD = 1.55;
+export const USD_TO_AUD = 1.55;
+/** Convert USD taxes (as returned by the awards provider) to AUD dollars. */
+export function taxesAudFromUsd(taxesUsd: number): number {
+  return taxesUsd * USD_TO_AUD;
+}
 export function calcCppAud(a: AwardItinerary): number {
   const pax = a.pax && a.pax > 0 ? a.pax : 1;
   // miles/taxes are totals across all passengers; the fare benchmark is per seat.
@@ -313,57 +318,6 @@ export const TRANSFER_MATRIX: TransferRoute[] = [
     etaMaxMin: 4320,
     href: "https://global.americanexpress.com/rewards/transfer-points",
   },
-  // Chase
-  {
-    bank: "Chase UR",
-    programId: "united",
-    ratio: "1:1",
-    etaMin: 1,
-    etaMaxMin: 60,
-    href: "https://ultimaterewards.chase.com",
-  },
-  {
-    bank: "Chase UR",
-    programId: "krisflyer",
-    ratio: "1:1",
-    etaMin: 60,
-    etaMaxMin: 1440,
-    href: "https://ultimaterewards.chase.com",
-  },
-  // Bilt
-  {
-    bank: "Bilt",
-    programId: "united",
-    ratio: "1:1",
-    etaMin: 5,
-    etaMaxMin: 60,
-    href: "https://www.biltrewards.com",
-  },
-  {
-    bank: "Bilt",
-    programId: "emirates",
-    ratio: "1:1",
-    etaMin: 5,
-    etaMaxMin: 60,
-    href: "https://www.biltrewards.com",
-  },
-  // Citi
-  {
-    bank: "Citi TYP",
-    programId: "krisflyer",
-    ratio: "1:1",
-    etaMin: 60,
-    etaMaxMin: 1440,
-    href: "https://www.citi.com/thankyou",
-  },
-  {
-    bank: "Citi TYP",
-    programId: "lifemiles",
-    ratio: "1:1",
-    etaMin: 60,
-    etaMaxMin: 1440,
-    href: "https://www.citi.com/thankyou",
-  },
 ];
 
 export function transfersFor(programId: string): TransferRoute[] {
@@ -378,7 +332,6 @@ export function transfersFor(programId: string): TransferRoute[] {
  */
 export const TRANSFERABLE_PROGRAM_BANKS: Record<string, string[]> = {
   amex_mr: ["Amex MR (AU)", "Amex MR"],
-  citi: ["Citi TYP"],
   anz: [], // no partner routes on file yet
 };
 
