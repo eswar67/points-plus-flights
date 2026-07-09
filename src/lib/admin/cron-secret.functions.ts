@@ -11,8 +11,14 @@ export const getCronSecretMeta = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({}).parse(input ?? {}))
   .handler(async ({ context }) => {
-    const { supabase } = context;
-    const { data, error } = await supabase.rpc("admin_get_cron_secret_meta");
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    if (!isAdmin) return { ok: false as const, error: "admin role required" };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("admin_get_cron_secret_meta");
     if (error) return { ok: false as const, error: error.message };
     const row = Array.isArray(data) ? data[0] : data;
     return {
@@ -31,9 +37,15 @@ export const rotateCronSecret = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({}).parse(input ?? {}))
   .handler(async ({ context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    if (!isAdmin) return { ok: false as const, error: "admin role required" };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const newSecret = randomBytes(32).toString("hex");
-    const { data, error } = await supabase.rpc("admin_rotate_cron_secret", {
+    const { data, error } = await supabaseAdmin.rpc("admin_rotate_cron_secret", {
       _new_value: newSecret,
     });
     if (error) return { ok: false as const, error: error.message };
