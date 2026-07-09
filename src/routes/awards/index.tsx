@@ -131,9 +131,20 @@ function AwardsIndex() {
                   <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {list.map(({ from, to }) => {
                       const fares = fareTableFor(from, to);
-                      const eco = fares?.economy;
                       const biz = fares?.business;
                       const spots = sweetSpotsFor(from, to);
+                      // Cheapest business redemption: pick the sweet spot with the lowest
+                      // cash outlay (taxes) — that's the real % saving vs a paid business fare.
+                      const bizSpots = spots.filter((s) => s.cabin === "business");
+                      const bestBiz = bizSpots.length
+                        ? bizSpots.reduce((a, b) =>
+                            (a.taxesAud ?? Infinity) <= (b.taxesAud ?? Infinity) ? a : b,
+                          )
+                        : null;
+                      const savingPct =
+                        biz && bestBiz && bestBiz.taxesAud !== undefined
+                          ? Math.max(0, Math.round(((biz - bestBiz.taxesAud) / biz) * 100))
+                          : null;
                       return (
                         <Link
                           key={`${from}-${to}`}
@@ -145,34 +156,43 @@ function AwardsIndex() {
                             <div className="font-display text-2xl">
                               {from} <span className="text-gold">→</span> {to}
                             </div>
-                            {spots.length > 0 && (
-                              <span className="text-[9px] uppercase tracking-widest text-gold border border-gold/40 rounded-full px-2 py-0.5">
-                                {spots.length} sweet spot{spots.length > 1 ? "s" : ""}
+                            {savingPct !== null && (
+                              <span className="text-[10px] uppercase tracking-widest text-gold-foreground bg-gold rounded-full px-2 py-0.5 font-medium">
+                                Save {savingPct}%
                               </span>
                             )}
                           </div>
-                          <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                            {eco && (
-                              <div>
-                                <dt className="uppercase tracking-widest text-muted-foreground">
-                                  Economy cash
-                                </dt>
-                                <dd className="font-mono tabular-nums text-foreground">
-                                  {fmtAud(eco)}
-                                </dd>
-                              </div>
-                            )}
-                            {biz && (
-                              <div>
-                                <dt className="uppercase tracking-widest text-muted-foreground">
+                          {biz && (
+                            <div className="mt-4 space-y-2">
+                              <div className="flex items-baseline justify-between text-xs">
+                                <span className="uppercase tracking-widest text-muted-foreground">
                                   Business cash
-                                </dt>
-                                <dd className="font-mono tabular-nums text-foreground">
+                                </span>
+                                <span className="font-mono tabular-nums text-muted-foreground line-through">
                                   {fmtAud(biz)}
-                                </dd>
+                                </span>
                               </div>
-                            )}
-                          </dl>
+                              {bestBiz ? (
+                                <div className="flex items-baseline justify-between text-xs">
+                                  <span className="uppercase tracking-widest text-gold">
+                                    Reward · {PROGRAMS.find((p) => p.id === bestBiz.programId)?.short}
+                                  </span>
+                                  <span className="font-mono tabular-nums text-foreground">
+                                    {(bestBiz.miles / 1000).toFixed(0)}k
+                                    {bestBiz.taxesAud !== undefined && (
+                                      <span className="text-muted-foreground">
+                                        {" "}+ {fmtAud(bestBiz.taxesAud)}
+                                      </span>
+                                    )}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="text-[10px] uppercase tracking-widest text-muted-foreground/70">
+                                  Reward benchmark inside →
+                                </div>
+                              )}
+                            </div>
+                          )}
                           <div className="mt-4 text-[10px] uppercase tracking-widest text-gold opacity-0 group-hover:opacity-100 transition">
                             Read the guide →
                           </div>
