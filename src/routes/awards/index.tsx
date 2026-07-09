@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { SavingTooltip } from "@/components/awards/SavingTooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { knownRoutes, fareTableFor, fmtAud } from "@/lib/intelligence";
 import {
   sweetSpotsFor,
@@ -9,6 +11,7 @@ import {
   type Region,
 } from "@/lib/awards/sweetSpots";
 import { PROGRAMS } from "@/lib/programs";
+
 
 export const Route = createFileRoute("/awards/")({
   head: () => ({
@@ -44,9 +47,11 @@ function AwardsIndex() {
   const programShort = (id: string) => PROGRAMS.find((p) => p.id === id)?.short ?? "?";
 
   return (
-    <div className="min-h-screen bg-noir">
-      <Header />
-      <main className="mx-auto max-w-7xl px-6 py-16">
+    <TooltipProvider delayDuration={150}>
+      <div className="min-h-screen bg-noir">
+        <Header />
+        <main className="mx-auto max-w-7xl px-6 py-16">
+
         <span className="text-xs uppercase tracking-widest text-gold">The Redemption Playbook</span>
         <h1 className="font-display text-5xl md:text-6xl mt-4 max-w-4xl">
           Where your points{" "}
@@ -167,11 +172,20 @@ function AwardsIndex() {
                             <div className="font-display text-2xl">
                               {from} <span className="text-gold">→</span> {to}
                             </div>
-                            {savingPct !== null && (
-                              <span className="text-[10px] uppercase tracking-widest text-gold-foreground bg-gold rounded-full px-2 py-0.5 font-medium">
+                            {savingPct !== null && bestBiz?.taxesAud !== undefined && (
+                              <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gold-foreground bg-gold rounded-full px-2 py-0.5 font-medium">
                                 Save {savingPct}%
+                                <SavingTooltip
+                                  cash={biz ?? 0}
+                                  taxes={bestBiz.taxesAud ?? 0}
+                                  pct={savingPct}
+                                  cabin="business"
+                                />
                               </span>
                             )}
+
+
+
                           </div>
                           {biz && (
                             <div className="mt-4 space-y-2">
@@ -233,11 +247,18 @@ function AwardsIndex() {
                                   Economy reward inside →
                                 </div>
                               )}
-                              {ecoSavingPct !== null && (
-                                <div className="text-[10px] uppercase tracking-widest text-gold">
+                              {ecoSavingPct !== null && bestEco?.taxesAud !== undefined && (
+                                <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gold">
                                   Save {ecoSavingPct}% vs cash
+                                  <SavingTooltip
+                                    cash={eco ?? 0}
+                                    taxes={bestEco.taxesAud ?? 0}
+                                    pct={ecoSavingPct}
+                                    cabin="economy"
+                                  />
                                 </div>
                               )}
+
                             </div>
                           )}
                           <div className="mt-4 text-[10px] uppercase tracking-widest text-gold opacity-0 group-hover:opacity-100 transition">
@@ -289,7 +310,9 @@ function AwardsIndex() {
           Australian Frequent Flyer. Miles and taxes are indicative — always confirm in-program before transferring.
         </p>
       </main>
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </TooltipProvider>
   );
 }
+
