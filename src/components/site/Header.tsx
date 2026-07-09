@@ -54,14 +54,7 @@ export function Header() {
                 Sign out
               </button>
             </div>
-          ) : (
-            <Link
-              to="/auth"
-              className="hidden md:inline-block text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
-            >
-              Sign in
-            </Link>
-          )}
+          ) : null}
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -110,15 +103,7 @@ export function Header() {
                   Sign out
                 </button>
               </>
-            ) : (
-              <Link
-                to="/auth"
-                onClick={() => setOpen(false)}
-                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
-              >
-                Sign in
-              </Link>
-            )}
+            ) : null}
           </div>
         </nav>
       )}
