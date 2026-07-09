@@ -111,6 +111,7 @@ function Index() {
   const [twoPlusSeats, setTwoPlusSeats] = useState(false);
   const [bookableOnly, setBookableOnly] = useState(false);
   const [sweetOnly, setSweetOnly] = useState(false);
+  const [hideZeroAvailability, setHideZeroAvailability] = useState(true);
 
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
