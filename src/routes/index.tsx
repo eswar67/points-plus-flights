@@ -211,6 +211,7 @@ function Index() {
     return k === "direct" || k === "transfer";
   });
   const sweetSpotCount = ranked.filter((a) => a.isSweetSpot).length;
+  const zeroAvailabilityCount = ranked.filter((a) => a.seats === 0).length;
 
   const filtered = ranked.filter(
     (a) =>
@@ -270,6 +271,10 @@ function Index() {
   }
 
   const minMiles = filtered.length ? Math.min(...filtered.map((a) => a.miles)) : 0;
+  // Smoothly animate the results count and the zero-availability badge so
+  // toggling the filter feels like the number is being tallied live.
+  const animatedCount = useCountUp(sorted.length, 450);
+  const animatedZeroCount = useCountUp(zeroAvailabilityCount, 450);
 
   function toggleProgram(pid: string) {
     setProgramFilter((cur) => {
