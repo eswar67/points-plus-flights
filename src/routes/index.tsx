@@ -28,7 +28,6 @@ import {
   type SweetSpotInfo,
 } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
-import { useAuth } from "@/hooks/useAuth";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { RecentSearches } from "@/components/site/RecentSearches";
 import { TopPickBanner } from "@/components/site/TopPickBanner";
