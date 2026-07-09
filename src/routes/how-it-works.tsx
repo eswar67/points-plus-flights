@@ -5,7 +5,7 @@ import { Footer } from "@/components/site/Footer";
 export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
-      { title: "How Miles Expert Works — Award Search & Concierge" },
+      { title: "How Miles Expert Works — Award Seat Search" },
       {
         name: "description",
         content:

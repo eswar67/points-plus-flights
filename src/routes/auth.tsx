@@ -262,12 +262,6 @@ function AuthPage() {
           )}
         </div>
 
-        <p className="mt-10 text-center text-xs text-muted-foreground">
-          Concierge agent?{" "}
-          <Link to="/agent-login" className="text-gold hover:underline">
-            Agent sign in
-          </Link>
-        </p>
       </main>
     </div>
   );
