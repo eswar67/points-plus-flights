@@ -1,4 +1,4 @@
-import { ArrowRight, Clock, X } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import type { RecentSearch } from "@/hooks/useRecentSearches";
 import { AIRPORTS } from "@/lib/airports";
 
@@ -56,5 +56,3 @@ export function RecentSearches({
 }
 
 RecentSearches.displayName = "RecentSearches";
-// keep import used
-void X;
