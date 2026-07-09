@@ -13,8 +13,9 @@ function fmtEta(min: number) {
 }
 
 /**
- * Shows where the user's transferable currencies (Amex MR, Citi TYP, ANZ)
- * can go, at what ratio and speed — and the resulting per-program reach.
+ * Shows where the user's Australian transferable currencies (Amex MR AU,
+ * ANZ Rewards) can go, at what ratio and speed — and the resulting
+ * per-program reach.
  */
 export function TransferPlanner() {
   const { balances, byProgramId, loading } = useUserBalances();
