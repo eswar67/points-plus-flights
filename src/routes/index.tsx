@@ -22,6 +22,8 @@ import {
   knownRoutes,
   fareEstimateAud,
   type RankedItinerary,
+  annotateSweetSpots,
+  type SweetSpotInfo,
 } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useAuth } from "@/hooks/useAuth";
@@ -91,13 +93,23 @@ function Index() {
 
   // Results toolbar (point.me-grade result controls)
   const [sortBy, setSortBy] = useState<
-    "value" | "points" | "taxes" | "seats" | "duration" | "stops" | "depart" | "fresh"
+    | "value"
+    | "points"
+    | "taxes"
+    | "seats"
+    | "duration"
+    | "stops"
+    | "depart"
+    | "fresh"
+    | "sweet"
   >("points");
   const [programFilter, setProgramFilter] = useState<Set<string> | null>(null);
   const [carrierFilter, setCarrierFilter] = useState<Set<string> | null>(null);
   const [gradeFilter, setGradeFilter] = useState<Set<string> | null>(null);
   const [nonstopOnly, setNonstopOnly] = useState(false);
   const [twoPlusSeats, setTwoPlusSeats] = useState(false);
+  const [bookableOnly, setBookableOnly] = useState(false);
+  const [sweetOnly, setSweetOnly] = useState(false);
 
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
@@ -125,6 +137,8 @@ function Index() {
     setGradeFilter(null);
     setNonstopOnly(false);
     setTwoPlusSeats(false);
+    setBookableOnly(false);
+    setSweetOnly(false);
     startTransition(async () => {
       try {
         const range = rangeFor(q);
@@ -140,7 +154,10 @@ function Index() {
   }
 
   const itineraries: AwardItinerary[] = result?.itineraries ?? [];
-  const ranked = rankItineraries(itineraries, byProgramId);
+  const rankedRaw = rankItineraries(itineraries, byProgramId);
+  // Enrich with sweet-spot annotations (median-baseline detection per cabin)
+  const ranked = annotateSweetSpots(rankedRaw);
+  type Enriched = RankedItinerary & SweetSpotInfo;
 
   // Program facets (from unfiltered results, so counts stay stable)
   const programFacets = new Map<string, { name: string; accent: string; count: number }>();
@@ -165,15 +182,37 @@ function Index() {
     carrierFacets.set(key, cur);
   }
 
+  // Bookability derived from user's balances + transfer reach
+  const hasAnyBalance = Object.keys(byProgramId).length > 0;
+  const reach = hasAnyBalance ? effectiveBalances(byProgramId) : {};
+  function bookableKind(a: Enriched): "direct" | "transfer" | "short" | null {
+    if (!hasAnyBalance) return null;
+    const direct = byProgramId[a.programId] ?? 0;
+    if (direct >= a.miles) return "direct";
+    const total = reach[a.programId]?.total ?? direct;
+    if (total >= a.miles) return "transfer";
+    return "short";
+  }
+  const bookableNow = ranked.filter((a) => {
+    const k = bookableKind(a);
+    return k === "direct" || k === "transfer";
+  });
+  const sweetSpotCount = ranked.filter((a) => a.isSweetSpot).length;
+
   const filtered = ranked.filter(
     (a) =>
       (!nonstopOnly || a.direct || a.stops === 0) &&
       (!twoPlusSeats || a.seats >= 2) &&
       (!gradeFilter || gradeFilter.size === 0 || gradeFilter.has(a.grade)) &&
       (!programFilter || programFilter.size === 0 || programFilter.has(a.programId)) &&
-      (!carrierFilter || carrierFilter.size === 0 || carrierFilter.has((a.carrier || "").trim())),
+      (!carrierFilter || carrierFilter.size === 0 || carrierFilter.has((a.carrier || "").trim())) &&
+      (!sweetOnly || a.isSweetSpot) &&
+      (!bookableOnly || (() => {
+        const k = bookableKind(a);
+        return k === "direct" || k === "transfer";
+      })()),
   );
-  const sorted =
+  const sorted: Enriched[] =
     sortBy === "points"
       ? [...filtered].sort((a, b) => a.miles - b.miles)
       : sortBy === "taxes"
@@ -198,7 +237,14 @@ function Index() {
                       const tb = b.updatedAt ? Date.parse(b.updatedAt) : 0;
                       return tb - ta;
                     })
-                  : filtered; // "value" keeps the CPP-first ranking
+                  : sortBy === "sweet"
+                    ? [...filtered].sort(
+                        (a, b) =>
+                          Number(b.isSweetSpot) - Number(a.isSweetSpot) ||
+                          b.discountPct - a.discountPct ||
+                          a.miles - b.miles,
+                      )
+                    : filtered; // "value" keeps the CPP-first ranking
 
   function toggleGrade(g: string) {
     setGradeFilter((cur) => {
@@ -244,8 +290,15 @@ function Index() {
     if (!min) return "—";
     return `${Math.floor(min / 60)}h ${min % 60}m`;
   }
-  function reasonFor(a: RankedItinerary): string | undefined {
+  function reasonFor(a: Enriched): string | undefined {
     switch (sortBy) {
+      case "sweet": {
+        if (a.isSweetSpot)
+          return `Sweet spot — ${Math.round(a.discountPct * 100)}% below typical (${a.baselineMiles.toLocaleString()} pts)`;
+        if (a.savingsMiles > 0)
+          return `${a.savingsMiles.toLocaleString()} pts below typical (${a.baselineMiles.toLocaleString()})`;
+        return `Typical for this cabin (${a.baselineMiles.toLocaleString()} pts)`;
+      }
       case "points": {
         if (a.miles === leader.miles) return `Cheapest here — ${a.miles.toLocaleString()} pts`;
         const diff = a.miles - leader.miles;
@@ -290,7 +343,7 @@ function Index() {
 
   // Group by departure date (each group's first entry is its best by the
   // active sort).
-  const byDate = new Map<string, RankedItinerary[]>();
+  const byDate = new Map<string, Enriched[]>();
   for (const a of sorted) {
     const d = (a.depart || "").slice(0, 10);
     const list = byDate.get(d) ?? [];
@@ -425,6 +478,75 @@ function Index() {
               </div>
             )}
 
+            {/* Personalised banner: bookable-now + sweet-spot summary */}
+            {!pending && !error && ranked.length > 0 && (
+              <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {hasAnyBalance ? (
+                  <button
+                    type="button"
+                    onClick={() => setBookableOnly((v) => !v)}
+                    aria-pressed={bookableOnly}
+                    className={`text-left rounded-lg border p-4 transition ${
+                      bookableOnly
+                        ? "border-emerald-400/50 bg-emerald-500/10"
+                        : "border-border hover:border-border-strong bg-card"
+                    }`}
+                  >
+                    <div className="text-xs uppercase tracking-widest text-emerald-300/90">
+                      You can book today
+                    </div>
+                    <div className="mt-1 text-sm">
+                      <span className="font-display text-2xl tabular-nums text-foreground">
+                        {bookableNow.length}
+                      </span>{" "}
+                      of {ranked.length} results are covered by miles you already hold
+                      {bookableOnly ? " — filtered" : ". Click to filter."}
+                    </div>
+                  </button>
+                ) : (
+                  <Link
+                    to="/auth"
+                    className="text-left rounded-lg border border-border hover:border-border-strong bg-card p-4 transition"
+                  >
+                    <div className="text-xs uppercase tracking-widest text-gold">
+                      See which of these you can book
+                    </div>
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      Sign in and paste your balances — takes 60 seconds. We'll flag every
+                      seat you can redeem directly or via a fast transfer.
+                    </div>
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setSweetOnly((v) => !v)}
+                  aria-pressed={sweetOnly}
+                  disabled={sweetSpotCount === 0}
+                  className={`text-left rounded-lg border p-4 transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                    sweetOnly
+                      ? "border-gold/60 bg-gold/10"
+                      : "border-border hover:border-border-strong bg-card"
+                  }`}
+                >
+                  <div className="text-xs uppercase tracking-widest text-gold">
+                    Sweet spots today
+                  </div>
+                  <div className="mt-1 text-sm">
+                    <span className="font-display text-2xl tabular-nums text-foreground">
+                      {sweetSpotCount}
+                    </span>{" "}
+                    {sweetSpotCount === 1 ? "outlier" : "outliers"} priced ≥25% below the
+                    typical rate for this cabin
+                    {sweetSpotCount > 0
+                      ? sweetOnly
+                        ? " — filtered"
+                        : ". Click to filter."
+                      : "."}
+                  </div>
+                </button>
+              </div>
+            )}
+
             {/* Results toolbar: sort, stops, program facets */}
             {!pending && !error && query.mode !== "month" && ranked.length > 0 && (
               <div className="mb-6 space-y-3">
@@ -433,6 +555,7 @@ function Index() {
                   {(
                     [
                       ["value", "Best value"],
+                      ["sweet", "Sweet spots"],
                       ["points", "Fewest points"],
                       ["taxes", "Lowest taxes"],
                       ["seats", "Most seats"],
@@ -656,7 +779,15 @@ function Index() {
                             className="animate-card-in"
                             style={{ "--stagger": Math.min(i, 8) } as React.CSSProperties}
                           >
-                            <AwardCard award={a} balances={byProgramId} reason={reasonFor(a)} />
+                            <AwardCard
+                              award={a}
+                              balances={byProgramId}
+                              reason={reasonFor(a)}
+                              isSweetSpot={a.isSweetSpot}
+                              baselineMiles={a.baselineMiles}
+                              savingsMiles={a.savingsMiles}
+                              discountPct={a.discountPct}
+                            />
                           </div>
                         ))}
                       </div>

@@ -13,7 +13,7 @@ import {
   transfersFor,
   effectiveBalances,
 } from "@/lib/intelligence";
-import { AlertTriangle, Check, Plane, Sparkles, Zap } from "lucide-react";
+import { AlertTriangle, Check, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -38,10 +38,18 @@ export function AwardCard({
   award,
   balances = {},
   reason,
+  isSweetSpot,
+  baselineMiles,
+  savingsMiles,
+  discountPct,
 }: {
   award: AwardItinerary;
   balances?: Record<string, number>;
   reason?: string;
+  isSweetSpot?: boolean;
+  baselineMiles?: number;
+  savingsMiles?: number;
+  discountPct?: number;
 }) {
   const [open, setOpen] = useState(false);
   const byProgramId = balances;
@@ -103,6 +111,22 @@ export function AwardCard({
   return (
     <div className="group relative rounded-lg border border-border bg-card hover:border-border-strong transition overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent opacity-0 group-hover:opacity-100 transition" />
+
+      {/* Sweet-spot ribbon (Phase 1) */}
+      {isSweetSpot && savingsMiles && savingsMiles > 0 && (
+        <div className="px-5 pt-3 pb-1 flex items-center gap-2 border-b border-gold/20 bg-gradient-to-r from-gold/10 via-gold/5 to-transparent">
+          <Sparkles className="size-3.5 text-gold" />
+          <span className="text-xs uppercase tracking-widest text-gold font-medium">
+            Sweet spot
+          </span>
+          <span className="text-xs text-foreground/80 tabular-nums">
+            saves {savingsMiles.toLocaleString()} pts vs typical{" "}
+            {(baselineMiles ?? 0).toLocaleString()}
+            {discountPct ? ` · ${Math.round(discountPct * 100)}% off` : ""}
+          </span>
+        </div>
+      )}
+
       {/* Intelligence strip */}
       <div className="px-5 pt-3 pb-2 flex flex-wrap items-center gap-2 border-b border-border-soft">
         <span
@@ -188,18 +212,23 @@ export function AwardCard({
           </div>
           <div className="text-xs text-muted-foreground mt-1">{alliance}</div>
           {bookable === "direct" && (
-            <div className="mt-2 inline-flex items-center gap-1 text-xs text-emerald-300">
-              <Check className="size-3" /> Covered by your balance
+            <div className="mt-2 inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-2.5 py-1 rounded-full border border-emerald-400/40 bg-emerald-500/15 text-emerald-300">
+              <Check className="size-3" /> Book now
             </div>
           )}
-          {bookable === "transfer" && (
-            <div className="mt-2 inline-flex items-center gap-1 text-xs text-gold tabular-nums">
-              <Check className="size-3" /> In reach via transfer
+          {bookable === "transfer" && fastest && (
+            <div className="mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-gold/40 bg-gold/10 text-gold tabular-nums">
+              <ArrowRightLeft className="size-3" />
+              Transfer {Math.max(0, award.miles - balance).toLocaleString()} from{" "}
+              {fastest.bank}
+              <span className="opacity-70">
+                · {fastest.etaMin < 60 ? "instant" : `~${Math.round(fastest.etaMin / 60)}h`}
+              </span>
             </div>
           )}
           {bookable === "short" && (
-            <div className="mt-2 text-xs text-muted-foreground tabular-nums">
-              {(award.miles - effective).toLocaleString()} pts short
+            <div className="mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-border bg-muted/40 text-muted-foreground tabular-nums">
+              Short {(award.miles - effective).toLocaleString()} pts
             </div>
           )}
         </div>
