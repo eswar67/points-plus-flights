@@ -111,6 +111,7 @@ function Index() {
   const [twoPlusSeats, setTwoPlusSeats] = useState(false);
   const [bookableOnly, setBookableOnly] = useState(false);
   const [sweetOnly, setSweetOnly] = useState(false);
+  const [hideZeroAvailability, setHideZeroAvailability] = useState(true);
 
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
@@ -140,6 +141,7 @@ function Index() {
     setTwoPlusSeats(false);
     setBookableOnly(false);
     setSweetOnly(false);
+    setHideZeroAvailability(true);
     // Smoothly reveal the results section so the user sees the transition.
     requestAnimationFrame(() => {
       resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -212,6 +214,7 @@ function Index() {
       (!programFilter || programFilter.size === 0 || programFilter.has(a.programId)) &&
       (!carrierFilter || carrierFilter.size === 0 || carrierFilter.has((a.carrier || "").trim())) &&
       (!sweetOnly || a.isSweetSpot) &&
+      (!hideZeroAvailability || a.seats > 0) &&
       (!bookableOnly || (() => {
         const k = bookableKind(a);
         return k === "direct" || k === "transfer";
@@ -612,6 +615,18 @@ function Index() {
                   >
                     2+ seats
                   </button>
+                  <button
+                    type="button"
+                    aria-pressed={!hideZeroAvailability}
+                    onClick={() => setHideZeroAvailability((v) => !v)}
+                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                      !hideZeroAvailability
+                        ? "bg-gold/15 text-gold border-gold/50"
+                        : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                    }`}
+                  >
+                    Zero availability
+                  </button>
                 </div>
                 <div
                   className="flex flex-wrap items-center gap-2"
@@ -733,6 +748,7 @@ function Index() {
                     setGradeFilter(null);
                     setNonstopOnly(false);
                     setTwoPlusSeats(false);
+                    setHideZeroAvailability(true);
                   }}
                   className="mt-4 btn btn-ghost"
                 >
