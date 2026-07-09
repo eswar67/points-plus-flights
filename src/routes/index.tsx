@@ -835,7 +835,18 @@ function Index() {
             ) : (
               <>
                 {sorted.length > 0 && (
-                  <TopPickBanner items={sorted} pax={query.pax} />
+                  <TopPickBanner
+                    items={sorted}
+                    pax={query.pax}
+                    range={{
+                      from: query.from,
+                      to: query.to,
+                      cabin: query.cabin,
+                      pax: query.pax,
+                      dateFrom: rangeFor(query).date,
+                      dateTo: rangeFor(query).dateTo ?? rangeFor(query).date,
+                    }}
+                  />
                 )}
                 {multiDate && (
                   <div
