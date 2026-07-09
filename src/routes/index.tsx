@@ -949,6 +949,14 @@ function Index() {
                           })}
                         </h3>
                       )}
+                      {viewMode === "table" ? (
+                        <AwardTable
+                          rows={byDate.get(d) ?? []}
+                          sortBy={sortBy}
+                          onSort={setSortBy}
+                          pax={query.pax}
+                        />
+                      ) : (
                       <div className="space-y-3">
                         {(byDate.get(d) ?? []).map((a, i) => (
                           <div
@@ -968,6 +976,7 @@ function Index() {
                           </div>
                         ))}
                       </div>
+                      )}
                     </div>
                   ))}
                 </div>
