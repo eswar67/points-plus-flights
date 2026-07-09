@@ -6,7 +6,6 @@ import { LogoMark } from "./Logo";
 
 const NAV_LINKS = [
   { to: "/", label: "Search", authed: false },
-  { to: "/programs", label: "Programs", authed: false },
   { to: "/awards", label: "Route guide", authed: false },
   { to: "/watchlists", label: "Watchlists", authed: true },
   { to: "/how-it-works", label: "How it works", authed: false },
