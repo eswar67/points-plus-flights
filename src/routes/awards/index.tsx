@@ -177,12 +177,13 @@ function AwardsIndex() {
                                 Save {savingPct}%
                                 <SavingTooltip
                                   cash={biz}
-                                  taxes={bestBiz.taxesAud}
+                                  taxes={bestBiz.taxesAud ?? 0}
                                   pct={savingPct}
                                   cabin="business"
                                 />
                               </span>
                             )}
+
 
                           </div>
                           {biz && (
