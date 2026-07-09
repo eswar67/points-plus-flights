@@ -480,6 +480,38 @@ function Index() {
                       })}
                   </div>
                 )}
+                {carrierFacets.size > 1 && (
+                  <div
+                    className="flex gap-2 overflow-x-auto pb-1"
+                    role="group"
+                    aria-label="Filter by airline"
+                  >
+                    <span className="text-xs text-muted-foreground mr-1 self-center shrink-0">
+                      Airline
+                    </span>
+                    {[...carrierFacets.entries()]
+                      .sort((a, b) => b[1].count - a[1].count)
+                      .map(([carrier, f]) => {
+                        const active = carrierFilter?.has(carrier) ?? false;
+                        return (
+                          <button
+                            key={carrier}
+                            type="button"
+                            aria-pressed={active}
+                            onClick={() => toggleCarrier(carrier)}
+                            className={`shrink-0 inline-flex items-center gap-2 text-xs px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
+                              active
+                                ? "bg-gold/15 text-gold border-gold/50"
+                                : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                            }`}
+                          >
+                            {carrier}
+                            <span className="opacity-60">{f.count}</span>
+                          </button>
+                        );
+                      })}
+                  </div>
+                )}
               </div>
             )}
 
