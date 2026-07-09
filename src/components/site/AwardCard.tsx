@@ -13,7 +13,8 @@ import {
   transfersFor,
   effectiveBalances,
 } from "@/lib/intelligence";
-import { AlertTriangle, Check, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
+import { AlertTriangle, Bookmark, BookmarkCheck, Check, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
+import { useShortlist } from "@/hooks/useShortlist";
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -52,6 +53,9 @@ export function AwardCard({
   discountPct?: number;
 }) {
   const [open, setOpen] = useState(false);
+  const { has, toggle } = useShortlist();
+  const saved = has(award.id);
+  const [flash, setFlash] = useState(false);
   const byProgramId = balances;
   const program = PROGRAMS.find((p) => p.id === award.programId);
   const accent = program?.accent ?? "#c9a84c";
@@ -111,6 +115,37 @@ export function AwardCard({
   return (
     <div className="group relative rounded-lg border border-border bg-card hover:border-border-strong transition overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent opacity-0 group-hover:opacity-100 transition" />
+
+      {/* Save (shortlist) toggle — top-right corner */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          const nowSaved = toggle(award);
+          if (nowSaved) {
+            setFlash(true);
+            setTimeout(() => setFlash(false), 700);
+          }
+        }}
+        aria-pressed={saved}
+        aria-label={saved ? "Remove from shortlist" : "Save to shortlist"}
+        title={saved ? "Saved · click to remove" : "Save for later"}
+        className={`absolute top-2 right-2 z-10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-widest transition ${
+          saved
+            ? "border-gold/50 bg-gold/15 text-gold"
+            : "border-border-soft bg-card/70 backdrop-blur text-muted-foreground hover:text-gold hover:border-gold/40"
+        } ${flash ? "animate-scale-in" : ""}`}
+      >
+        {saved ? (
+          <>
+            <BookmarkCheck className="size-3.5" /> Saved
+          </>
+        ) : (
+          <>
+            <Bookmark className="size-3.5" /> Save
+          </>
+        )}
+      </button>
 
       {/* Sweet-spot ribbon (Phase 1) */}
       {isSweetSpot && savingsMiles && savingsMiles > 0 && (
