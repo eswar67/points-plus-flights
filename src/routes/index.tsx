@@ -93,13 +93,23 @@ function Index() {
 
   // Results toolbar (point.me-grade result controls)
   const [sortBy, setSortBy] = useState<
-    "value" | "points" | "taxes" | "seats" | "duration" | "stops" | "depart" | "fresh"
+    | "value"
+    | "points"
+    | "taxes"
+    | "seats"
+    | "duration"
+    | "stops"
+    | "depart"
+    | "fresh"
+    | "sweet"
   >("points");
   const [programFilter, setProgramFilter] = useState<Set<string> | null>(null);
   const [carrierFilter, setCarrierFilter] = useState<Set<string> | null>(null);
   const [gradeFilter, setGradeFilter] = useState<Set<string> | null>(null);
   const [nonstopOnly, setNonstopOnly] = useState(false);
   const [twoPlusSeats, setTwoPlusSeats] = useState(false);
+  const [bookableOnly, setBookableOnly] = useState(false);
+  const [sweetOnly, setSweetOnly] = useState(false);
 
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
