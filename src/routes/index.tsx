@@ -229,6 +229,65 @@ function Index() {
     });
   }
 
+  // Leader values across the currently sorted set (used to explain each card)
+  const leader = {
+    miles: sorted.length ? Math.min(...sorted.map((a) => a.miles)) : 0,
+    taxes: sorted.length ? Math.min(...sorted.map((a) => a.taxesUsd)) : 0,
+    seats: sorted.length ? Math.max(...sorted.map((a) => a.seats)) : 0,
+    duration: sorted.length
+      ? Math.min(...sorted.map((a) => a.durationMin || Number.POSITIVE_INFINITY))
+      : 0,
+    stops: sorted.length ? Math.min(...sorted.map((a) => a.stops)) : 0,
+    cpp: sorted.length ? Math.max(...sorted.map((a) => a.cpp)) : 0,
+  };
+  function fmtHrs(min: number) {
+    if (!min) return "—";
+    return `${Math.floor(min / 60)}h ${min % 60}m`;
+  }
+  function reasonFor(a: RankedItinerary): string | undefined {
+    switch (sortBy) {
+      case "points": {
+        if (a.miles === leader.miles) return `Cheapest here — ${a.miles.toLocaleString()} pts`;
+        const diff = a.miles - leader.miles;
+        return `+${diff.toLocaleString()} pts vs cheapest (${leader.miles.toLocaleString()})`;
+      }
+      case "taxes": {
+        if (a.taxesUsd === leader.taxes) return `Lowest taxes here — US$${Math.round(a.taxesUsd)}`;
+        return `US$${Math.round(a.taxesUsd - leader.taxes)} more taxes than lowest`;
+      }
+      case "seats": {
+        if (a.seats === leader.seats) return `Most seats here — ${a.seats} available`;
+        return `${a.seats} seat${a.seats === 1 ? "" : "s"} · ${leader.seats} available on the top pick`;
+      }
+      case "duration": {
+        if (!a.durationMin) return "Duration not published";
+        if (a.durationMin === leader.duration) return `Fastest here — ${fmtHrs(a.durationMin)}`;
+        const diff = a.durationMin - leader.duration;
+        return `${fmtHrs(diff)} longer than the fastest (${fmtHrs(leader.duration)})`;
+      }
+      case "stops": {
+        if (a.stops === 0 || a.direct) return "Nonstop";
+        return `${a.stops} stop${a.stops === 1 ? "" : "s"} · nonstop options above if any`;
+      }
+      case "depart": {
+        const t = (a.depart || "").slice(11, 16);
+        return t ? `Departs ${t}` : "Earliest departure on this date";
+      }
+      case "fresh": {
+        if (!a.updatedAt) return "Freshness unknown";
+        const ageMin = Math.max(0, Math.round((Date.now() - Date.parse(a.updatedAt)) / 60000));
+        if (ageMin < 60) return `Verified ${ageMin}m ago`;
+        if (ageMin < 60 * 24) return `Verified ${Math.round(ageMin / 60)}h ago`;
+        return `Verified ${Math.round(ageMin / 1440)}d ago`;
+      }
+      case "value":
+      default: {
+        if (a.cpp === leader.cpp) return `Best value — ${a.cpp.toFixed(2)}¢ / pt`;
+        return `${a.cpp.toFixed(2)}¢ / pt · top pick ${leader.cpp.toFixed(2)}¢`;
+      }
+    }
+  }
+
   // Group by departure date (each group's first entry is its best by the
   // active sort).
   const byDate = new Map<string, RankedItinerary[]>();
@@ -597,7 +656,7 @@ function Index() {
                             className="animate-card-in"
                             style={{ "--stagger": Math.min(i, 8) } as React.CSSProperties}
                           >
-                            <AwardCard award={a} balances={byProgramId} />
+                            <AwardCard award={a} balances={byProgramId} reason={reasonFor(a)} />
                           </div>
                         ))}
                       </div>
