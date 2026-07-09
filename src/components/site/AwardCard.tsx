@@ -428,7 +428,7 @@ export function AwardCard({
             {transferTooSlow ? (
               <span>
                 Risk: {fastest!.bank} → {programName} takes ~{Math.round(fastest!.etaMin / 60)}h.
-                Seat may be gone before points land. Use Bilt or Chase if you have them.
+                Seat may be gone before points land — consider a faster program if you have one.
               </span>
             ) : (
               <span>Only {award.seats} seat left — book within minutes once miles arrive.</span>
