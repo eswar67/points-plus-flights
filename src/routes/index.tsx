@@ -609,18 +609,18 @@ function Index() {
                     </div>
                   </button>
                 ) : (
-                  <Link
-                    to="/auth"
+                  <a
+                    href="#portfolio"
                     className="text-left rounded-lg border border-border hover:border-border-strong bg-card p-4 transition"
                   >
                     <div className="text-xs uppercase tracking-widest text-gold">
                       See which of these you can book
                     </div>
                     <div className="mt-1 text-sm text-muted-foreground">
-                      Sign in and paste your balances — takes 60 seconds. We'll flag every
-                      seat you can redeem directly or via a fast transfer.
+                      Add your balances below — takes 60 seconds and stays private on your device.
+                      We'll flag every seat you can redeem directly or via a fast transfer.
                     </div>
-                  </Link>
+                  </a>
                 )}
                 <button
                   type="button"
