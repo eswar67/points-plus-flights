@@ -6,4 +6,21 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig();
+const cloudUrl =
+  process.env.VITE_SUPABASE_URL ??
+  process.env.SUPABASE_URL ??
+  "https://bunawyxeikzzsyhuwosw.supabase.co";
+
+const cloudPublishableKey =
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
+  process.env.SUPABASE_PUBLISHABLE_KEY ??
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1bmF3eXhlaWt6enN5aHV3b3N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MTk4ODAsImV4cCI6MjA5MzI5NTg4MH0.jglb_EKd-cpOahe0lK-ZT3a2zUdJ31yhRYKXULSwFv8";
+
+export default defineConfig({
+  vite: {
+    define: {
+      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(cloudUrl),
+      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(cloudPublishableKey),
+    },
+  },
+});
