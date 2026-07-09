@@ -8,6 +8,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
 import { AwardCard } from "@/components/site/AwardCard";
+import { AwardTable } from "@/components/site/AwardTable";
 import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
 import { FlightScene } from "@/components/site/FlightScene";
 import { SearchingState } from "@/components/site/SearchingState";
@@ -134,6 +135,7 @@ function Index() {
   const [bookableOnly, setBookableOnly] = useState(false);
   const [sweetOnly, setSweetOnly] = useState(false);
   const [hideZeroAvailability, setHideZeroAvailability] = useState(true);
+  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
 
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
@@ -684,11 +686,37 @@ function Index() {
                       {label}
                     </button>
                   ))}
+                  <div
+                    className="ml-auto inline-flex rounded-full border border-border p-0.5"
+                    role="group"
+                    aria-label="Results view"
+                  >
+                    {(
+                      [
+                        ["cards", "Cards"],
+                        ["table", "Table"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        aria-pressed={viewMode === key}
+                        onClick={() => setViewMode(key)}
+                        className={`text-[10px] uppercase tracking-widest px-3 py-2 rounded-full transition ${
+                          viewMode === key
+                            ? "bg-gold/15 text-gold"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                   <button
                     type="button"
                     aria-pressed={nonstopOnly}
                     onClick={() => setNonstopOnly((v) => !v)}
-                    className={`ml-auto text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
                       nonstopOnly
                         ? "bg-gold/15 text-gold border-gold/50"
                         : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
@@ -921,6 +949,14 @@ function Index() {
                           })}
                         </h3>
                       )}
+                      {viewMode === "table" ? (
+                        <AwardTable
+                          rows={byDate.get(d) ?? []}
+                          sortBy={sortBy}
+                          onSort={setSortBy}
+                          pax={query.pax}
+                        />
+                      ) : (
                       <div className="space-y-3">
                         {(byDate.get(d) ?? []).map((a, i) => (
                           <div
@@ -940,6 +976,7 @@ function Index() {
                           </div>
                         ))}
                       </div>
+                      )}
                     </div>
                   ))}
                 </div>
