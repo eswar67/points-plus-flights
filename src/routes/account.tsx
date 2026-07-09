@@ -44,7 +44,7 @@ function AccountPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      nav({ to: "/auth" });
+      nav({ to: "/auth", search: { redirect: "/account" } });
       return;
     }
     (async () => {
