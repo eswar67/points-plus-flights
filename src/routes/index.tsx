@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import heroWing from "@/assets/hero-wing.jpg";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -88,6 +88,7 @@ function Index() {
   const [pending, startTransition] = useTransition();
   const { balances, byProgramId } = useUserBalances();
   const totalBalance = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
+  const resultsRef = useRef<HTMLElement | null>(null);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -139,6 +140,10 @@ function Index() {
     setTwoPlusSeats(false);
     setBookableOnly(false);
     setSweetOnly(false);
+    // Smoothly reveal the results section so the user sees the transition.
+    requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     startTransition(async () => {
       try {
         const range = rangeFor(q);
