@@ -491,6 +491,35 @@ function Index() {
                 {!pending && ranked.length > 0 && (
                   <ShareSearchButton from={query.from} to={query.to} cabin={query.cabin} />
                 )}
+                {!pending && sorted.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      exportResultsPdf({
+                        from: query.from,
+                        to: query.to,
+                        cabin: query.cabin,
+                        pax: query.pax,
+                        dateLabel:
+                          query.mode === "month"
+                            ? new Date(monthStart + "T00:00:00").toLocaleDateString([], {
+                                month: "long",
+                                year: "numeric",
+                              })
+                            : query.mode === "flex"
+                              ? `${query.date} ± 3 days`
+                              : query.mode === "flex1"
+                                ? `${query.date} ± 1 day`
+                                : query.date,
+                        items: sorted,
+                      })
+                    }
+                    className="btn btn-ghost whitespace-nowrap"
+                    aria-label="Export results as PDF"
+                  >
+                    <Download className="size-3.5" /> Export PDF
+                  </button>
+                )}
                 {!pending && ranked.length > 0 && (
                   <Link
                     to="/watchlists"
