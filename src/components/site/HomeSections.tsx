@@ -106,60 +106,6 @@ export function ValueProps() {
   );
 }
 
-const TESTIMONIALS = [
-  {
-    quote:
-      "Miles Expert found us four business-class seats to Tokyo on Velocity that were nowhere on the airline's own site. Saved us $18k in cash fares.",
-    name: "Hannah & James L.",
-    detail: "Sydney → Tokyo · Virgin Australia Business",
-  },
-  {
-    quote:
-      "I had 480k points sitting idle for two years. Their concierge ticketed a Singapore Suites redemption inside an hour.",
-    name: "Marcus T.",
-    detail: "Melbourne → London · Singapore Suites",
-  },
-  {
-    quote:
-      "The watchlist alert pinged me at 6am, I tapped through and the seats were ours by breakfast. Genuinely magic.",
-    name: "Priya K.",
-    detail: "Brisbane → Los Angeles · Qantas First",
-  },
-];
-
-export function Testimonials() {
-  return (
-    <section className="border-y border-border-soft bg-card/30">
-      <div className="mx-auto max-w-7xl px-6 py-20 md:py-28">
-        <div className="max-w-2xl mb-12">
-          <span className="text-xs uppercase tracking-widest text-gold">Members</span>
-          <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
-            Seats other people couldn't find.
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {TESTIMONIALS.map((t, i) => (
-            <Reveal key={t.name} stagger={i}>
-              <figure className="h-full rounded-lg border border-border bg-background/60 p-6 flex flex-col">
-                <div className="text-gold font-display text-3xl leading-none mb-3">"</div>
-                <blockquote className="text-sm text-foreground/90 leading-relaxed flex-1">
-                  {t.quote}
-                </blockquote>
-                <figcaption className="mt-5 pt-5 border-t border-border-soft">
-                  <div className="font-display text-sm">{t.name}</div>
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
-                    {t.detail}
-                  </div>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export const FAQ_ITEMS = [
   {
     q: "How does Miles Expert actually find seats?",

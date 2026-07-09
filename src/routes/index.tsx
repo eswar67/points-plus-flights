@@ -13,7 +13,6 @@ import { useCountUp } from "@/hooks/useCountUp";
 import { ProgramRail } from "@/components/site/ProgramRail";
 import {
   ValueProps,
-  Testimonials,
   FAQ,
   ConciergeCTA,
   HowItWorksStrip,
@@ -544,7 +543,6 @@ function Index() {
         <>
           <HowItWorksStrip />
           <ValueProps />
-          <Testimonials />
           <FAQ limit={4} />
           <ConciergeCTA />
         </>
