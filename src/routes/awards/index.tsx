@@ -172,11 +172,18 @@ function AwardsIndex() {
                             <div className="font-display text-2xl">
                               {from} <span className="text-gold">→</span> {to}
                             </div>
-                            {savingPct !== null && (
-                              <span className="text-[10px] uppercase tracking-widest text-gold-foreground bg-gold rounded-full px-2 py-0.5 font-medium">
+                            {savingPct !== null && bestBiz?.taxesAud !== undefined && (
+                              <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gold-foreground bg-gold rounded-full px-2 py-0.5 font-medium">
                                 Save {savingPct}%
+                                <SavingTooltip
+                                  cash={biz}
+                                  taxes={bestBiz.taxesAud}
+                                  pct={savingPct}
+                                  cabin="business"
+                                />
                               </span>
                             )}
+
                           </div>
                           {biz && (
                             <div className="mt-4 space-y-2">
