@@ -1,5 +1,6 @@
 import { useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
+import { AIRPORTS } from "@/lib/airports";
 
 const CABINS: { value: Cabin; label: string }[] = [
   { value: "economy", label: "Economy" },
@@ -19,8 +20,8 @@ const MODES: { value: SearchMode; label: string }[] = [
 
 /** Popular ex-Australia award routes, one tap to fill. */
 const PRESETS: { from: string; to: string }[] = [
-  { from: "SYD", to: "LHR" },
   { from: "SYD", to: "SIN" },
+  { from: "SYD", to: "LHR" },
   { from: "SYD", to: "HND" },
   { from: "SYD", to: "LAX" },
   { from: "MEL", to: "LHR" },
@@ -46,7 +47,7 @@ export function SearchForm({
   initial?: SearchFormQuery;
 }) {
   const [from, setFrom] = useState(initial?.from ?? "SYD");
-  const [to, setTo] = useState(initial?.to ?? "LHR");
+  const [to, setTo] = useState(initial?.to ?? "SIN");
   const [date, setDate] = useState(
     initial?.date ?? new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
   );
@@ -85,6 +86,9 @@ export function SearchForm({
             required
             aria-invalid={!!errors.from}
             title="3-letter IATA airport code, e.g. SYD"
+            list="ml-airports"
+            autoComplete="off"
+            spellCheck={false}
             className="w-full bg-transparent text-2xl font-display tracking-wider text-foreground outline-none"
           />
         </Field>
@@ -98,7 +102,10 @@ export function SearchForm({
             maxLength={3}
             required
             aria-invalid={!!errors.to}
-            title="3-letter IATA airport code, e.g. LHR"
+            title="3-letter IATA airport code, e.g. SIN"
+            list="ml-airports"
+            autoComplete="off"
+            spellCheck={false}
             className="w-full bg-transparent text-2xl font-display tracking-wider text-foreground outline-none"
           />
         </Field>
@@ -189,6 +196,12 @@ export function SearchForm({
           </button>
         ))}
       </div>
+
+      <datalist id="ml-airports">
+        {AIRPORTS.map((a) => (
+          <option key={a.code} value={a.code} label={`${a.city} · ${a.country}`} />
+        ))}
+      </datalist>
     </form>
   );
 }
