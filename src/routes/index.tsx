@@ -290,8 +290,15 @@ function Index() {
     if (!min) return "—";
     return `${Math.floor(min / 60)}h ${min % 60}m`;
   }
-  function reasonFor(a: RankedItinerary): string | undefined {
+  function reasonFor(a: Enriched): string | undefined {
     switch (sortBy) {
+      case "sweet": {
+        if (a.isSweetSpot)
+          return `Sweet spot — ${Math.round(a.discountPct * 100)}% below typical (${a.baselineMiles.toLocaleString()} pts)`;
+        if (a.savingsMiles > 0)
+          return `${a.savingsMiles.toLocaleString()} pts below typical (${a.baselineMiles.toLocaleString()})`;
+        return `Typical for this cabin (${a.baselineMiles.toLocaleString()} pts)`;
+      }
       case "points": {
         if (a.miles === leader.miles) return `Cheapest here — ${a.miles.toLocaleString()} pts`;
         const diff = a.miles - leader.miles;
