@@ -543,7 +543,6 @@ function Index() {
         <>
           <HowItWorksStrip />
           <ValueProps />
-          <Testimonials />
           <FAQ limit={4} />
           <ConciergeCTA />
         </>
