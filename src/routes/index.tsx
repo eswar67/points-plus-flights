@@ -94,6 +94,7 @@ function Index() {
     "value" | "points" | "taxes" | "seats" | "duration" | "stops" | "depart" | "fresh"
   >("points");
   const [programFilter, setProgramFilter] = useState<Set<string> | null>(null);
+  const [carrierFilter, setCarrierFilter] = useState<Set<string> | null>(null);
   const [gradeFilter, setGradeFilter] = useState<Set<string> | null>(null);
   const [nonstopOnly, setNonstopOnly] = useState(false);
   const [twoPlusSeats, setTwoPlusSeats] = useState(false);
@@ -120,6 +121,7 @@ function Index() {
     setSelectedDate(null);
     setSortBy("points");
     setProgramFilter(null);
+    setCarrierFilter(null);
     setGradeFilter(null);
     setNonstopOnly(false);
     setTwoPlusSeats(false);
@@ -153,12 +155,23 @@ function Index() {
     programFacets.set(a.programId, cur);
   }
 
+  // Carrier (operating airline) facets
+  const carrierFacets = new Map<string, { count: number }>();
+  for (const a of ranked) {
+    const key = (a.carrier || "").trim();
+    if (!key) continue;
+    const cur = carrierFacets.get(key) ?? { count: 0 };
+    cur.count += 1;
+    carrierFacets.set(key, cur);
+  }
+
   const filtered = ranked.filter(
     (a) =>
       (!nonstopOnly || a.direct || a.stops === 0) &&
       (!twoPlusSeats || a.seats >= 2) &&
       (!gradeFilter || gradeFilter.size === 0 || gradeFilter.has(a.grade)) &&
-      (!programFilter || programFilter.size === 0 || programFilter.has(a.programId)),
+      (!programFilter || programFilter.size === 0 || programFilter.has(a.programId)) &&
+      (!carrierFilter || carrierFilter.size === 0 || carrierFilter.has((a.carrier || "").trim())),
   );
   const sorted =
     sortBy === "points"
@@ -203,6 +216,15 @@ function Index() {
       const next = new Set(cur ?? []);
       if (next.has(pid)) next.delete(pid);
       else next.add(pid);
+      return next.size === 0 ? null : next;
+    });
+  }
+
+  function toggleCarrier(c: string) {
+    setCarrierFilter((cur) => {
+      const next = new Set(cur ?? []);
+      if (next.has(c)) next.delete(c);
+      else next.add(c);
       return next.size === 0 ? null : next;
     });
   }
@@ -452,6 +474,38 @@ function Index() {
                               style={{ background: f.accent }}
                             />
                             {f.name}
+                            <span className="opacity-60">{f.count}</span>
+                          </button>
+                        );
+                      })}
+                  </div>
+                )}
+                {carrierFacets.size > 1 && (
+                  <div
+                    className="flex gap-2 overflow-x-auto pb-1"
+                    role="group"
+                    aria-label="Filter by airline"
+                  >
+                    <span className="text-xs text-muted-foreground mr-1 self-center shrink-0">
+                      Airline
+                    </span>
+                    {[...carrierFacets.entries()]
+                      .sort((a, b) => b[1].count - a[1].count)
+                      .map(([carrier, f]) => {
+                        const active = carrierFilter?.has(carrier) ?? false;
+                        return (
+                          <button
+                            key={carrier}
+                            type="button"
+                            aria-pressed={active}
+                            onClick={() => toggleCarrier(carrier)}
+                            className={`shrink-0 inline-flex items-center gap-2 text-xs px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
+                              active
+                                ? "bg-gold/15 text-gold border-gold/50"
+                                : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                            }`}
+                          >
+                            {carrier}
                             <span className="opacity-60">{f.count}</span>
                           </button>
                         );
