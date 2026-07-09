@@ -415,9 +415,13 @@ function Index() {
 
       <ProgramRail />
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section
+        ref={resultsRef}
+        id="results"
+        className="mx-auto max-w-7xl px-6 py-16 scroll-mt-24"
+      >
         {query ? (
-          <>
+          <div key={`${query.from}-${query.to}-${query.date}-${query.mode}`} className="animate-fade-in">
             <div className="flex items-end justify-between mb-6">
               <div>
                 <h2 className="font-display text-3xl">
