@@ -1,8 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { PROGRAMS } from "@/lib/programs";
-import { fareEstimateAud, fmtAud, knownRoutes } from "@/lib/intelligence";
+import { fareEstimateAud, fmtAud, knownRoutes, isKnownAirport } from "@/lib/intelligence";
 import { sweetSpotsFor } from "@/lib/awards/sweetSpots";
 import type { Cabin } from "@/lib/awards/types";
 
@@ -16,10 +16,24 @@ const CABINS: { value: Cabin; label: string }[] = [
 function parseRoute(param: string): { from: string; to: string } | null {
   const m = /^([a-z]{3})-([a-z]{3})$/i.exec(param);
   if (!m) return null;
-  return { from: m[1].toUpperCase(), to: m[2].toUpperCase() };
+  const from = m[1].toUpperCase();
+  const to = m[2].toUpperCase();
+  if (from === to) return null;
+  if (!isKnownAirport(from) || !isKnownAirport(to)) return null;
+  return { from, to };
 }
 
 export const Route = createFileRoute("/awards/$route")({
+  beforeLoad: ({ params }) => {
+    // Canonicalize URL casing: /awards/syd-nrt → /awards/SYD-NRT
+    if (params.route && params.route !== params.route.toUpperCase()) {
+      const canonical = params.route.toUpperCase();
+      // Only redirect when the canonical form is a valid, known route pair.
+      if (parseRoute(canonical)) {
+        throw redirect({ to: "/awards/$route", params: { route: canonical } });
+      }
+    }
+  },
   head: ({ params }) => {
     const parsed = parseRoute(params.route);
     const title = parsed
