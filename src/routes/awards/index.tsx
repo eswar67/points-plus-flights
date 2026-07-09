@@ -176,13 +176,14 @@ function AwardsIndex() {
                               <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-gold-foreground bg-gold rounded-full px-2 py-0.5 font-medium">
                                 Save {savingPct}%
                                 <SavingTooltip
-                                  cash={biz}
+                                  cash={biz ?? 0}
                                   taxes={bestBiz.taxesAud ?? 0}
                                   pct={savingPct}
                                   cabin="business"
                                 />
                               </span>
                             )}
+
 
 
                           </div>
