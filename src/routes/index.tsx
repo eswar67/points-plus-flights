@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import heroWing from "@/assets/hero-wing.jpg";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -88,6 +88,7 @@ function Index() {
   const [pending, startTransition] = useTransition();
   const { balances, byProgramId } = useUserBalances();
   const totalBalance = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
+  const resultsRef = useRef<HTMLElement | null>(null);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -139,6 +140,10 @@ function Index() {
     setTwoPlusSeats(false);
     setBookableOnly(false);
     setSweetOnly(false);
+    // Smoothly reveal the results section so the user sees the transition.
+    requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     startTransition(async () => {
       try {
         const range = rangeFor(q);
@@ -410,9 +415,13 @@ function Index() {
 
       <ProgramRail />
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section
+        ref={resultsRef}
+        id="results"
+        className="mx-auto max-w-7xl px-6 py-16 scroll-mt-24"
+      >
         {query ? (
-          <>
+          <div key={`${query.from}-${query.to}-${query.date}-${query.mode}`} className="animate-fade-in">
             <div className="flex items-end justify-between mb-6">
               <div>
                 <h2 className="font-display text-3xl">
@@ -796,7 +805,7 @@ function Index() {
                 </div>
               </>
             )}
-          </>
+          </div>
         ) : (
           <Portfolio balances={balances} />
         )}
