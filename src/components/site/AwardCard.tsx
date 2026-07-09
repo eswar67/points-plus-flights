@@ -201,8 +201,13 @@ export function AwardCard({
         {compareSelected ? "Comparing" : "Compare"}
       </button>
 
-      {/* Editorial masthead: program monogram + name + status */}
-      <div className={`flex items-start gap-4 ${isSweetSpot ? "px-8 pt-8" : "px-6 pt-6"}`}>
+      {/* Editorial masthead: program monogram + name + status.
+          Right padding leaves room for the Save/Compare pills (and Editor's pick tag). */}
+      <div
+        className={`flex items-start gap-4 ${
+          isSweetSpot ? "px-8 pt-14 md:pt-8 md:pr-[360px]" : "px-6 pt-14 md:pt-6 md:pr-[190px]"
+        }`}
+      >
         <div
           className={`shrink-0 grid place-items-center rounded-full border font-semibold tracking-tight ${
             isSweetSpot ? "size-14 text-lg" : "size-11 text-sm"
@@ -226,7 +231,7 @@ export function AwardCard({
           </div>
         </div>
         <span
-          className={`inline-flex items-center gap-1.5 text-[10px] tabular-nums shrink-0 ${confStyles[confidence.label]}`}
+          className={`hidden lg:inline-flex items-center gap-1.5 text-[10px] tabular-nums shrink-0 ${confStyles[confidence.label]}`}
         >
           <span
             className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-live" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`}
