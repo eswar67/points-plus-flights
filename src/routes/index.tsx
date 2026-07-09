@@ -137,6 +137,8 @@ function Index() {
     setGradeFilter(null);
     setNonstopOnly(false);
     setTwoPlusSeats(false);
+    setBookableOnly(false);
+    setSweetOnly(false);
     startTransition(async () => {
       try {
         const range = rangeFor(q);
