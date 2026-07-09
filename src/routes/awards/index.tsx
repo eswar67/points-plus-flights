@@ -132,6 +132,7 @@ function AwardsIndex() {
                     {list.map(({ from, to }) => {
                       const fares = fareTableFor(from, to);
                       const biz = fares?.business;
+                      const eco = fares?.economy;
                       const spots = sweetSpotsFor(from, to);
                       // Cheapest business redemption: pick the sweet spot with the lowest
                       // cash outlay (taxes) — that's the real % saving vs a paid business fare.
@@ -144,6 +145,16 @@ function AwardsIndex() {
                       const savingPct =
                         biz && bestBiz && bestBiz.taxesAud !== undefined
                           ? Math.max(0, Math.round(((biz - bestBiz.taxesAud) / biz) * 100))
+                          : null;
+                      const ecoSpots = spots.filter((s) => s.cabin === "economy");
+                      const bestEco = ecoSpots.length
+                        ? ecoSpots.reduce((a, b) =>
+                            (a.taxesAud ?? Infinity) <= (b.taxesAud ?? Infinity) ? a : b,
+                          )
+                        : null;
+                      const ecoSavingPct =
+                        eco && bestEco && bestEco.taxesAud !== undefined
+                          ? Math.max(0, Math.round(((eco - bestEco.taxesAud) / eco) * 100))
                           : null;
                       return (
                         <Link
@@ -189,6 +200,42 @@ function AwardsIndex() {
                               ) : (
                                 <div className="text-[10px] uppercase tracking-widest text-muted-foreground/70">
                                   Reward benchmark inside →
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          {eco && (
+                            <div className="mt-3 pt-3 border-t border-border-soft space-y-2">
+                              <div className="flex items-baseline justify-between text-xs">
+                                <span className="uppercase tracking-widest text-muted-foreground">
+                                  Economy cash
+                                </span>
+                                <span className="font-mono tabular-nums text-muted-foreground line-through">
+                                  {fmtAud(eco)}
+                                </span>
+                              </div>
+                              {bestEco ? (
+                                <div className="flex items-baseline justify-between text-xs">
+                                  <span className="uppercase tracking-widest text-gold">
+                                    Reward · {PROGRAMS.find((p) => p.id === bestEco.programId)?.short}
+                                  </span>
+                                  <span className="font-mono tabular-nums text-foreground">
+                                    {(bestEco.miles / 1000).toFixed(0)}k
+                                    {bestEco.taxesAud !== undefined && (
+                                      <span className="text-muted-foreground">
+                                        {" "}+ {fmtAud(bestEco.taxesAud)}
+                                      </span>
+                                    )}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="text-[10px] uppercase tracking-widest text-muted-foreground/70">
+                                  Economy reward inside →
+                                </div>
+                              )}
+                              {ecoSavingPct !== null && (
+                                <div className="text-[10px] uppercase tracking-widest text-gold">
+                                  Save {ecoSavingPct}% vs cash
                                 </div>
                               )}
                             </div>
