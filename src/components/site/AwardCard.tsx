@@ -12,6 +12,7 @@ import {
   fareEstimateAud,
   transfersFor,
   effectiveBalances,
+  taxesAudFromUsd,
 } from "@/lib/intelligence";
 import { AlertTriangle, Bookmark, BookmarkCheck, Check, GitCompare, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
 import { useShortlist } from "@/hooks/useShortlist";
@@ -391,7 +392,7 @@ export function AwardCard({
                 Taxes
               </div>
               <div className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}>
-                {award.taxesUsd ? `$${award.taxesUsd}` : "—"}
+                {award.taxesUsd ? `$${Math.round(taxesAudFromUsd(award.taxesUsd))}` : "—"}
                 {award.taxesUsd ? (
                   <span className="text-[11px] font-sans align-top ml-1 opacity-40 uppercase tracking-normal">
                     aud
