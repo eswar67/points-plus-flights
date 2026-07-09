@@ -22,6 +22,8 @@ import {
   knownRoutes,
   fareEstimateAud,
   type RankedItinerary,
+  annotateSweetSpots,
+  type SweetSpotInfo,
 } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useAuth } from "@/hooks/useAuth";
