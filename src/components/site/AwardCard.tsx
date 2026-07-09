@@ -13,7 +13,7 @@ import {
   transfersFor,
   effectiveBalances,
 } from "@/lib/intelligence";
-import { AlertTriangle, Check, Plane, Sparkles, Zap } from "lucide-react";
+import { AlertTriangle, Check, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -38,10 +38,18 @@ export function AwardCard({
   award,
   balances = {},
   reason,
+  isSweetSpot,
+  baselineMiles,
+  savingsMiles,
+  discountPct,
 }: {
   award: AwardItinerary;
   balances?: Record<string, number>;
   reason?: string;
+  isSweetSpot?: boolean;
+  baselineMiles?: number;
+  savingsMiles?: number;
+  discountPct?: number;
 }) {
   const [open, setOpen] = useState(false);
   const byProgramId = balances;
