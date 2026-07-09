@@ -9,18 +9,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { TransferPlanner } from "@/components/site/TransferPlanner";
 import { sendTestTelegramAlert } from "@/lib/alerts/alerts.functions";
-import {
-  getCronSecretMeta,
-  rotateCronSecret,
-} from "@/lib/admin/cron-secret.functions";
+import { getCronSecretMeta, rotateCronSecret } from "@/lib/admin/cron-secret.functions";
 import { listPollerRuns } from "@/lib/admin/observability.functions";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
-    meta: [
-      { title: "Account — Aureum" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Account — Aureum" }, { name: "robots", content: "noindex" }],
   }),
   component: AccountPage,
 });
@@ -86,14 +80,18 @@ function AccountPage() {
       programs_held: profile?.programs_held ?? [],
       telegram_chat_id: telegram.trim() || null,
     };
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(payload, { onConflict: "user_id" });
+    const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "user_id" });
     setSaving(false);
     if (error) {
       setError(error.message);
       return;
     }
+    setProfile({
+      user_id: user.id,
+      display_name: payload.display_name,
+      programs_held: payload.programs_held,
+      telegram_chat_id: payload.telegram_chat_id,
+    });
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }
@@ -119,7 +117,10 @@ function AccountPage() {
             <h1 className="font-display text-3xl">Your account</h1>
             <p className="text-sm text-muted-foreground mt-1">{user?.email}</p>
           </div>
-          <Link to="/watchlists" className="text-xs uppercase tracking-widest text-gold hover:underline">
+          <Link
+            to="/watchlists"
+            className="text-xs uppercase tracking-widest text-gold hover:underline"
+          >
             Watchlists →
           </Link>
         </div>
@@ -128,7 +129,9 @@ function AccountPage() {
           <section>
             <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Profile</h2>
             <div className="mt-4">
-              <label className="text-xs uppercase tracking-widest text-muted-foreground">Display name</label>
+              <label className="text-xs uppercase tracking-widest text-muted-foreground">
+                Display name
+              </label>
               <input
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
@@ -139,10 +142,12 @@ function AccountPage() {
           </section>
 
           <section>
-            <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Your points balances</h2>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
+              Your points balances
+            </h2>
             <p className="text-sm text-muted-foreground mt-2">
-              Add the loyalty programs you hold and how many points you have. We'll value the
-              total in AUD on your homepage and use it to rank award deals.
+              Add the loyalty programs you hold and how many points you have. We'll value the total
+              in AUD on your homepage and use it to rank award deals.
             </p>
             <div className="mt-5">
               <BalancesEditor />
@@ -150,9 +155,12 @@ function AccountPage() {
           </section>
 
           <section>
-            <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Telegram alerts</h2>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
+              Telegram alerts
+            </h2>
             <p className="text-sm text-muted-foreground mt-2">
-              Paste your Telegram chat ID to receive alerts when watchlists hit. Get yours by messaging @userinfobot on Telegram.
+              Paste your Telegram chat ID to receive alerts when watchlists hit. Get yours by
+              messaging @userinfobot on Telegram.
             </p>
             <input
               value={telegram}
@@ -169,7 +177,8 @@ function AccountPage() {
                   setTestMsg(null);
                   try {
                     const res = await sendTest({ data: {} });
-                    if (res.ok) setTestMsg({ kind: "ok", text: "Test message sent — check Telegram." });
+                    if (res.ok)
+                      setTestMsg({ kind: "ok", text: "Test message sent — check Telegram." });
                     else setTestMsg({ kind: "err", text: res.error });
                   } catch (e) {
                     setTestMsg({ kind: "err", text: (e as Error).message });
@@ -182,10 +191,14 @@ function AccountPage() {
                 {testing ? "Sending…" : "Send test alert"}
               </button>
               {!profile?.telegram_chat_id && (
-                <span className="text-xs text-muted-foreground">Save your chat ID first to enable test.</span>
+                <span className="text-xs text-muted-foreground">
+                  Save your chat ID first to enable test.
+                </span>
               )}
               {testMsg && (
-                <span className={`text-xs ${testMsg.kind === "ok" ? "text-gold" : "text-destructive"}`}>
+                <span
+                  className={`text-xs ${testMsg.kind === "ok" ? "text-gold" : "text-destructive"}`}
+                >
                   {testMsg.text}
                 </span>
               )}
@@ -195,11 +208,7 @@ function AccountPage() {
           {error && <div className="text-sm text-destructive">{error}</div>}
 
           <div className="flex items-center gap-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="btn btn-primary"
-            >
+            <button type="submit" disabled={saving} className="btn btn-primary">
               {saving ? "Saving…" : "Save changes"}
             </button>
             {saved && <span className="text-sm text-gold">Saved.</span>}
@@ -274,10 +283,10 @@ function AdminCronSecretSection() {
       </div>
       <p className="text-sm text-muted-foreground mt-2 max-w-prose">
         Rotates the shared secret used by the scheduled poller to authenticate against{" "}
-        <code className="text-xs">/api/public/hooks/poll-watchlists</code>. The new value is
-        written to the locked-down config table immediately. You must then paste the same
-        value into the Lovable Cloud secret <code className="text-xs">CRON_SECRET</code> so
-        runtime code stays in sync.
+        <code className="text-xs">/api/public/hooks/poll-watchlists</code>. The new value is written
+        to the locked-down config table immediately. You must then paste the same value into the
+        Lovable Cloud secret <code className="text-xs">CRON_SECRET</code> so runtime code stays in
+        sync.
       </p>
 
       <div className="mt-5 text-xs text-muted-foreground">
@@ -329,9 +338,7 @@ function AdminCronSecretSection() {
 
       {revealed && (
         <div className="mt-6 rounded-lg border border-gold/40 bg-gold/5 p-5">
-          <div className="text-xs uppercase tracking-widest text-gold">
-            New secret — shown once
-          </div>
+          <div className="text-xs uppercase tracking-widest text-gold">New secret — shown once</div>
           <div className="mt-3 font-mono text-xs break-all bg-background border border-border rounded p-3">
             {revealed}
           </div>
@@ -354,12 +361,12 @@ function AdminCronSecretSection() {
           <ol className="mt-5 space-y-2 text-xs text-muted-foreground list-decimal list-inside">
             <li>Copy the value above.</li>
             <li>
-              Open Lovable Cloud → Secrets, find <code>CRON_SECRET</code>, and paste the new
-              value to update it.
+              Open Lovable Cloud → Secrets, find <code>CRON_SECRET</code>, and paste the new value
+              to update it.
             </li>
             <li>
-              The scheduled poller will pick up the new secret on its next run (within 15
-              minutes). No redeploy needed.
+              The scheduled poller will pick up the new secret on its next run (within 15 minutes).
+              No redeploy needed.
             </li>
           </ol>
           <p className="mt-4 text-xs text-destructive/80">
@@ -457,7 +464,7 @@ function AdminPollerRunsSection() {
         />
       </div>
 
-      <div className="mt-6 rounded-xl border border-border overflow-hidden">
+      <div className="mt-6 rounded-lg border border-border overflow-hidden">
         <table className="w-full text-xs">
           <thead className="bg-background/40 text-muted-foreground uppercase tracking-widest text-xs">
             <tr>
@@ -483,11 +490,12 @@ function AdminPollerRunsSection() {
               </tr>
             ) : (
               runs.map((r) => {
-                const errMsgs = (r.errors ?? [])
-                  .map((e) => e.message)
-                  .filter(Boolean) as string[];
+                const errMsgs = (r.errors ?? []).map((e) => e.message).filter(Boolean) as string[];
                 return (
-                  <tr key={r.id} className="border-t border-border-soft hover:bg-background/40 transition-colors tabular-nums">
+                  <tr
+                    key={r.id}
+                    className="border-t border-border-soft hover:bg-background/40 transition-colors tabular-nums"
+                  >
                     <td className="px-3 py-2 font-mono text-xs">
                       {new Date(r.started_at).toLocaleString()}
                     </td>
@@ -500,10 +508,7 @@ function AdminPollerRunsSection() {
                       {r.ok ? (
                         <span className="text-emerald-400">OK</span>
                       ) : (
-                        <span
-                          className="text-destructive"
-                          title={errMsgs.join("\n")}
-                        >
+                        <span className="text-destructive" title={errMsgs.join("\n")}>
                           {errMsgs.length} error{errMsgs.length === 1 ? "" : "s"}
                         </span>
                       )}
@@ -529,13 +534,9 @@ function Stat({
   tone: "ok" | "err" | "muted";
 }) {
   const toneCls =
-    tone === "ok"
-      ? "text-emerald-400"
-      : tone === "err"
-        ? "text-destructive"
-        : "text-foreground";
+    tone === "ok" ? "text-emerald-400" : tone === "err" ? "text-destructive" : "text-foreground";
   return (
-    <div className="rounded-xl border border-border bg-background/40 px-4 py-3">
+    <div className="rounded-lg border border-border bg-background/40 px-4 py-3">
       <div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className={`font-display text-xl mt-1 ${toneCls}`}>{value}</div>
     </div>
@@ -592,10 +593,7 @@ function BalancesEditor() {
 
   async function updateBalance(id: string, value: number) {
     if (!Number.isFinite(value) || value < 0 || value > 50_000_000) return;
-    await supabase
-      .from("user_program_balances")
-      .update({ balance: value })
-      .eq("id", id);
+    await supabase.from("user_program_balances").update({ balance: value }).eq("id", id);
     refetch();
   }
 

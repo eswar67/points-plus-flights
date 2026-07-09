@@ -4,13 +4,10 @@ import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: {
-    priceId: string;
-    returnUrl: string;
-    environment: StripeEnv;
-  }) => {
+  .inputValidator((data: { priceId: string; returnUrl: string; environment: StripeEnv }) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
-    if (data.environment !== "sandbox" && data.environment !== "live") throw new Error("Invalid env");
+    if (data.environment !== "sandbox" && data.environment !== "live")
+      throw new Error("Invalid env");
     return data;
   })
   .handler(async ({ data, context }) => {
@@ -40,7 +37,8 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => {
-    if (data.environment !== "sandbox" && data.environment !== "live") throw new Error("Invalid env");
+    if (data.environment !== "sandbox" && data.environment !== "live")
+      throw new Error("Invalid env");
     return data;
   })
   .handler(async ({ data, context }) => {

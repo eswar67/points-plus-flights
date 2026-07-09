@@ -31,11 +31,30 @@ type RawAvailability = {
   Date?: string;
   Source?: string;
   UpdatedAt?: string;
-  YAvailable?: boolean; YMileageCost?: string; YRemainingSeats?: number; YDirect?: boolean; YAirlines?: string;
-  WAvailable?: boolean; WMileageCost?: string; WRemainingSeats?: number; WDirect?: boolean; WAirlines?: string;
-  JAvailable?: boolean; JMileageCost?: string; JRemainingSeats?: number; JDirect?: boolean; JAirlines?: string;
-  FAvailable?: boolean; FMileageCost?: string; FRemainingSeats?: number; FDirect?: boolean; FAirlines?: string;
-  YTotalTaxes?: number; WTotalTaxes?: number; JTotalTaxes?: number; FTotalTaxes?: number;
+  YAvailable?: boolean;
+  YMileageCost?: string;
+  YRemainingSeats?: number;
+  YDirect?: boolean;
+  YAirlines?: string;
+  WAvailable?: boolean;
+  WMileageCost?: string;
+  WRemainingSeats?: number;
+  WDirect?: boolean;
+  WAirlines?: string;
+  JAvailable?: boolean;
+  JMileageCost?: string;
+  JRemainingSeats?: number;
+  JDirect?: boolean;
+  JAirlines?: string;
+  FAvailable?: boolean;
+  FMileageCost?: string;
+  FRemainingSeats?: number;
+  FDirect?: boolean;
+  FAirlines?: string;
+  YTotalTaxes?: number;
+  WTotalTaxes?: number;
+  JTotalTaxes?: number;
+  FTotalTaxes?: number;
   TaxesCurrency?: string; // usually "USD"
 };
 

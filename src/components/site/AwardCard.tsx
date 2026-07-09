@@ -2,7 +2,17 @@ import { useState } from "react";
 import type { AwardItinerary } from "@/lib/awards/types";
 import { PROGRAMS } from "@/lib/programs";
 import { PlaybookDrawer } from "./PlaybookDrawer";
-import { calcCppAud, confidenceFor, gradeCpp, fmtCpp, fmtAud, fmtAge, fareEstimateAud, transfersFor, effectiveBalances } from "@/lib/intelligence";
+import {
+  calcCppAud,
+  confidenceFor,
+  gradeCpp,
+  fmtCpp,
+  fmtAud,
+  fmtAge,
+  fareEstimateAud,
+  transfersFor,
+  effectiveBalances,
+} from "@/lib/intelligence";
 import { AlertTriangle, Check, Plane, Sparkles, Zap } from "lucide-react";
 
 function fmtDuration(min: number) {
@@ -61,41 +71,51 @@ export function AwardCard({
 
   const gradeStyles: Record<typeof grade, string> = {
     exceptional: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
-    great:       "bg-gold/15 text-gold border-gold/40",
-    fair:        "bg-muted text-muted-foreground border-border",
-    skip:        "bg-destructive/10 text-destructive/80 border-destructive/30",
+    great: "bg-gold/15 text-gold border-gold/40",
+    fair: "bg-muted text-muted-foreground border-border",
+    skip: "bg-destructive/10 text-destructive/80 border-destructive/30",
   };
   const confStyles: Record<typeof confidence.label, string> = {
-    live:   "text-emerald-400",
+    live: "text-live",
     likely: "text-gold",
-    stale:  "text-muted-foreground",
+    stale: "text-muted-foreground",
   };
 
   // Value meter: how far this CPP sits along the road to "exceptional" for the cabin.
   const exceptionalCpp =
-    award.cabin === "first" ? 6.0 : award.cabin === "business" ? 5.0 : award.cabin === "premium" ? 3.5 : 2.5;
+    award.cabin === "first"
+      ? 6.0
+      : award.cabin === "business"
+        ? 5.0
+        : award.cabin === "premium"
+          ? 3.5
+          : 2.5;
   const meterPct = Math.max(4, Math.min(100, (cpp / (exceptionalCpp * 1.15)) * 100));
   const meterColor: Record<typeof grade, string> = {
     exceptional: "oklch(0.72 0.17 160)",
-    great:       "var(--gold)",
-    fair:        "oklch(0.62 0.01 90)",
-    skip:        "oklch(0.55 0.16 25)",
+    great: "var(--gold)",
+    fair: "oklch(0.62 0.01 90)",
+    skip: "oklch(0.55 0.16 25)",
   };
 
   return (
-    <div className="group relative rounded-xl border border-border bg-card hover:border-border-strong transition overflow-hidden">
+    <div className="group relative rounded-lg border border-border bg-card hover:border-border-strong transition overflow-hidden">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent opacity-0 group-hover:opacity-100 transition" />
       {/* Intelligence strip */}
       <div className="px-5 pt-3 pb-2 flex flex-wrap items-center gap-2 border-b border-border-soft">
-        <span className={`inline-flex items-center gap-1 text-xs uppercase tracking-widest px-2.5 py-1 rounded-full border tabular-nums ${gradeStyles[grade]}`}>
+        <span
+          className={`inline-flex items-center gap-1 text-xs uppercase tracking-widest px-2.5 py-1 rounded-full border tabular-nums ${gradeStyles[grade]}`}
+        >
           {grade === "exceptional" && <Sparkles className="size-3" />}
           {grade.toUpperCase()} · {fmtCpp(cpp)}
         </span>
-        <span className="text-xs text-muted-foreground tabular-nums">
-          vs {fmtAud(fare)} cash
-        </span>
-        <span className={`inline-flex items-center gap-1 text-xs ml-auto tabular-nums ${confStyles[confidence.label]}`}>
-          <span className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-emerald-400" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`} />
+        <span className="text-xs text-muted-foreground tabular-nums">vs {fmtAud(fare)} cash</span>
+        <span
+          className={`inline-flex items-center gap-1 text-xs ml-auto tabular-nums ${confStyles[confidence.label]}`}
+        >
+          <span
+            className={`size-1.5 rounded-full ${confidence.label === "live" ? "bg-live" : confidence.label === "likely" ? "bg-gold" : "bg-muted-foreground"}`}
+          />
           {confidence.label} · {fmtAge(confidence.ageMin)}
         </span>
       </div>
@@ -111,9 +131,13 @@ export function AwardCard({
       <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr_auto] gap-6 p-5 items-center">
         <div>
           <div className="text-sm text-foreground/90">{award.carrier}</div>
-          <div className="text-xs text-muted-foreground mt-0.5">{award.flightNo || "Award seat"}</div>
+          <div className="text-xs text-muted-foreground mt-0.5">
+            {award.flightNo || "Award seat"}
+          </div>
           <div className="text-xs text-muted-foreground mt-1 tabular-nums">
-            {award.seats > 0 ? `${award.seats} seat${award.seats > 1 ? "s" : ""} remaining` : "Availability confirmed"}
+            {award.seats > 0
+              ? `${award.seats} seat${award.seats > 1 ? "s" : ""} remaining`
+              : "Availability confirmed"}
           </div>
         </div>
 
@@ -125,7 +149,11 @@ export function AwardCard({
           <div className="flex-1">
             <div className="text-xs text-center text-muted-foreground mb-1">
               {award.durationMin ? `${fmtDuration(award.durationMin)} · ` : ""}
-              {award.direct ? "Nonstop" : award.stops === 0 ? "Direct" : `${award.stops} stop${award.stops > 1 ? "s" : ""}`}
+              {award.direct
+                ? "Nonstop"
+                : award.stops === 0
+                  ? "Direct"
+                  : `${award.stops} stop${award.stops > 1 ? "s" : ""}`}
             </div>
             <div className="relative h-px bg-gradient-to-r from-border via-gold/50 to-border">
               <span className="absolute -top-[3px] left-0 size-1.5 rounded-full bg-gold" />
@@ -187,7 +215,8 @@ export function AwardCard({
             <AlertTriangle className="size-3.5 mt-px flex-shrink-0" />
             {transferTooSlow ? (
               <span>
-                Risk: {fastest!.bank} → {programName} takes ~{Math.round(fastest!.etaMin / 60)}h. Seat may be gone before points land. Use Bilt or Chase if you have them.
+                Risk: {fastest!.bank} → {programName} takes ~{Math.round(fastest!.etaMin / 60)}h.
+                Seat may be gone before points land. Use Bilt or Chase if you have them.
               </span>
             ) : (
               <span>Only {award.seats} seat left — book within minutes once miles arrive.</span>

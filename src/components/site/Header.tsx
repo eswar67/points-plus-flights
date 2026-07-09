@@ -26,9 +26,7 @@ export function Header() {
       <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
           <LogoMark className="size-8" />
-          <span className="font-display font-semibold tracking-tight text-lg">
-            Aureum
-          </span>
+          <span className="font-display font-semibold tracking-tight text-lg">Aureum</span>
         </Link>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           {links.map((l) => (
@@ -49,7 +47,10 @@ export function Header() {
                 Account
               </Link>
               <button
-                onClick={async () => { await signOut(); nav({ to: "/" }); }}
+                onClick={async () => {
+                  await signOut();
+                  nav({ to: "/" });
+                }}
                 className="text-xs uppercase tracking-widest px-3 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
               >
                 Sign out
@@ -101,7 +102,11 @@ export function Header() {
                   Account
                 </Link>
                 <button
-                  onClick={async () => { setOpen(false); await signOut(); nav({ to: "/" }); }}
+                  onClick={async () => {
+                    setOpen(false);
+                    await signOut();
+                    nav({ to: "/" });
+                  }}
                   className="text-xs uppercase tracking-widest px-3 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
                 >
                   Sign out

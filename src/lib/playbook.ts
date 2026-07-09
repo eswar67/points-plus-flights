@@ -13,7 +13,7 @@ export type PlaybookStep = {
 
 export type Playbook = {
   feasible: boolean;
-  shortfall: number;            // miles missing in the chosen program (0 = covered)
+  shortfall: number; // miles missing in the chosen program (0 = covered)
   totalMiles: number;
   bookingProgramId: string;
   steps: PlaybookStep[];
@@ -25,21 +25,36 @@ function airlineBookingUrl(programId: string, a: AwardItinerary): { href: string
   const dep = a.depart?.slice(0, 10) || "";
   switch (programId) {
     case "qantas":
-      return { site: "qantas.com", href: `https://www.qantas.com/au/en/book-a-trip/flights.html?from=${a.from}&to=${a.to}&departingDate=${dep}&useClassicRewards=true` };
+      return {
+        site: "qantas.com",
+        href: `https://www.qantas.com/au/en/book-a-trip/flights.html?from=${a.from}&to=${a.to}&departingDate=${dep}&useClassicRewards=true`,
+      };
     case "velocity":
-      return { site: "virginaustralia.com", href: `https://book.virginaustralia.com/dx/VADX/#/flight-selection?journeyType=oneway&class=${a.cabin}&origin=${a.from}&destination=${a.to}&date=${dep}&awardBooking=true` };
+      return {
+        site: "virginaustralia.com",
+        href: `https://book.virginaustralia.com/dx/VADX/#/flight-selection?journeyType=oneway&class=${a.cabin}&origin=${a.from}&destination=${a.to}&date=${dep}&awardBooking=true`,
+      };
     case "krisflyer":
-      return { site: "singaporeair.com", href: `https://www.singaporeair.com/en_UK/plan-and-book/our-fares-and-deals/krisflyer-redemption/` };
+      return {
+        site: "singaporeair.com",
+        href: `https://www.singaporeair.com/en_UK/plan-and-book/our-fares-and-deals/krisflyer-redemption/`,
+      };
     case "emirates":
       return { site: "emirates.com", href: `https://www.emirates.com/english/skywards/use-miles/` };
     case "united":
-      return { site: "united.com", href: `https://www.united.com/en/us/fsr/choose-flights?f=${a.from}&t=${a.to}&d=${dep}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches` };
+      return {
+        site: "united.com",
+        href: `https://www.united.com/en/us/fsr/choose-flights?f=${a.from}&t=${a.to}&d=${dep}&tt=1&at=1&sc=7&px=1&taxng=1&newHP=True&clm=7&st=bestmatches`,
+      };
     case "lifemiles":
       return { site: "lifemiles.com", href: `https://www.lifemiles.com/fly/redeem` };
     case "flyingblue":
       return { site: "flyingblue.com", href: `https://www.flyingblue.com/en/spend/flights` };
     case "american":
-      return { site: "aa.com", href: `https://www.aa.com/booking/find-flights?from=${a.from}&to=${a.to}&departDate=${dep}&redeemMiles=true` };
+      return {
+        site: "aa.com",
+        href: `https://www.aa.com/booking/find-flights?from=${a.from}&to=${a.to}&departDate=${dep}&redeemMiles=true`,
+      };
     case "delta":
       return { site: "delta.com", href: `https://www.delta.com/flight-search/book-a-flight` };
     case "alaska":
@@ -49,9 +64,15 @@ function airlineBookingUrl(programId: string, a: AwardItinerary): { href: string
     case "etihad":
       return { site: "etihadguest.com", href: `https://www.etihadguest.com/en/spend-miles.html` };
     case "qatar":
-      return { site: "qatarairways.com", href: `https://www.qatarairways.com/en/Privilege-Club/redeem-avios.html` };
+      return {
+        site: "qatarairways.com",
+        href: `https://www.qatarairways.com/en/Privilege-Club/redeem-avios.html`,
+      };
     case "turkish":
-      return { site: "turkishairlines.com", href: `https://www.turkishairlines.com/en-int/miles-and-smiles/` };
+      return {
+        site: "turkishairlines.com",
+        href: `https://www.turkishairlines.com/en-int/miles-and-smiles/`,
+      };
     case "virginatlantic":
       return { site: "virginatlantic.com", href: `https://www.virginatlantic.com/flyingclub` };
     default: {
@@ -96,7 +117,8 @@ export function buildPlaybook(a: AwardItinerary, balances: Record<string, number
       steps.push({
         kind: "transfer",
         title: `You need ${shortfall.toLocaleString()} more ${program?.name ?? "miles"}`,
-        detail: "No bank transfer partner in your linked accounts. Consider buying miles or another program.",
+        detail:
+          "No bank transfer partner in your linked accounts. Consider buying miles or another program.",
       });
     }
   }

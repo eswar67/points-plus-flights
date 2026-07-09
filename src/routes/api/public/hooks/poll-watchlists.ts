@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getAwardProvider } from "@/lib/awards/provider.server";
-import { calcCppAud, gradeCpp, confidenceFor, fmtCpp, fmtAud, fareEstimateAud } from "@/lib/intelligence";
+import {
+  calcCppAud,
+  gradeCpp,
+  confidenceFor,
+  fmtCpp,
+  fmtAud,
+  fareEstimateAud,
+} from "@/lib/intelligence";
 import { sendTelegramMessage } from "@/lib/alerts/telegram.server";
 import { emailAlertsConfigured, sendAlertEmail } from "@/lib/alerts/email.server";
 import type { Cabin, AwardItinerary } from "@/lib/awards/types";
@@ -93,12 +100,14 @@ async function processWatchlist(
 
   // Take top hit per (programId+depart-date) to avoid spamming
   const seen = new Set<string>();
-  const top = candidates.filter(({ a }) => {
-    const k = `${a.programId}|${a.depart.slice(0, 10)}`;
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  }).slice(0, 3);
+  const top = candidates
+    .filter(({ a }) => {
+      const k = `${a.programId}|${a.depart.slice(0, 10)}`;
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    })
+    .slice(0, 3);
 
   let sent = 0;
   for (const { a, cpp } of top) {
@@ -193,7 +202,9 @@ export const Route = createFileRoute("/api/public/hooks/poll-watchlists")({
         const startedAt = new Date().toISOString();
         const { data: watchlists, error } = await supabaseAdmin
           .from("watchlists")
-          .select("id, user_id, origin, destination, date_from, date_to, cabin, pax, max_miles, min_cpp_aud, channel, active, label")
+          .select(
+            "id, user_id, origin, destination, date_from, date_to, cabin, pax, max_miles, min_cpp_aud, channel, active, label",
+          )
           .eq("active", true);
         if (error) {
           await supabaseAdmin.from("poller_runs").insert({
@@ -211,7 +222,10 @@ export const Route = createFileRoute("/api/public/hooks/poll-watchlists")({
         // Preload telegram chat IDs in one query
         const userIds = Array.from(new Set((watchlists ?? []).map((w) => w.user_id)));
         const { data: profiles } = userIds.length
-          ? await supabaseAdmin.from("profiles").select("user_id, telegram_chat_id").in("user_id", userIds)
+          ? await supabaseAdmin
+              .from("profiles")
+              .select("user_id, telegram_chat_id")
+              .in("user_id", userIds)
           : { data: [] as { user_id: string; telegram_chat_id: string | null }[] };
         const chatById = new Map((profiles ?? []).map((p) => [p.user_id, p.telegram_chat_id]));
 

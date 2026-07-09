@@ -36,7 +36,9 @@ export function useUserBalances() {
     setLoading(false);
   }, [user]);
 
-  useEffect(() => { refetch(); }, [refetch]);
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const byProgramId: Record<string, number> = {};
   for (const b of balances) byProgramId[b.program_id] = b.balance;

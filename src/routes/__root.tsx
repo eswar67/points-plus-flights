@@ -35,15 +35,27 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Aureum — Redeem Reward Points for Premium Flights" },
-      { name: "description", content: "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook." },
+      {
+        name: "description",
+        content:
+          "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook.",
+      },
       { name: "author", content: "Aureum" },
       { property: "og:title", content: "Aureum — Redeem Reward Points for Premium Flights" },
-      { property: "og:description", content: "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook." },
+      {
+        property: "og:description",
+        content:
+          "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook.",
+      },
       { property: "og:type", content: "website" },
       { name: "theme-color", content: "#0d0d0d" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Aureum — Redeem Reward Points for Premium Flights" },
-      { name: "twitter:description", content: "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook." },
+      {
+        name: "twitter:description",
+        content:
+          "Track Qantas, Velocity, KrisFlyer, Emirates, United and LifeMiles in one vault. Search cached award space across programs, updated continuously, with a guided redemption playbook.",
+      },
       { property: "og:image", content: OG_IMAGE },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },

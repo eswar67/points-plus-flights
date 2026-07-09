@@ -24,9 +24,21 @@ const PROPS = [
 ];
 
 const STRIP_STEPS = [
-  { n: "1", t: "Search once", d: "Every program, cabin and alliance in one query — with freshness badges on each seat." },
-  { n: "2", t: "See true value", d: "Cents-per-point grading against real one-way fares tells you book or skip." },
-  { n: "3", t: "Follow the playbook", d: "Transfer timing, booking links, step by step — or hand it to our concierge." },
+  {
+    n: "1",
+    t: "Search once",
+    d: "Every program, cabin and alliance in one query — with freshness badges on each seat.",
+  },
+  {
+    n: "2",
+    t: "See true value",
+    d: "Cents-per-point grading against real one-way fares tells you book or skip.",
+  },
+  {
+    n: "3",
+    t: "Follow the playbook",
+    d: "Transfer timing, booking links, step by step — or hand it to our concierge.",
+  },
 ];
 
 export function HowItWorksStrip() {
@@ -37,14 +49,16 @@ export function HowItWorksStrip() {
           <Reveal key={s.n} stagger={i}>
             <Link
               to="/how-it-works"
-              className="group flex h-full items-start gap-4 rounded-2xl border border-border bg-card/40 p-6 hover:border-border-strong transition"
+              className="group flex h-full items-start gap-4 rounded-lg border border-border bg-card/40 p-6 hover:border-border-strong transition"
             >
               <span className="shrink-0 size-9 rounded-full grid place-items-center font-display text-sm bg-gold/10 text-gold border border-gold/30">
                 {s.n}
               </span>
               <span>
                 <span className="block font-display text-lg">{s.t}</span>
-                <span className="block text-sm text-muted-foreground mt-1 leading-relaxed">{s.d}</span>
+                <span className="block text-sm text-muted-foreground mt-1 leading-relaxed">
+                  {s.d}
+                </span>
               </span>
             </Link>
           </Reveal>
@@ -69,24 +83,22 @@ export function ValueProps() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {PROPS.map((p, i) => (
           <Reveal key={p.title} stagger={i}>
-          <article
-            className="group rounded-2xl overflow-hidden border border-border bg-card hover:border-border-strong hover:-translate-y-1 transition duration-300"
-          >
-            <div className="aspect-[4/3] overflow-hidden">
-              <img
-                src={p.img}
-                alt=""
-                width={1024}
-                height={768}
-                loading="lazy"
-                className="w-full h-full object-cover transition duration-700 group-hover:scale-[1.04]"
-              />
-            </div>
-            <div className="p-6">
-              <h3 className="font-display text-xl">{p.title}</h3>
-              <p className="text-sm text-muted-foreground mt-2">{p.body}</p>
-            </div>
-          </article>
+            <article className="group rounded-lg overflow-hidden border border-border bg-card hover:border-border-strong hover:-translate-y-1 transition duration-300">
+              <div className="aspect-[4/3] overflow-hidden">
+                <img
+                  src={p.img}
+                  alt=""
+                  width={1024}
+                  height={768}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="font-display text-xl">{p.title}</h3>
+                <p className="text-sm text-muted-foreground mt-2">{p.body}</p>
+              </div>
+            </article>
           </Reveal>
         ))}
       </div>
@@ -128,20 +140,18 @@ export function Testimonials() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {TESTIMONIALS.map((t, i) => (
             <Reveal key={t.name} stagger={i}>
-            <figure
-              className="h-full rounded-2xl border border-border bg-background/60 p-6 flex flex-col"
-            >
-              <div className="text-gold font-display text-3xl leading-none mb-3">"</div>
-              <blockquote className="text-sm text-foreground/90 leading-relaxed flex-1">
-                {t.quote}
-              </blockquote>
-              <figcaption className="mt-5 pt-5 border-t border-border-soft">
-                <div className="font-display text-sm">{t.name}</div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
-                  {t.detail}
-                </div>
-              </figcaption>
-            </figure>
+              <figure className="h-full rounded-lg border border-border bg-background/60 p-6 flex flex-col">
+                <div className="text-gold font-display text-3xl leading-none mb-3">"</div>
+                <blockquote className="text-sm text-foreground/90 leading-relaxed flex-1">
+                  {t.quote}
+                </blockquote>
+                <figcaption className="mt-5 pt-5 border-t border-border-soft">
+                  <div className="font-display text-sm">{t.name}</div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
+                    {t.detail}
+                  </div>
+                </figcaption>
+              </figure>
             </Reveal>
           ))}
         </div>
@@ -235,15 +245,15 @@ export function FAQ({ limit }: { limit?: number }) {
 export function ConciergeCTA() {
   return (
     <section className="mx-auto max-w-7xl px-6 pb-20 md:pb-28">
-      <div className="relative overflow-hidden rounded-3xl border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-16">
+      <div className="relative overflow-hidden rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-16">
         <div className="max-w-2xl">
           <span className="text-xs uppercase tracking-widest text-gold">Aureum Plus</span>
           <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
             Hand the search to us.
           </h2>
           <p className="mt-4 text-muted-foreground max-w-lg">
-            Tell our concierge where you want to go. We'll find the seats, hold them, and ticket
-            the redemption — usually inside 24 hours.
+            Tell our concierge where you want to go. We'll find the seats, hold them, and ticket the
+            redemption — usually inside 24 hours.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link

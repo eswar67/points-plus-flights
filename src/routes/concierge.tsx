@@ -8,10 +8,7 @@ import { listBookingRequests, updateBookingRequest } from "@/lib/booking/agent.f
 
 export const Route = createFileRoute("/concierge")({
   head: () => ({
-    meta: [
-      { title: "Concierge queue — Aureum" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Concierge queue — Aureum" }, { name: "robots", content: "noindex" }],
   }),
   component: ConciergeQueue,
 });
@@ -71,7 +68,9 @@ function ConciergeQueue() {
       setAuthorized(isAgent);
       if (isAgent) refresh();
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -82,11 +81,14 @@ function ConciergeQueue() {
         <main className="mx-auto max-w-md px-6 py-24 text-center">
           <h1 className="font-display text-3xl">Agents only.</h1>
           <p className="text-sm text-muted-foreground mt-3">
-            This queue is restricted to concierge agents. If you should have
-            access, ask an admin to assign you the <span className="font-mono">agent</span> role.
+            This queue is restricted to concierge agents. If you should have access, ask an admin to
+            assign you the <span className="font-mono">agent</span> role.
           </p>
           <button
-            onClick={async () => { await supabase.auth.signOut(); nav({ to: "/agent-login" }); }}
+            onClick={async () => {
+              await supabase.auth.signOut();
+              nav({ to: "/agent-login" });
+            }}
             className="mt-8 text-xs uppercase tracking-widest px-5 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
           >
             Sign in as an agent
@@ -96,7 +98,11 @@ function ConciergeQueue() {
     );
   }
 
-  async function setStatus(id: string, status: typeof STATUSES[number], agent_notes?: string | null) {
+  async function setStatus(
+    id: string,
+    status: (typeof STATUSES)[number],
+    agent_notes?: string | null,
+  ) {
     await update({ data: { id, status, agent_notes: agent_notes ?? null } });
     refresh();
   }
@@ -113,7 +119,10 @@ function ConciergeQueue() {
             </p>
           </div>
           <button
-            onClick={async () => { await supabase.auth.signOut(); nav({ to: "/agent-login" }); }}
+            onClick={async () => {
+              await supabase.auth.signOut();
+              nav({ to: "/agent-login" });
+            }}
             className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
           >
             Sign out
@@ -122,20 +131,21 @@ function ConciergeQueue() {
 
         {error && (
           <div className="rounded-lg border border-destructive/40 bg-destructive/10 text-destructive p-4 text-sm mb-6">
-            {error}. You may need the <span className="font-mono">agent</span> role assigned to your user.
+            {error}. You may need the <span className="font-mono">agent</span> role assigned to your
+            user.
           </div>
         )}
 
         {!requests ? (
           <SkeletonRows rows={4} height="h-24" />
         ) : requests.length === 0 ? (
-          <div className="rounded-xl border border-border bg-card p-10 text-center text-muted-foreground">
+          <div className="rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">
             No booking requests yet.
           </div>
         ) : (
           <div className="space-y-3">
             {requests.map((r) => (
-              <div key={r.id} className="rounded-xl border border-border bg-card p-5">
+              <div key={r.id} className="rounded-lg border border-border bg-card p-5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
                     <div className="text-xs uppercase tracking-widest text-muted-foreground">
@@ -152,8 +162,19 @@ function ConciergeQueue() {
                     </div>
                     <div className="text-sm mt-2">
                       <span className="text-muted-foreground">Program:</span> {r.program}
-                      {r.carrier && <> · <span className="text-muted-foreground">Carrier:</span> {r.carrier}</>}
-                      {r.miles_required != null && <> · <span className="text-muted-foreground">Miles:</span> {r.miles_required.toLocaleString()}</>}
+                      {r.carrier && (
+                        <>
+                          {" "}
+                          · <span className="text-muted-foreground">Carrier:</span> {r.carrier}
+                        </>
+                      )}
+                      {r.miles_required != null && (
+                        <>
+                          {" "}
+                          · <span className="text-muted-foreground">Miles:</span>{" "}
+                          {r.miles_required.toLocaleString()}
+                        </>
+                      )}
                     </div>
                     {r.notes && (
                       <div className="text-sm text-muted-foreground mt-2 italic">"{r.notes}"</div>

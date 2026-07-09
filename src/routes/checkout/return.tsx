@@ -6,10 +6,7 @@ export const Route = createFileRoute("/checkout/return")({
     session_id: typeof s.session_id === "string" ? s.session_id : undefined,
   }),
   head: () => ({
-    meta: [
-      { title: "Welcome to Aureum Plus" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Welcome to Aureum Plus" }, { name: "robots", content: "noindex" }],
   }),
   component: ReturnPage,
 });

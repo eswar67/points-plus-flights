@@ -33,8 +33,8 @@ function FAQPage() {
             Frequently asked.
           </h1>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Can't find what you're looking for? Submit a concierge request and we'll come back
-            to you personally.
+            Can't find what you're looking for? Submit a concierge request and we'll come back to
+            you personally.
           </p>
         </div>
         <FAQ />

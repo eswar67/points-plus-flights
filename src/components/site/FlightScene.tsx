@@ -52,15 +52,29 @@ export function FlightScene() {
         <g>
           <circle cx="40" cy="300" r="3" fill="var(--gold)" />
           <circle
-            cx="40" cy="300" r="6"
-            fill="none" stroke="var(--gold)" strokeWidth="1"
-            style={{ transformOrigin: "40px 300px", animation: "beacon-ping 2.8s ease-out infinite" }}
+            cx="40"
+            cy="300"
+            r="6"
+            fill="none"
+            stroke="var(--gold)"
+            strokeWidth="1"
+            style={{
+              transformOrigin: "40px 300px",
+              animation: "beacon-ping 2.8s ease-out infinite",
+            }}
           />
           <circle cx="1160" cy="210" r="3" fill="var(--gold)" />
           <circle
-            cx="1160" cy="210" r="6"
-            fill="none" stroke="var(--gold)" strokeWidth="1"
-            style={{ transformOrigin: "1160px 210px", animation: "beacon-ping 2.8s ease-out 1.4s infinite" }}
+            cx="1160"
+            cy="210"
+            r="6"
+            fill="none"
+            stroke="var(--gold)"
+            strokeWidth="1"
+            style={{
+              transformOrigin: "1160px 210px",
+              animation: "beacon-ping 2.8s ease-out 1.4s infinite",
+            }}
           />
         </g>
 

@@ -6,8 +6,18 @@ const RequestSchema = z.object({
   contact_email: z.string().trim().email().max(255),
   contact_name: z.string().trim().min(1).max(120),
   passenger_count: z.number().int().min(1).max(9),
-  route_from: z.string().trim().min(3).max(7).regex(/^[A-Za-z]+$/),
-  route_to: z.string().trim().min(3).max(7).regex(/^[A-Za-z]+$/),
+  route_from: z
+    .string()
+    .trim()
+    .min(3)
+    .max(7)
+    .regex(/^[A-Za-z]+$/),
+  route_to: z
+    .string()
+    .trim()
+    .min(3)
+    .max(7)
+    .regex(/^[A-Za-z]+$/),
   travel_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   cabin: z.enum(["economy", "premium", "business", "first"]),
   program: z.string().trim().min(1).max(60),
@@ -36,7 +46,7 @@ export const submitBookingRequest = createServerFn({ method: "POST" })
     });
     if (!hasSandbox && !hasLive) {
       throw new Error(
-        "Concierge booking is an Aureum Plus benefit. Upgrade at /pricing to submit a request."
+        "Concierge booking is an Aureum Plus benefit. Upgrade at /pricing to submit a request.",
       );
     }
 

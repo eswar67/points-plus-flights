@@ -10,9 +10,16 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — Aureum Plus" },
-      { name: "description", content: "Aureum Plus: unlimited award watchlists, instant Telegram alerts, and concierge ticketing." },
+      {
+        name: "description",
+        content:
+          "Aureum Plus: unlimited award watchlists, instant Telegram alerts, and concierge ticketing.",
+      },
       { property: "og:title", content: "Pricing — Aureum Plus" },
-      { property: "og:description", content: "AUD $12/month. Unlimited watchlists, alerts, concierge access. Cancel anytime." },
+      {
+        property: "og:description",
+        content: "AUD $12/month. Unlimited watchlists, alerts, concierge access. Cancel anytime.",
+      },
     ],
   }),
   component: PricingPage,
@@ -34,7 +41,7 @@ function PricingPage() {
 
   function start(plan: "monthly" | "yearly") {
     if (!user) {
-      nav({ to: "/auth", search: { redirect: "/pricing" } as never });
+      nav({ to: "/auth", search: { redirect: "/pricing" } });
       return;
     }
     setOpen(plan);
@@ -47,22 +54,23 @@ function PricingPage() {
       <main className="mx-auto max-w-5xl px-6 py-16">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <div className="text-xs uppercase tracking-widest text-gold mb-3">Membership</div>
-          <h1 className="font-display text-4xl md:text-5xl tracking-tight">
-            Aureum Plus.
-          </h1>
+          <h1 className="font-display text-4xl md:text-5xl tracking-tight">Aureum Plus.</h1>
           <p className="text-muted-foreground mt-4">
-            Unlimited award hunting, instant alerts, human concierge backup.
-            One flat membership — cancel any time.
+            Unlimited award hunting, instant alerts, human concierge backup. One flat membership —
+            cancel any time.
           </p>
         </div>
 
         {open ? (
-          <div className="max-w-2xl mx-auto rounded-2xl border border-border bg-card p-4">
+          <div className="max-w-2xl mx-auto rounded-lg border border-border bg-card p-4">
             <div className="flex items-center justify-between mb-4 px-2">
               <div className="text-sm text-muted-foreground">
                 Aureum Plus — {open === "monthly" ? "AUD $12/mo" : "AUD $120/yr"}
               </div>
-              <button onClick={() => setOpen(null)} className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setOpen(null)}
+                className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
+              >
                 Cancel
               </button>
             </div>
@@ -97,7 +105,10 @@ function PricingPage() {
 
         {isActive && !open && (
           <div className="text-center mt-10">
-            <Link to="/account" className="text-xs uppercase tracking-widest text-gold hover:underline">
+            <Link
+              to="/account"
+              className="text-xs uppercase tracking-widest text-gold hover:underline"
+            >
               Manage billing in account →
             </Link>
           </div>
@@ -108,13 +119,30 @@ function PricingPage() {
 }
 
 function PlanCard({
-  title, price, cadence, features, cta, onClick, disabled, highlight, badge,
+  title,
+  price,
+  cadence,
+  features,
+  cta,
+  onClick,
+  disabled,
+  highlight,
+  badge,
 }: {
-  title: string; price: string; cadence: string; features: string[];
-  cta: string; onClick: () => void; disabled?: boolean; highlight?: boolean; badge?: string;
+  title: string;
+  price: string;
+  cadence: string;
+  features: string[];
+  cta: string;
+  onClick: () => void;
+  disabled?: boolean;
+  highlight?: boolean;
+  badge?: string;
 }) {
   return (
-    <div className={`rounded-2xl border p-8 ${highlight ? "border-gold/60 bg-gold/5" : "border-border bg-card"}`}>
+    <div
+      className={`rounded-lg border p-8 ${highlight ? "border-gold/60 bg-gold/5" : "border-border bg-card"}`}
+    >
       <div className="flex items-baseline justify-between">
         <h3 className="font-display text-xl">{title}</h3>
         {badge && <span className="text-xs uppercase tracking-widest text-gold">{badge}</span>}

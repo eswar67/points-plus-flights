@@ -8,10 +8,23 @@ const MAX_RANGE_DAYS = 31;
 
 const SearchSchema = z
   .object({
-    from: z.string().trim().min(3).max(7).regex(/^[A-Za-z,]+$/, "IATA codes only"),
-    to: z.string().trim().min(3).max(7).regex(/^[A-Za-z,]+$/, "IATA codes only"),
+    from: z
+      .string()
+      .trim()
+      .min(3)
+      .max(7)
+      .regex(/^[A-Za-z,]+$/, "IATA codes only"),
+    to: z
+      .string()
+      .trim()
+      .min(3)
+      .max(7)
+      .regex(/^[A-Za-z,]+$/, "IATA codes only"),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD"),
-    dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD").optional(),
+    dateTo: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD")
+      .optional(),
     cabin: z.enum(["economy", "premium", "business", "first"]),
     pax: z.number().int().min(1).max(9),
   })

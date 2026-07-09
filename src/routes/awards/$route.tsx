@@ -67,7 +67,9 @@ function AwardRoutePage() {
   const { from, to } = parsed;
   // Airline programs only (transferable currencies aren't redeemed directly).
   const airlinePrograms = PROGRAMS.filter((p) => p.alliance !== "Transferable");
-  const others = knownRoutes().filter((r) => !(r.from === from && r.to === to)).slice(0, 6);
+  const others = knownRoutes()
+    .filter((r) => !(r.from === from && r.to === to))
+    .slice(0, 6);
 
   return (
     <div className="min-h-screen bg-noir">
@@ -78,9 +80,8 @@ function AwardRoutePage() {
           {from} <span className="text-gold">→</span> {to}
         </h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
-          Benchmark cash fares and indicative points cost for this route. Figures
-          are typical mid-market values used by our CPP engine — live award
-          pricing varies by date and program.
+          Benchmark cash fares and indicative points cost for this route. Figures are typical
+          mid-market values used by our CPP engine — live award pricing varies by date and program.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
@@ -103,7 +104,7 @@ function AwardRoutePage() {
           <h2 className="font-display text-2xl">Benchmark cash fares</h2>
           <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
             {CABINS.map((c) => (
-              <div key={c.value} className="rounded-xl border border-border bg-card p-5">
+              <div key={c.value} className="rounded-lg border border-border bg-card p-5">
                 <div className="text-xs uppercase tracking-widest text-muted-foreground">
                   {c.label}
                 </div>
@@ -121,10 +122,10 @@ function AwardRoutePage() {
         <section className="mt-14">
           <h2 className="font-display text-2xl">Indicative miles per program</h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-            Estimated at each program's typical premium-redemption value — use it
-            to gauge which balance goes furthest, then confirm with a live search.
+            Estimated at each program's typical premium-redemption value — use it to gauge which
+            balance goes furthest, then confirm with a live search.
           </p>
-          <div className="mt-4 rounded-xl border border-border overflow-x-auto">
+          <div className="mt-4 rounded-lg border border-border overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-background/40 text-muted-foreground uppercase tracking-widest text-xs">
                 <tr>
@@ -136,14 +137,22 @@ function AwardRoutePage() {
               <tbody>
                 {airlinePrograms.map((p) => {
                   const milesFor = (cabin: Cabin) =>
-                    Math.round(fareEstimateAud(from, to, cabin) * 100 / p.valueAudCents / 1000) * 1000;
+                    Math.round((fareEstimateAud(from, to, cabin) * 100) / p.valueAudCents / 1000) *
+                    1000;
                   return (
-                    <tr key={p.id} className="border-t border-border-soft hover:bg-background/40 transition-colors">
+                    <tr
+                      key={p.id}
+                      className="border-t border-border-soft hover:bg-background/40 transition-colors"
+                    >
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-2">
                           <span
                             className="size-7 rounded-full grid place-items-center font-display text-xs"
-                            style={{ background: `${p.accent}22`, color: p.accent, border: `1px solid ${p.accent}55` }}
+                            style={{
+                              background: `${p.accent}22`,
+                              color: p.accent,
+                              border: `1px solid ${p.accent}55`,
+                            }}
                           >
                             {p.short}
                           </span>

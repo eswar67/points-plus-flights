@@ -30,9 +30,9 @@ export function TransferPlanner() {
           Transfer planner
         </h2>
         <p className="text-sm text-muted-foreground mt-2 max-w-prose">
-          Add a transferable currency above — Amex Membership Rewards or Citi
-          ThankYou Points — and we'll show every airline program you can reach,
-          at what ratio, and how long the points take to land.
+          Add a transferable currency above — Amex Membership Rewards or Citi ThankYou Points — and
+          we'll show every airline program you can reach, at what ratio, and how long the points
+          take to land.
         </p>
       </section>
     );
@@ -45,12 +45,10 @@ export function TransferPlanner() {
 
   return (
     <section className="mt-16 pt-10 border-t border-border">
-      <h2 className="text-xs uppercase tracking-widest text-muted-foreground">
-        Transfer planner
-      </h2>
+      <h2 className="text-xs uppercase tracking-widest text-muted-foreground">Transfer planner</h2>
       <p className="text-sm text-muted-foreground mt-2 max-w-prose">
-        Where your transferable points can go. Ratios and posting times are
-        typical values — always confirm on the bank's site before moving points.
+        Where your transferable points can go. Ratios and posting times are typical values — always
+        confirm on the bank's site before moving points.
       </p>
 
       <div className="mt-6 space-y-4">
@@ -59,11 +57,15 @@ export function TransferPlanner() {
           const routes = routesFromBankProgram(b.program_id);
           const accent = program?.accent ?? "#c9a84c";
           return (
-            <div key={b.id} className="rounded-xl border border-border bg-card p-5">
+            <div key={b.id} className="rounded-lg border border-border bg-card p-5">
               <div className="flex items-center gap-3 mb-4">
                 <span
                   className="size-8 rounded-full grid place-items-center font-display text-xs"
-                  style={{ background: `${accent}22`, color: accent, border: `1px solid ${accent}55` }}
+                  style={{
+                    background: `${accent}22`,
+                    color: accent,
+                    border: `1px solid ${accent}55`,
+                  }}
                 >
                   {program?.short ?? "•"}
                 </span>
@@ -127,7 +129,7 @@ export function TransferPlanner() {
             {boostedPrograms.map(([pid, v]) => {
               const p = getProgram(pid);
               return (
-                <div key={pid} className="rounded-xl border border-border bg-background/40 p-4">
+                <div key={pid} className="rounded-lg border border-border bg-background/40 p-4">
                   <div className="text-sm">{p?.name ?? pid}</div>
                   <div className="font-display text-2xl text-gold-gradient mt-1">
                     {v.total.toLocaleString()}

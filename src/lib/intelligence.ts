@@ -32,9 +32,9 @@ const FARE_AUD: Record<string, Partial<Record<Cabin, number>>> = {
 
 // Last-resort defaults when an airport has no coordinates on file (one-way).
 const REGION_DEFAULTS_AUD: Record<string, Partial<Record<Cabin, number>>> = {
-  short:  { economy: 350, premium: 700, business: 1600, first: 3000 },
+  short: { economy: 350, premium: 700, business: 1600, first: 3000 },
   medium: { economy: 850, premium: 1700, business: 3900, first: 7500 },
-  long:   { economy: 1300, premium: 2800, business: 6500, first: 12500 },
+  long: { economy: 1300, premium: 2800, business: 6500, first: 12500 },
 };
 
 function regionFor(from: string, to: string): keyof typeof REGION_DEFAULTS_AUD {
@@ -49,36 +49,103 @@ function regionFor(from: string, to: string): keyof typeof REGION_DEFAULTS_AUD {
 /** [lat, lon] for fare modeling. Unknown airports fall back to region defaults. */
 const AIRPORT_COORDS: Record<string, [number, number]> = {
   // Australia / NZ / Pacific
-  SYD: [-33.95, 151.18], MEL: [-37.67, 144.84], BNE: [-27.38, 153.12], PER: [-31.94, 115.97],
-  ADL: [-34.95, 138.53], OOL: [-28.16, 153.50], CNS: [-16.88, 145.75], DRW: [-12.41, 130.88],
-  HBA: [-42.84, 147.51], CBR: [-35.31, 149.19], AKL: [-37.01, 174.79], CHC: [-43.49, 172.53],
-  WLG: [-41.33, 174.81], ZQN: [-45.02, 168.74], NAN: [-17.76, 177.44],
+  SYD: [-33.95, 151.18],
+  MEL: [-37.67, 144.84],
+  BNE: [-27.38, 153.12],
+  PER: [-31.94, 115.97],
+  ADL: [-34.95, 138.53],
+  OOL: [-28.16, 153.5],
+  CNS: [-16.88, 145.75],
+  DRW: [-12.41, 130.88],
+  HBA: [-42.84, 147.51],
+  CBR: [-35.31, 149.19],
+  AKL: [-37.01, 174.79],
+  CHC: [-43.49, 172.53],
+  WLG: [-41.33, 174.81],
+  ZQN: [-45.02, 168.74],
+  NAN: [-17.76, 177.44],
   // Asia
-  DPS: [-8.75, 115.17], CGK: [-6.13, 106.66], SIN: [1.36, 103.99], KUL: [2.75, 101.71],
-  BKK: [13.69, 100.75], HKT: [8.11, 98.32], HKG: [22.31, 113.91], TPE: [25.08, 121.23],
-  MNL: [14.51, 121.02], NRT: [35.77, 140.39], HND: [35.55, 139.78], KIX: [34.43, 135.24],
-  ICN: [37.46, 126.44], PVG: [31.14, 121.81], PEK: [40.08, 116.58], CAN: [23.39, 113.30],
-  SGN: [10.82, 106.65], HAN: [21.21, 105.80], PNH: [11.55, 104.84],
-  DEL: [28.57, 77.10], BOM: [19.09, 72.87], BLR: [13.20, 77.71], HYD: [17.24, 78.43],
-  MAA: [12.99, 80.17], CMB: [7.18, 79.88], KTM: [27.70, 85.36], MLE: [4.19, 73.53],
+  DPS: [-8.75, 115.17],
+  CGK: [-6.13, 106.66],
+  SIN: [1.36, 103.99],
+  KUL: [2.75, 101.71],
+  BKK: [13.69, 100.75],
+  HKT: [8.11, 98.32],
+  HKG: [22.31, 113.91],
+  TPE: [25.08, 121.23],
+  MNL: [14.51, 121.02],
+  NRT: [35.77, 140.39],
+  HND: [35.55, 139.78],
+  KIX: [34.43, 135.24],
+  ICN: [37.46, 126.44],
+  PVG: [31.14, 121.81],
+  PEK: [40.08, 116.58],
+  CAN: [23.39, 113.3],
+  SGN: [10.82, 106.65],
+  HAN: [21.21, 105.8],
+  PNH: [11.55, 104.84],
+  DEL: [28.57, 77.1],
+  BOM: [19.09, 72.87],
+  BLR: [13.2, 77.71],
+  HYD: [17.24, 78.43],
+  MAA: [12.99, 80.17],
+  CMB: [7.18, 79.88],
+  KTM: [27.7, 85.36],
+  MLE: [4.19, 73.53],
   // Middle East
-  DXB: [25.25, 55.36], AUH: [24.43, 54.65], DOH: [25.27, 51.61], JED: [21.68, 39.16],
-  RUH: [24.96, 46.70],
+  DXB: [25.25, 55.36],
+  AUH: [24.43, 54.65],
+  DOH: [25.27, 51.61],
+  JED: [21.68, 39.16],
+  RUH: [24.96, 46.7],
   // Europe
-  LHR: [51.47, -0.45], LGW: [51.15, -0.19], CDG: [49.01, 2.55], FRA: [50.03, 8.56],
-  MUC: [48.35, 11.79], AMS: [52.31, 4.76], ZRH: [47.46, 8.55], VIE: [48.11, 16.57],
-  FCO: [41.80, 12.25], MAD: [40.47, -3.56], BCN: [41.30, 2.08], IST: [41.28, 28.75],
-  ATH: [37.94, 23.94], DUB: [53.42, -6.27], MAN: [53.35, -2.28], HEL: [60.32, 24.96],
-  ARN: [59.65, 17.92], CPH: [55.62, 12.66], OSL: [60.19, 11.10],
+  LHR: [51.47, -0.45],
+  LGW: [51.15, -0.19],
+  CDG: [49.01, 2.55],
+  FRA: [50.03, 8.56],
+  MUC: [48.35, 11.79],
+  AMS: [52.31, 4.76],
+  ZRH: [47.46, 8.55],
+  VIE: [48.11, 16.57],
+  FCO: [41.8, 12.25],
+  MAD: [40.47, -3.56],
+  BCN: [41.3, 2.08],
+  IST: [41.28, 28.75],
+  ATH: [37.94, 23.94],
+  DUB: [53.42, -6.27],
+  MAN: [53.35, -2.28],
+  HEL: [60.32, 24.96],
+  ARN: [59.65, 17.92],
+  CPH: [55.62, 12.66],
+  OSL: [60.19, 11.1],
   // Americas
-  LAX: [33.94, -118.41], SFO: [37.62, -122.38], SEA: [47.45, -122.31], YVR: [49.19, -123.18],
-  YYZ: [43.68, -79.63], JFK: [40.64, -73.78], EWR: [40.69, -74.17], BOS: [42.36, -71.01],
-  ORD: [41.97, -87.91], DFW: [32.90, -97.04], IAH: [29.98, -95.34], MIA: [25.79, -80.29],
-  ATL: [33.64, -84.43], DEN: [39.86, -104.67], LAS: [36.08, -115.15], HNL: [21.32, -157.92],
-  MEX: [19.44, -99.07], GRU: [-23.43, -46.47], EZE: [-34.82, -58.54], SCL: [-33.39, -70.79],
-  LIM: [-12.02, -77.11], BOG: [4.70, -74.14],
+  LAX: [33.94, -118.41],
+  SFO: [37.62, -122.38],
+  SEA: [47.45, -122.31],
+  YVR: [49.19, -123.18],
+  YYZ: [43.68, -79.63],
+  JFK: [40.64, -73.78],
+  EWR: [40.69, -74.17],
+  BOS: [42.36, -71.01],
+  ORD: [41.97, -87.91],
+  DFW: [32.9, -97.04],
+  IAH: [29.98, -95.34],
+  MIA: [25.79, -80.29],
+  ATL: [33.64, -84.43],
+  DEN: [39.86, -104.67],
+  LAS: [36.08, -115.15],
+  HNL: [21.32, -157.92],
+  MEX: [19.44, -99.07],
+  GRU: [-23.43, -46.47],
+  EZE: [-34.82, -58.54],
+  SCL: [-33.39, -70.79],
+  LIM: [-12.02, -77.11],
+  BOG: [4.7, -74.14],
   // Africa
-  JNB: [-26.14, 28.25], CPT: [-33.96, 18.60], NBO: [-1.32, 36.93], CAI: [30.12, 31.41],
+  JNB: [-26.14, 28.25],
+  CPT: [-33.96, 18.6],
+  NBO: [-1.32, 36.93],
+  CAI: [30.12, 31.41],
 };
 
 function distanceKm(a: [number, number], b: [number, number]): number {
@@ -150,10 +217,13 @@ export type ValueGrade = "exceptional" | "great" | "fair" | "skip";
 export function gradeCpp(cpp: number, cabin: Cabin): ValueGrade {
   // Premium cabins should clear higher CPP bars.
   const t =
-    cabin === "first"    ? { ex: 6.0, gr: 4.5, fa: 3.0 } :
-    cabin === "business" ? { ex: 5.0, gr: 3.5, fa: 2.2 } :
-    cabin === "premium"  ? { ex: 3.5, gr: 2.5, fa: 1.5 } :
-                           { ex: 2.5, gr: 1.8, fa: 1.0 };
+    cabin === "first"
+      ? { ex: 6.0, gr: 4.5, fa: 3.0 }
+      : cabin === "business"
+        ? { ex: 5.0, gr: 3.5, fa: 2.2 }
+        : cabin === "premium"
+          ? { ex: 3.5, gr: 2.5, fa: 1.5 }
+          : { ex: 2.5, gr: 1.8, fa: 1.0 };
   if (cpp >= t.ex) return "exceptional";
   if (cpp >= t.gr) return "great";
   if (cpp >= t.fa) return "fair";
@@ -169,11 +239,11 @@ export function confidenceFor(a: AwardItinerary, now: number = Date.now()): Conf
   const updated = a.updatedAt ? new Date(a.updatedAt).getTime() : now - 90 * 60_000;
   const ageMin = Math.max(0, Math.round((now - updated) / 60_000));
   let score = 100;
-  if (ageMin > 5)   score -= 10;
-  if (ageMin > 30)  score -= 25;
+  if (ageMin > 5) score -= 10;
+  if (ageMin > 30) score -= 25;
   if (ageMin > 120) score -= 30;
   if (ageMin > 360) score -= 25;
-  if (a.seats <= 1) score -= 10;     // single seat = high turnover risk
+  if (a.seats <= 1) score -= 10; // single seat = high turnover risk
   if (a.seats >= 4) score += 5;
   score = Math.max(0, Math.min(100, score));
   const label = score >= 75 ? "live" : score >= 45 ? "likely" : "stale";
@@ -187,35 +257,119 @@ export function confidenceFor(a: AwardItinerary, now: number = Date.now()): Conf
 export type TransferRoute = {
   bank: string;
   programId: string;
-  ratio: string;     // e.g. "1:1", "1:1.25"
-  etaMin: number;    // typical posting time
+  ratio: string; // e.g. "1:1", "1:1.25"
+  etaMin: number; // typical posting time
   etaMaxMin: number; // worst case
   href: string;
 };
 
 export const TRANSFER_MATRIX: TransferRoute[] = [
   // Amex (AU + global)
-  { bank: "Amex MR (AU)",  programId: "qantas",    ratio: "1:0.5", etaMin: 1440, etaMaxMin: 4320, href: "https://www.americanexpress.com/au/rewards/membership-rewards/transfer-points" },
-  { bank: "Amex MR (AU)",  programId: "velocity",  ratio: "1:1",   etaMin: 1440, etaMaxMin: 4320, href: "https://www.americanexpress.com/au/rewards/membership-rewards/transfer-points" },
-  { bank: "Amex MR (AU)",  programId: "krisflyer", ratio: "1:1",   etaMin: 60,   etaMaxMin: 1440, href: "https://www.americanexpress.com/au/rewards/membership-rewards/transfer-points" },
-  { bank: "Amex MR",       programId: "krisflyer", ratio: "1:1",   etaMin: 60,   etaMaxMin: 1440, href: "https://global.americanexpress.com/rewards/transfer-points" },
-  { bank: "Amex MR",       programId: "emirates",  ratio: "1:1",   etaMin: 60,   etaMaxMin: 1440, href: "https://global.americanexpress.com/rewards/transfer-points" },
-  { bank: "Amex MR",       programId: "lifemiles", ratio: "1:1",   etaMin: 1440, etaMaxMin: 4320, href: "https://global.americanexpress.com/rewards/transfer-points" },
+  {
+    bank: "Amex MR (AU)",
+    programId: "qantas",
+    ratio: "1:0.5",
+    etaMin: 1440,
+    etaMaxMin: 4320,
+    href: "https://www.americanexpress.com/au/rewards/membership-rewards/transfer-points",
+  },
+  {
+    bank: "Amex MR (AU)",
+    programId: "velocity",
+    ratio: "1:1",
+    etaMin: 1440,
+    etaMaxMin: 4320,
+    href: "https://www.americanexpress.com/au/rewards/membership-rewards/transfer-points",
+  },
+  {
+    bank: "Amex MR (AU)",
+    programId: "krisflyer",
+    ratio: "1:1",
+    etaMin: 60,
+    etaMaxMin: 1440,
+    href: "https://www.americanexpress.com/au/rewards/membership-rewards/transfer-points",
+  },
+  {
+    bank: "Amex MR",
+    programId: "krisflyer",
+    ratio: "1:1",
+    etaMin: 60,
+    etaMaxMin: 1440,
+    href: "https://global.americanexpress.com/rewards/transfer-points",
+  },
+  {
+    bank: "Amex MR",
+    programId: "emirates",
+    ratio: "1:1",
+    etaMin: 60,
+    etaMaxMin: 1440,
+    href: "https://global.americanexpress.com/rewards/transfer-points",
+  },
+  {
+    bank: "Amex MR",
+    programId: "lifemiles",
+    ratio: "1:1",
+    etaMin: 1440,
+    etaMaxMin: 4320,
+    href: "https://global.americanexpress.com/rewards/transfer-points",
+  },
   // Chase
-  { bank: "Chase UR",      programId: "united",    ratio: "1:1",   etaMin: 1,    etaMaxMin: 60,   href: "https://ultimaterewards.chase.com" },
-  { bank: "Chase UR",      programId: "krisflyer", ratio: "1:1",   etaMin: 60,   etaMaxMin: 1440, href: "https://ultimaterewards.chase.com" },
+  {
+    bank: "Chase UR",
+    programId: "united",
+    ratio: "1:1",
+    etaMin: 1,
+    etaMaxMin: 60,
+    href: "https://ultimaterewards.chase.com",
+  },
+  {
+    bank: "Chase UR",
+    programId: "krisflyer",
+    ratio: "1:1",
+    etaMin: 60,
+    etaMaxMin: 1440,
+    href: "https://ultimaterewards.chase.com",
+  },
   // Bilt
-  { bank: "Bilt",          programId: "united",    ratio: "1:1",   etaMin: 5,    etaMaxMin: 60,   href: "https://www.biltrewards.com" },
-  { bank: "Bilt",          programId: "emirates",  ratio: "1:1",   etaMin: 5,    etaMaxMin: 60,   href: "https://www.biltrewards.com" },
+  {
+    bank: "Bilt",
+    programId: "united",
+    ratio: "1:1",
+    etaMin: 5,
+    etaMaxMin: 60,
+    href: "https://www.biltrewards.com",
+  },
+  {
+    bank: "Bilt",
+    programId: "emirates",
+    ratio: "1:1",
+    etaMin: 5,
+    etaMaxMin: 60,
+    href: "https://www.biltrewards.com",
+  },
   // Citi
-  { bank: "Citi TYP",      programId: "krisflyer", ratio: "1:1",   etaMin: 60,   etaMaxMin: 1440, href: "https://www.citi.com/thankyou" },
-  { bank: "Citi TYP",      programId: "lifemiles", ratio: "1:1",   etaMin: 60,   etaMaxMin: 1440, href: "https://www.citi.com/thankyou" },
+  {
+    bank: "Citi TYP",
+    programId: "krisflyer",
+    ratio: "1:1",
+    etaMin: 60,
+    etaMaxMin: 1440,
+    href: "https://www.citi.com/thankyou",
+  },
+  {
+    bank: "Citi TYP",
+    programId: "lifemiles",
+    ratio: "1:1",
+    etaMin: 60,
+    etaMaxMin: 1440,
+    href: "https://www.citi.com/thankyou",
+  },
 ];
 
 export function transfersFor(programId: string): TransferRoute[] {
-  return TRANSFER_MATRIX
-    .filter((t) => t.programId === programId)
-    .sort((a, b) => a.etaMin - b.etaMin);
+  return TRANSFER_MATRIX.filter((t) => t.programId === programId).sort(
+    (a, b) => a.etaMin - b.etaMin,
+  );
 }
 
 /**
@@ -238,9 +392,7 @@ export function ratioMultiplier(ratio: string): number {
 /** Outbound routes available from a transferable program the user holds. */
 export function routesFromBankProgram(bankProgramId: string): TransferRoute[] {
   const banks = TRANSFERABLE_PROGRAM_BANKS[bankProgramId] ?? [];
-  return TRANSFER_MATRIX
-    .filter((t) => banks.includes(t.bank))
-    .sort((a, b) => a.etaMin - b.etaMin);
+  return TRANSFER_MATRIX.filter((t) => banks.includes(t.bank)).sort((a, b) => a.etaMin - b.etaMin);
 }
 
 /** Best route (highest ratio, then fastest) from one bank program to one airline program. */
@@ -254,8 +406,8 @@ export function bestTransferRoute(
 }
 
 export type EffectiveBalance = {
-  direct: number;       // points held in the program itself
-  viaTransfer: number;  // reachable by transferring bank currencies at best ratio
+  direct: number; // points held in the program itself
+  viaTransfer: number; // reachable by transferring bank currencies at best ratio
   total: number;
 };
 
@@ -300,9 +452,9 @@ export type RankedItinerary = AwardItinerary & {
   cpp: number;
   grade: ValueGrade;
   confidence: Confidence;
-  shortfallMiles: number;        // extra miles needed after counting transferable reach
-  effectiveBalance: number;      // direct balance + best-ratio transferable reach
-  hasBalance: boolean;           // user holds a direct balance in this program
+  shortfallMiles: number; // extra miles needed after counting transferable reach
+  effectiveBalance: number; // direct balance + best-ratio transferable reach
+  hasBalance: boolean; // user holds a direct balance in this program
   fastestTransfer?: TransferRoute;
   riskFlag?: "transfer-too-slow" | "single-seat" | "stale-cache";
 };
@@ -312,35 +464,49 @@ export function rankItineraries(
   balances: Record<string, number> = {},
 ): RankedItinerary[] {
   const reach = effectiveBalances(balances);
-  return items
-    .map((a): RankedItinerary => {
-      const balance = balances[a.programId] ?? 0;
-      const effectiveBalance = reach[a.programId]?.total ?? balance;
-      const cpp = calcCppAud(a);
-      const grade = gradeCpp(cpp, a.cabin);
-      const confidence = confidenceFor(a);
-      const shortfallMiles = Math.max(0, a.miles - effectiveBalance);
-      const hasBalance = balance > 0;
-      const transfers = transfersFor(a.programId);
-      const fastestTransfer = shortfallMiles > 0 || (balance < a.miles && effectiveBalance >= a.miles)
-        ? transfers[0]
-        : undefined;
+  return (
+    items
+      .map((a): RankedItinerary => {
+        const balance = balances[a.programId] ?? 0;
+        const effectiveBalance = reach[a.programId]?.total ?? balance;
+        const cpp = calcCppAud(a);
+        const grade = gradeCpp(cpp, a.cabin);
+        const confidence = confidenceFor(a);
+        const shortfallMiles = Math.max(0, a.miles - effectiveBalance);
+        const hasBalance = balance > 0;
+        const transfers = transfersFor(a.programId);
+        const fastestTransfer =
+          shortfallMiles > 0 || (balance < a.miles && effectiveBalance >= a.miles)
+            ? transfers[0]
+            : undefined;
 
-      let riskFlag: RankedItinerary["riskFlag"];
-      if (confidence.label === "stale") riskFlag = "stale-cache";
-      else if (a.seats <= 1) riskFlag = "single-seat";
-      else if (fastestTransfer && fastestTransfer.etaMin > 60 && confidence.ageMin < 30) {
-        riskFlag = "transfer-too-slow";
-      }
+        let riskFlag: RankedItinerary["riskFlag"];
+        if (confidence.label === "stale") riskFlag = "stale-cache";
+        else if (a.seats <= 1) riskFlag = "single-seat";
+        else if (fastestTransfer && fastestTransfer.etaMin > 60 && confidence.ageMin < 30) {
+          riskFlag = "transfer-too-slow";
+        }
 
-      return { ...a, cpp, grade, confidence, shortfallMiles, effectiveBalance, hasBalance, fastestTransfer, riskFlag };
-    })
-    // Sort: best CPP first, then highest confidence, then lowest miles
-    .sort((a, b) => {
-      if (b.cpp !== a.cpp) return b.cpp - a.cpp;
-      if (b.confidence.score !== a.confidence.score) return b.confidence.score - a.confidence.score;
-      return a.miles - b.miles;
-    });
+        return {
+          ...a,
+          cpp,
+          grade,
+          confidence,
+          shortfallMiles,
+          effectiveBalance,
+          hasBalance,
+          fastestTransfer,
+          riskFlag,
+        };
+      })
+      // Sort: best CPP first, then highest confidence, then lowest miles
+      .sort((a, b) => {
+        if (b.cpp !== a.cpp) return b.cpp - a.cpp;
+        if (b.confidence.score !== a.confidence.score)
+          return b.confidence.score - a.confidence.score;
+        return a.miles - b.miles;
+      })
+  );
 }
 
 export function fmtCpp(cpp: number) {
@@ -348,7 +514,11 @@ export function fmtCpp(cpp: number) {
 }
 
 export function fmtAud(n: number) {
-  return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD", maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat("en-AU", {
+    style: "currency",
+    currency: "AUD",
+    maximumFractionDigits: 0,
+  }).format(n);
 }
 
 export function fmtAge(min: number) {

@@ -15,12 +15,51 @@ export const Route = createFileRoute("/watchlists")({
   head: () => ({
     meta: [
       { title: "Watchlists — Aureum" },
-      { name: "description", content: "Save routes, set CPP thresholds and get alerted the moment award seats open." },
+      {
+        name: "description",
+        content: "Save routes, set CPP thresholds and get alerted the moment award seats open.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
+  // Prefill arrives from "Watch this route" on the results page.
+  validateSearch: (s: Record<string, unknown>) => ({
+    from:
+      typeof s.from === "string" && /^[A-Za-z]{3}$/.test(s.from) ? s.from.toUpperCase() : undefined,
+    to: typeof s.to === "string" && /^[A-Za-z]{3}$/.test(s.to) ? s.to.toUpperCase() : undefined,
+    dateFrom:
+      typeof s.dateFrom === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.dateFrom)
+        ? s.dateFrom
+        : undefined,
+    dateTo:
+      typeof s.dateTo === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.dateTo) ? s.dateTo : undefined,
+    cabin: ["economy", "premium", "business", "first"].includes(s.cabin as string)
+      ? (s.cabin as Cabin)
+      : undefined,
+    pax:
+      Number.isInteger(Number(s.pax)) && Number(s.pax) >= 1 && Number(s.pax) <= 9
+        ? Number(s.pax)
+        : undefined,
+  }),
   component: WatchlistsPage,
 });
+
+type Prefill = {
+  from?: string;
+  to?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  cabin?: Cabin;
+  pax?: number;
+};
+
+function relTime(iso: string): string {
+  const mins = Math.max(1, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (mins < 60) return `${mins}m ago`;
+  const h = Math.round(mins / 60);
+  if (h < 48) return `${h}h ago`;
+  return `${Math.round(h / 24)}d ago`;
+}
 
 type Watchlist = {
   id: string;
@@ -44,15 +83,17 @@ function WatchlistsPage() {
   const nav = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { isActive: hasPlus } = useSubscription();
+  const prefill: Prefill = Route.useSearch();
   const [items, setItems] = useState<Watchlist[]>([]);
+  const [lastMatch, setLastMatch] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(() => !!(prefill.from && prefill.to));
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      nav({ to: "/auth" });
+      nav({ to: "/auth", search: { redirect: "/watchlists" } });
       return;
     }
     refresh();
@@ -66,8 +107,23 @@ function WatchlistsPage() {
       .select("*")
       .order("created_at", { ascending: false });
     if (error) setError(error.message);
-    setItems((data ?? []) as Watchlist[]);
+    const rows = (data ?? []) as Watchlist[];
+    setItems(rows);
     setLoading(false);
+    if (rows.length) {
+      const { data: alerts } = await supabase
+        .from("alerts_sent")
+        .select("watchlist_id, sent_at")
+        .in(
+          "watchlist_id",
+          rows.map((r) => r.id),
+        )
+        .order("sent_at", { ascending: false })
+        .limit(200);
+      const m: Record<string, string> = {};
+      for (const a of alerts ?? []) if (!m[a.watchlist_id]) m[a.watchlist_id] = a.sent_at;
+      setLastMatch(m);
+    }
   }
 
   async function toggleActive(w: Watchlist) {
@@ -83,13 +139,16 @@ function WatchlistsPage() {
       );
       return;
     }
-    setItems((prev) => prev.map((x) => x.id === w.id ? { ...x, active: !x.active } : x));
+    setItems((prev) => prev.map((x) => (x.id === w.id ? { ...x, active: !x.active } : x)));
   }
 
   async function remove(w: Watchlist) {
     if (!confirm(`Delete watchlist for ${w.origin} → ${w.destination}?`)) return;
     const { error } = await supabase.from("watchlists").delete().eq("id", w.id);
-    if (error) { setError(error.message); return; }
+    if (error) {
+      setError(error.message);
+      return;
+    }
     setItems((prev) => prev.filter((x) => x.id !== w.id));
   }
 
@@ -126,11 +185,15 @@ function WatchlistsPage() {
         </div>
 
         {!hasPlus && items.length >= 1 && !showForm && (
-          <div className="mt-6 rounded-xl border border-gold/40 bg-gold/5 p-5 flex flex-wrap items-center justify-between gap-4">
+          <div className="mt-6 rounded-lg border border-gold/40 bg-gold/5 p-5 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <div className="text-xs uppercase tracking-widest text-gold mb-1">Free plan limit</div>
+              <div className="text-xs uppercase tracking-widest text-gold mb-1">
+                Free plan limit
+              </div>
               <p className="text-sm text-muted-foreground">
-                You're using your one free watchlist. Upgrade to <span className="text-foreground">Aureum Plus</span> for unlimited watchlists and priority alerts.
+                You're using your one free watchlist. Upgrade to{" "}
+                <span className="text-foreground">Aureum Plus</span> for unlimited watchlists and
+                priority alerts.
               </p>
             </div>
             <Link
@@ -144,7 +207,11 @@ function WatchlistsPage() {
 
         {showForm && (
           <NewWatchlistForm
-            onCreated={() => { setShowForm(false); refresh(); }}
+            initial={prefill}
+            onCreated={() => {
+              setShowForm(false);
+              refresh();
+            }}
             onCancel={() => setShowForm(false)}
           />
         )}
@@ -155,15 +222,17 @@ function WatchlistsPage() {
           {loading ? (
             <SkeletonRows rows={3} height="h-28" />
           ) : items.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
               No watchlists yet. Add one above to start getting alerts.
             </div>
           ) : (
             items.map((w) => (
               <article
                 key={w.id}
-                className={`rounded-xl border p-5 flex flex-wrap items-center gap-4 ${
-                  w.active ? "border-border bg-background/40" : "border-border-soft bg-background/20 opacity-70"
+                className={`rounded-lg border p-5 flex flex-wrap items-center gap-4 ${
+                  w.active
+                    ? "border-border bg-background/40"
+                    : "border-border-soft bg-background/20 opacity-70"
                 }`}
               >
                 <div className="flex-1 min-w-[220px]">
@@ -178,9 +247,26 @@ function WatchlistsPage() {
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground space-y-0.5">
-                  {w.min_cpp_aud != null && <div>Min CPP: <span className="text-foreground">{w.min_cpp_aud}¢</span></div>}
-                  {w.max_miles != null && <div>Max miles: <span className="text-foreground">{w.max_miles.toLocaleString()}</span></div>}
-                  <div>Alert via: <span className="text-foreground">{w.channel}</span></div>
+                  {w.min_cpp_aud != null && (
+                    <div>
+                      Min CPP: <span className="text-foreground">{w.min_cpp_aud}¢</span>
+                    </div>
+                  )}
+                  {w.max_miles != null && (
+                    <div>
+                      Max miles:{" "}
+                      <span className="text-foreground">{w.max_miles.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div>
+                    Alert via: <span className="text-foreground">{w.channel}</span>
+                  </div>
+                  <div>
+                    Last match:{" "}
+                    <span className={lastMatch[w.id] ? "text-live" : "text-muted-foreground"}>
+                      {lastMatch[w.id] ? relTime(lastMatch[w.id]) : "none yet"}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -274,9 +360,7 @@ function AlertHistory({ watchlistId }: { watchlistId: string }) {
                       <span className="text-gold mr-3">{a.cpp_aud.toFixed(1)}¢/pt</span>
                     )}
                     {a.miles != null && (
-                      <span className="text-muted-foreground">
-                        {a.miles.toLocaleString()} mi
-                      </span>
+                      <span className="text-muted-foreground">{a.miles.toLocaleString()} mi</span>
                     )}
                   </span>
                 </li>
@@ -337,18 +421,28 @@ function CppSparkline({ alerts }: { alerts: AlertRow[] }) {
   );
 }
 
-function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCancel: () => void }) {
+function NewWatchlistForm({
+  onCreated,
+  onCancel,
+  initial,
+}: {
+  onCreated: () => void;
+  onCancel: () => void;
+  initial?: Prefill;
+}) {
   const { user } = useAuth();
   const today = new Date().toISOString().slice(0, 10);
   const plus60 = new Date(Date.now() + 60 * 86400 * 1000).toISOString().slice(0, 10);
 
-  const [label, setLabel] = useState("");
-  const [origin, setOrigin] = useState("SYD");
-  const [destination, setDestination] = useState("LAX");
-  const [dateFrom, setDateFrom] = useState(today);
-  const [dateTo, setDateTo] = useState(plus60);
-  const [cabin, setCabin] = useState<Cabin>("business");
-  const [pax, setPax] = useState(1);
+  const [label, setLabel] = useState(
+    initial?.from && initial?.to ? `${initial.from} → ${initial.to}` : "",
+  );
+  const [origin, setOrigin] = useState(initial?.from ?? "SYD");
+  const [destination, setDestination] = useState(initial?.to ?? "LAX");
+  const [dateFrom, setDateFrom] = useState(initial?.dateFrom ?? today);
+  const [dateTo, setDateTo] = useState(initial?.dateTo ?? plus60);
+  const [cabin, setCabin] = useState<Cabin>(initial?.cabin ?? "business");
+  const [pax, setPax] = useState(initial?.pax ?? 1);
   const [minCpp, setMinCpp] = useState<string>("3.5");
   const [maxMiles, setMaxMiles] = useState<string>("");
   const [channel, setChannel] = useState<string>("telegram");
@@ -377,7 +471,9 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
         /* keep in-app fallback */
         setChannel("app");
       });
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -418,43 +514,109 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-8 rounded-xl border border-border p-6 bg-background/40 space-y-5">
+    <form
+      onSubmit={onSubmit}
+      className="mt-8 rounded-lg border border-border p-6 bg-background/40 space-y-5"
+    >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Label (optional)">
-          <input value={label} onChange={(e) => setLabel(e.target.value)} className={inputCls} placeholder="Honeymoon SYD-LAX" />
+          <input
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            className={inputCls}
+            placeholder="Honeymoon SYD-LAX"
+          />
         </Field>
         <Field label="Cabin">
-          <select value={cabin} onChange={(e) => setCabin(e.target.value as Cabin)} className={inputCls}>
-            {CABINS.map((c) => <option key={c} value={c}>{c}</option>)}
+          <select
+            value={cabin}
+            onChange={(e) => setCabin(e.target.value as Cabin)}
+            className={inputCls}
+          >
+            {CABINS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
           </select>
         </Field>
         <Field label="From (IATA)">
-          <input required value={origin} onChange={(e) => setOrigin(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
-            maxLength={3} pattern="[A-Za-z]{3}" title="3-letter IATA airport code" className={inputCls} />
+          <input
+            required
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
+            maxLength={3}
+            pattern="[A-Za-z]{3}"
+            title="3-letter IATA airport code"
+            className={inputCls}
+          />
         </Field>
         <Field label="To (IATA)">
-          <input required value={destination} onChange={(e) => setDestination(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
-            maxLength={3} pattern="[A-Za-z]{3}" title="3-letter IATA airport code" className={inputCls} />
+          <input
+            required
+            value={destination}
+            onChange={(e) => setDestination(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
+            maxLength={3}
+            pattern="[A-Za-z]{3}"
+            title="3-letter IATA airport code"
+            className={inputCls}
+          />
         </Field>
         <Field label="Earliest date">
-          <input required type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={inputCls} />
+          <input
+            required
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className={inputCls}
+          />
         </Field>
         <Field label="Latest date">
-          <input required type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={inputCls} />
+          <input
+            required
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            className={inputCls}
+          />
         </Field>
         <Field label="Passengers">
-          <input required type="number" min={1} max={9} value={pax} onChange={(e) => setPax(Number(e.target.value))} className={inputCls} />
+          <input
+            required
+            type="number"
+            min={1}
+            max={9}
+            value={pax}
+            onChange={(e) => setPax(Number(e.target.value))}
+            className={inputCls}
+          />
         </Field>
         <Field label="Min CPP (¢ AUD)">
-          <input type="number" step="0.1" min="0" value={minCpp} onChange={(e) => setMinCpp(e.target.value)} className={inputCls} />
+          <input
+            type="number"
+            step="0.1"
+            min="0"
+            value={minCpp}
+            onChange={(e) => setMinCpp(e.target.value)}
+            className={inputCls}
+          />
         </Field>
         <Field label="Max miles (optional)">
-          <input type="number" min="0" value={maxMiles} onChange={(e) => setMaxMiles(e.target.value)} className={inputCls} placeholder="e.g. 120000" />
+          <input
+            type="number"
+            min="0"
+            value={maxMiles}
+            onChange={(e) => setMaxMiles(e.target.value)}
+            className={inputCls}
+            placeholder="e.g. 120000"
+          />
         </Field>
         <Field label="Alert channel">
           <select value={channel} onChange={(e) => setChannel(e.target.value)} className={inputCls}>
             {channelOptions.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
             ))}
           </select>
         </Field>
@@ -463,18 +625,10 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
       {err && <div className="text-sm text-destructive">{err}</div>}
 
       <div className="flex items-center gap-3 pt-2">
-        <button
-          type="submit"
-          disabled={submitting}
-          className="btn btn-primary"
-        >
+        <button type="submit" disabled={submitting} className="btn btn-primary">
           {submitting ? "Saving…" : "Create watchlist"}
         </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn btn-quiet"
-        >
+        <button type="button" onClick={onCancel} className="btn btn-quiet">
           Cancel
         </button>
       </div>
@@ -482,7 +636,8 @@ function NewWatchlistForm({ onCreated, onCancel }: { onCreated: () => void; onCa
   );
 }
 
-const inputCls = "mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60";
+const inputCls =
+  "mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

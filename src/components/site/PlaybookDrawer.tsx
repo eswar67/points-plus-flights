@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Check, Clock, ExternalLink, Loader2, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Clock,
+  ExternalLink,
+  Loader2,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import type { AwardItinerary } from "@/lib/awards/types";
 import { buildPlaybook } from "@/lib/playbook";
 import { submitBookingRequest } from "@/lib/booking/booking.functions";
@@ -85,20 +93,27 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-background/80 backdrop-blur-sm animate-backdrop-in" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-background/80 backdrop-blur-sm animate-backdrop-in"
+      onClick={onClose}
+    >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={`Redemption playbook ${award.from} to ${award.to}`}
         tabIndex={-1}
-        className="relative w-full md:max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-2xl md:rounded-2xl border border-gold/20 bg-card shadow-gold animate-drawer-up focus:outline-none"
+        className="relative w-full md:max-w-2xl max-h-[92vh] overflow-y-auto rounded-t-lg md:rounded-lg border border-gold/20 bg-card shadow-gold animate-drawer-up focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border px-6 py-4 flex items-center justify-between">
           <div>
             <div className="text-xs uppercase tracking-widest text-gold">
-              {mode === "concierge" ? "Concierge booking" : mode === "submitted" ? "Request received" : "Redemption playbook"}
+              {mode === "concierge"
+                ? "Concierge booking"
+                : mode === "submitted"
+                  ? "Request received"
+                  : "Redemption playbook"}
             </div>
             <div className="font-display text-lg mt-0.5">
               {award.from} → {award.to} · {award.cabin}
@@ -139,7 +154,10 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
                       )}
                       {s.etaMinutes !== undefined && s.kind !== "wait" && (
                         <span className="inline-flex items-center gap-1 text-xs uppercase tracking-widest text-muted-foreground">
-                          <Clock className="size-3" /> ~{s.etaMinutes < 60 ? `${s.etaMinutes}m` : `${Math.round(s.etaMinutes / 60)}h`}
+                          <Clock className="size-3" /> ~
+                          {s.etaMinutes < 60
+                            ? `${s.etaMinutes}m`
+                            : `${Math.round(s.etaMinutes / 60)}h`}
                         </span>
                       )}
                     </div>
@@ -147,13 +165,14 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
                 ))}
               </ol>
 
-              <div className="mt-8 rounded-xl border border-gold/30 bg-gradient-to-br from-gold/10 to-transparent p-5">
+              <div className="mt-8 rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 to-transparent p-5">
                 <div className="flex items-start gap-3">
                   <Sparkles className="size-5 text-gold mt-0.5" />
                   <div className="flex-1">
                     <div className="font-display text-base">Don't want to do this yourself?</div>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Our concierge will transfer points and ticket the seat for you. Service fee applies.
+                      Our concierge will transfer points and ticket the seat for you. Service fee
+                      applies.
                     </p>
                   </div>
                   <button
@@ -170,13 +189,24 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
           {mode === "concierge" && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                We'll reach out within 30 minutes to capture program logins (sent via secure link), confirm payment for fees & taxes, and ticket the seat.
+                We'll reach out within 30 minutes to capture program logins (sent via secure link),
+                confirm payment for fees & taxes, and ticket the seat.
               </p>
               <Field name="name" label="Full name (as on passport)" required maxLength={120} />
               <Field name="email" label="Email" type="email" required maxLength={255} />
-              <Field name="pax" label="Passengers" type="number" min={1} max={9} defaultValue={String(1)} required />
+              <Field
+                name="pax"
+                label="Passengers"
+                type="number"
+                min={1}
+                max={9}
+                defaultValue={String(1)}
+                required
+              />
               <div>
-                <label className="text-xs uppercase tracking-widest text-muted-foreground">Notes (optional)</label>
+                <label className="text-xs uppercase tracking-widest text-muted-foreground">
+                  Notes (optional)
+                </label>
                 <textarea
                   name="notes"
                   maxLength={2000}
@@ -187,11 +217,16 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
               </div>
               <div className="rounded-lg border border-border bg-background/40 p-3 text-xs text-muted-foreground">
                 <ShieldCheck className="size-3.5 inline -mt-0.5 mr-1 text-gold" />
-                We never store your loyalty passwords. Credentials are entered through a single-use encrypted link and erased after ticketing.
+                We never store your loyalty passwords. Credentials are entered through a single-use
+                encrypted link and erased after ticketing.
               </div>
               {error && <div className="text-sm text-destructive">{error}</div>}
               <div className="flex items-center justify-between gap-3">
-                <button type="button" onClick={() => setMode("playbook")} className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
+                <button
+                  type="button"
+                  onClick={() => setMode("playbook")}
+                  className="text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                >
                   ← Back to playbook
                 </button>
                 <button
@@ -213,7 +248,8 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
               </div>
               <div className="mt-4 font-display text-xl">You're in the queue.</div>
               <p className="text-sm text-muted-foreground mt-2">
-                Reference <span className="text-gold font-mono">{confirmation.id.slice(0, 8)}</span>. We'll email you within 30 minutes.
+                Reference <span className="text-gold font-mono">{confirmation.id.slice(0, 8)}</span>
+                . We'll email you within 30 minutes.
               </p>
               <button
                 onClick={onClose}
@@ -233,7 +269,8 @@ function FeasibilityBanner({ playbook }: { playbook: ReturnType<typeof buildPlay
   if (playbook.feasible) {
     return (
       <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 text-emerald-300 px-4 py-3 text-sm flex items-center gap-2">
-        <Check className="size-4" /> You have enough miles. Estimated time to ticket: under 10 minutes.
+        <Check className="size-4" /> You have enough miles. Estimated time to ticket: under 10
+        minutes.
       </div>
     );
   }
@@ -244,7 +281,9 @@ function FeasibilityBanner({ playbook }: { playbook: ReturnType<typeof buildPlay
   );
 }
 
-function Field(props: React.InputHTMLAttributes<HTMLInputElement> & { label: string; name: string }) {
+function Field(
+  props: React.InputHTMLAttributes<HTMLInputElement> & { label: string; name: string },
+) {
   const { label, ...rest } = props;
   return (
     <div>

@@ -29,8 +29,8 @@ function AwardsIndex() {
           Where do you want your <span className="text-gold-gradient">points to take you?</span>
         </h1>
         <p className="mt-4 text-muted-foreground max-w-2xl">
-          Benchmark fares and indicative miles for the routes Australians redeem most.
-          Every guide links straight into a live award search.
+          Benchmark fares and indicative miles for the routes Australians redeem most. Every guide
+          links straight into a live award search.
         </p>
 
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -42,7 +42,7 @@ function AwardsIndex() {
                 key={`${from}-${to}`}
                 to="/awards/$route"
                 params={{ route: `${from.toLowerCase()}-${to.toLowerCase()}` }}
-                className="group rounded-2xl border border-border bg-card p-6 hover:border-border-strong transition"
+                className="group rounded-lg border border-border bg-card p-6 hover:border-border-strong transition"
               >
                 <div className="font-display text-2xl">
                   {from} <span className="text-gold">→</span> {to}

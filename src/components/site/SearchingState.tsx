@@ -21,7 +21,7 @@ export function SearchingState({ from, to }: { from: string; to: string }) {
   const current = airlinePrograms[step % airlinePrograms.length];
 
   return (
-    <div className="rounded-2xl border border-border bg-card/60 px-6 py-10">
+    <div className="rounded-lg border border-border bg-card/60 px-6 py-10">
       <div className="mx-auto max-w-xl">
         <svg viewBox="0 0 600 80" className="w-full" aria-hidden="true">
           <path
@@ -35,13 +35,29 @@ export function SearchingState({ from, to }: { from: string; to: string }) {
           />
           <circle cx="20" cy="60" r="3" fill="var(--gold)" />
           <circle
-            cx="20" cy="60" r="7" fill="none" stroke="var(--gold)" strokeWidth="1"
-            style={{ transformOrigin: "20px 60px", animation: "radar-ping 1.6s cubic-bezier(0,0,0.2,1) infinite" }}
+            cx="20"
+            cy="60"
+            r="7"
+            fill="none"
+            stroke="var(--gold)"
+            strokeWidth="1"
+            style={{
+              transformOrigin: "20px 60px",
+              animation: "radar-ping 1.6s cubic-bezier(0,0,0.2,1) infinite",
+            }}
           />
           <circle cx="580" cy="60" r="3" fill="var(--gold)" />
           <circle
-            cx="580" cy="60" r="7" fill="none" stroke="var(--gold)" strokeWidth="1"
-            style={{ transformOrigin: "580px 60px", animation: "radar-ping 1.6s cubic-bezier(0,0,0.2,1) 0.8s infinite" }}
+            cx="580"
+            cy="60"
+            r="7"
+            fill="none"
+            stroke="var(--gold)"
+            strokeWidth="1"
+            style={{
+              transformOrigin: "580px 60px",
+              animation: "radar-ping 1.6s cubic-bezier(0,0,0.2,1) 0.8s infinite",
+            }}
           />
           <g
             style={{
@@ -66,10 +82,7 @@ export function SearchingState({ from, to }: { from: string; to: string }) {
               Scanning award space
             </div>
             <div className="mt-1 text-sm text-gold flex items-center justify-center gap-2">
-              <span
-                className="size-1.5 rounded-full"
-                style={{ background: current.accent }}
-              />
+              <span className="size-1.5 rounded-full" style={{ background: current.accent }} />
               {current.name}…
             </div>
           </div>
@@ -80,7 +93,7 @@ export function SearchingState({ from, to }: { from: string; to: string }) {
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="h-20 rounded-xl border border-border-soft bg-background/40 animate-pulse"
+              className="h-20 rounded-lg border border-border-soft bg-background/40 animate-pulse"
               style={{ animationDelay: `${i * 180}ms` }}
             />
           ))}

@@ -11,11 +11,19 @@ export function Footer() {
           <span className="opacity-60">— premium award travel.</span>
         </div>
         <nav className="flex items-center gap-5 text-xs uppercase tracking-widest">
-          <Link to="/awards" className="hover:text-gold transition">Route guides</Link>
-          <Link to="/how-it-works" className="hover:text-gold transition">How it works</Link>
-          <Link to="/faq" className="hover:text-gold transition">FAQ</Link>
+          <Link to="/awards" className="hover:text-gold transition">
+            Route guides
+          </Link>
+          <Link to="/how-it-works" className="hover:text-gold transition">
+            How it works
+          </Link>
+          <Link to="/faq" className="hover:text-gold transition">
+            FAQ
+          </Link>
         </nav>
-        <p className="opacity-70">© {new Date().getFullYear()} Aureum. Availability via seats.aero, refreshed continuously.</p>
+        <p className="opacity-70">
+          © {new Date().getFullYear()} Aureum. Availability via seats.aero, refreshed continuously.
+        </p>
       </div>
     </footer>
   );

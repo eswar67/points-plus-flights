@@ -54,7 +54,9 @@ function AgentLogin() {
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-widest text-muted-foreground">Password</label>
+            <label className="text-xs uppercase tracking-widest text-muted-foreground">
+              Password
+            </label>
             <input
               type="password"
               required

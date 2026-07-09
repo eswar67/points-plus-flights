@@ -23,27 +23,27 @@ gated behind an Aureum Plus subscription.
 
 Server-side (Lovable Cloud secrets / `wrangler secret put`):
 
-| Variable | Purpose |
-| --- | --- |
-| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_PROJECT_ID` | Supabase client (anon key — safe to expose) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Poller + Stripe webhook writes (bypasses RLS — server only) |
-| `SEATS_AERO_API_KEY` | Live award availability (required — no fallback) |
-| `CRON_SECRET` | Bearer token the scheduled poller must present (rotate from Account → Admin) |
-| `STRIPE_SANDBOX_API_KEY`, `STRIPE_LIVE_API_KEY` | Stripe via Lovable connector gateway |
-| `PAYMENTS_SANDBOX_WEBHOOK_SECRET`, `PAYMENTS_LIVE_WEBHOOK_SECRET` | Webhook signature verification |
-| `LOVABLE_API_KEY` | Lovable connector gateway auth (Stripe + Telegram) |
-| `TELEGRAM_API_KEY` | Telegram alerts via the Lovable connector |
-| `RESEND_API_KEY` | Email alerts + concierge notifications (channel hidden if unset) |
-| `ALERTS_FROM_EMAIL` | Verified sender, e.g. `Aureum Alerts <alerts@yourdomain.com>` |
-| `CONCIERGE_INBOX_EMAIL` | Inbox notified of new booking requests |
+| Variable                                                          | Purpose                                                                      |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_PROJECT_ID` | Supabase client (anon key — safe to expose)                                  |
+| `SUPABASE_SERVICE_ROLE_KEY`                                       | Poller + Stripe webhook writes (bypasses RLS — server only)                  |
+| `SEATS_AERO_API_KEY`                                              | Live award availability (required — no fallback)                             |
+| `CRON_SECRET`                                                     | Bearer token the scheduled poller must present (rotate from Account → Admin) |
+| `STRIPE_SANDBOX_API_KEY`, `STRIPE_LIVE_API_KEY`                   | Stripe via Lovable connector gateway                                         |
+| `PAYMENTS_SANDBOX_WEBHOOK_SECRET`, `PAYMENTS_LIVE_WEBHOOK_SECRET` | Webhook signature verification                                               |
+| `LOVABLE_API_KEY`                                                 | Lovable connector gateway auth (Stripe + Telegram)                           |
+| `TELEGRAM_API_KEY`                                                | Telegram alerts via the Lovable connector                                    |
+| `RESEND_API_KEY`                                                  | Email alerts + concierge notifications (channel hidden if unset)             |
+| `ALERTS_FROM_EMAIL`                                               | Verified sender, e.g. `Aureum Alerts <alerts@yourdomain.com>`                |
+| `CONCIERGE_INBOX_EMAIL`                                           | Inbox notified of new booking requests                                       |
 
 Client-side (`VITE_*`, safe to expose, committed in `.env.development`):
 
-| Variable | Purpose |
-| --- | --- |
-| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID` | Browser Supabase client |
-| `VITE_PAYMENTS_CLIENT_TOKEN` | Stripe publishable key (`pk_test_` ⇒ sandbox mode banner) |
-| `VITE_SITE_URL` | Deployed origin used to absolutize `og:image` |
+| Variable                                                                         | Purpose                                                   |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID` | Browser Supabase client                                   |
+| `VITE_PAYMENTS_CLIENT_TOKEN`                                                     | Stripe publishable key (`pk_test_` ⇒ sandbox mode banner) |
+| `VITE_SITE_URL`                                                                  | Deployed origin used to absolutize `og:image`             |
 
 `.env` is gitignored — keep real secrets out of the repo.
 
@@ -82,10 +82,10 @@ tables.
 
 ## Free tier vs Aureum Plus
 
-| | Free | Plus (A$12/mo · A$120/yr) |
-| --- | --- | --- |
-| Award search + CPP grading | ✓ | ✓ |
-| Points portfolio & transfer planner | ✓ | ✓ |
-| Active watchlists | 1 (enforced by RLS) | Unlimited |
-| Telegram / email alerts | ✓ | ✓ |
-| Concierge ticketing (`/book`) | — | ✓ |
+|                                     | Free                | Plus (A$12/mo · A$120/yr) |
+| ----------------------------------- | ------------------- | ------------------------- |
+| Award search + CPP grading          | ✓                   | ✓                         |
+| Points portfolio & transfer planner | ✓                   | ✓                         |
+| Active watchlists                   | 1 (enforced by RLS) | Unlimited                 |
+| Telegram / email alerts             | ✓                   | ✓                         |
+| Concierge ticketing (`/book`)       | —                   | ✓                         |

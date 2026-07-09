@@ -55,13 +55,15 @@ function RequestsPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      nav({ to: "/auth" });
+      nav({ to: "/auth", search: { redirect: "/requests" } });
       return;
     }
     (async () => {
       const { data, error } = await supabase
         .from("booking_requests")
-        .select("id, route_from, route_to, travel_date, cabin, passenger_count, program, carrier, miles_required, notes, status, created_at")
+        .select(
+          "id, route_from, route_to, travel_date, cabin, passenger_count, program, carrier, miles_required, notes, status, created_at",
+        )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(100);
@@ -99,11 +101,11 @@ function RequestsPage() {
           {requests === null ? (
             <SkeletonRows rows={3} height="h-28" />
           ) : requests.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-10 text-center">
+            <div className="rounded-lg border border-dashed border-border p-10 text-center">
               <h2 className="font-display text-xl">No requests yet.</h2>
               <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-                Hand a route to our concierge and we'll hunt the award seats and
-                ticket them for you.
+                Hand a route to our concierge and we'll hunt the award seats and ticket them for
+                you.
               </p>
               <Link
                 to="/book"
@@ -114,7 +116,7 @@ function RequestsPage() {
             </div>
           ) : (
             requests.map((r) => (
-              <article key={r.id} className="rounded-xl border border-border bg-card p-5">
+              <article key={r.id} className="rounded-lg border border-border bg-card p-5">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
                     <div className="text-xs uppercase tracking-widest text-muted-foreground">
@@ -128,9 +130,20 @@ function RequestsPage() {
                     </div>
                     <div className="text-sm mt-2 text-muted-foreground">
                       Program: <span className="text-foreground">{r.program}</span>
-                      {r.carrier && <> · Carrier: <span className="text-foreground">{r.carrier}</span></>}
+                      {r.carrier && (
+                        <>
+                          {" "}
+                          · Carrier: <span className="text-foreground">{r.carrier}</span>
+                        </>
+                      )}
                       {r.miles_required != null && (
-                        <> · Miles: <span className="text-foreground">{r.miles_required.toLocaleString()}</span></>
+                        <>
+                          {" "}
+                          · Miles:{" "}
+                          <span className="text-foreground">
+                            {r.miles_required.toLocaleString()}
+                          </span>
+                        </>
                       )}
                     </div>
                   </div>

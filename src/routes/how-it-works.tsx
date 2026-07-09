@@ -6,7 +6,11 @@ export const Route = createFileRoute("/how-it-works")({
   head: () => ({
     meta: [
       { title: "How Aureum Works — Award Search & Concierge" },
-      { name: "description", content: "Track your points, search cached award space across programs — updated continuously — and follow a guided redemption playbook." },
+      {
+        name: "description",
+        content:
+          "Track your points, search cached award space across programs — updated continuously — and follow a guided redemption playbook.",
+      },
       { property: "og:title", content: "How Aureum Works" },
       { property: "og:description", content: "Three steps from points to premium cabin." },
     ],
@@ -15,9 +19,21 @@ export const Route = createFileRoute("/how-it-works")({
 });
 
 const STEPS = [
-  { n: "01", t: "Track your programs", d: "Add the loyalty programs you hold — Qantas, Velocity, KrisFlyer, Emirates, United, LifeMiles and more — with the balances you have. We value the lot in AUD. No passwords, ever." },
-  { n: "02", t: "Search cached award space", d: "One search covers every program, cabin and alliance — cached award data, updated continuously, with freshness badges so you know exactly how current each seat is." },
-  { n: "03", t: "Follow the playbook", d: "Every result comes with a step-by-step plan: which points to transfer, how long they take to land, and where to ticket — or hand the whole thing to our concierge." },
+  {
+    n: "01",
+    t: "Track your programs",
+    d: "Add the loyalty programs you hold — Qantas, Velocity, KrisFlyer, Emirates, United, LifeMiles and more — with the balances you have. We value the lot in AUD. No passwords, ever.",
+  },
+  {
+    n: "02",
+    t: "Search cached award space",
+    d: "One search covers every program, cabin and alliance — cached award data, updated continuously, with freshness badges so you know exactly how current each seat is.",
+  },
+  {
+    n: "03",
+    t: "Follow the playbook",
+    d: "Every result comes with a step-by-step plan: which points to transfer, how long they take to land, and where to ticket — or hand the whole thing to our concierge.",
+  },
 ];
 
 function HowItWorks() {
@@ -32,7 +48,10 @@ function HowItWorks() {
       </section>
       <section className="mx-auto max-w-7xl px-6 pb-24 grid grid-cols-1 md:grid-cols-3 gap-3">
         {STEPS.map((s) => (
-          <div key={s.n} className="rounded-2xl border border-border bg-card p-8 hover:border-border-strong transition">
+          <div
+            key={s.n}
+            className="rounded-lg border border-border bg-card p-8 hover:border-border-strong transition"
+          >
             <div className="font-display text-5xl text-gold-gradient">{s.n}</div>
             <h3 className="font-display text-2xl mt-6">{s.t}</h3>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{s.d}</p>
