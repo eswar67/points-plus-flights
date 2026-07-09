@@ -120,3 +120,61 @@ export const AIRPORTS: Airport[] = [
 export const AIRPORT_BY_CODE: Record<string, Airport> = Object.fromEntries(
   AIRPORTS.map((a) => [a.code, a]),
 );
+
+/** Continent groupings for one-tap multi-airport searches. */
+export type Continent =
+  | "oceania"
+  | "asia"
+  | "middle-east"
+  | "europe"
+  | "north-america"
+  | "south-america"
+  | "africa";
+
+export const CONTINENTS: { value: Continent; label: string; codes: string[] }[] = [
+  {
+    value: "oceania",
+    label: "Oceania",
+    codes: ["SYD", "MEL", "BNE", "PER", "ADL", "OOL", "CBR", "HBA", "AKL", "CHC", "WLG", "NAN", "PPT"],
+  },
+  {
+    value: "asia",
+    label: "Asia",
+    codes: [
+      "SIN", "HKG", "NRT", "HND", "KIX", "ICN", "TPE", "BKK", "KUL", "CGK", "DPS",
+      "MNL", "SGN", "HAN", "PEK", "PKX", "PVG", "CAN", "DEL", "BOM", "BLR", "MAA", "CMB",
+    ],
+  },
+  {
+    value: "middle-east",
+    label: "Middle East",
+    codes: ["DXB", "AUH", "DOH", "AMM", "TLV"],
+  },
+  {
+    value: "europe",
+    label: "Europe",
+    codes: [
+      "LHR", "LGW", "MAN", "EDI", "DUB", "CDG", "ORY", "NCE", "AMS", "FRA", "MUC", "BER",
+      "ZRH", "GVA", "VIE", "MAD", "BCN", "LIS", "FCO", "MXP", "ATH", "IST", "CPH", "ARN",
+      "OSL", "HEL", "KEF", "WAW", "PRG",
+    ],
+  },
+  {
+    value: "north-america",
+    label: "North America",
+    codes: [
+      "LAX", "SFO", "SEA", "JFK", "EWR", "LGA", "BOS", "IAD", "DCA", "MIA", "MCO", "ATL",
+      "ORD", "DFW", "IAH", "DEN", "PHX", "LAS", "SAN", "HNL", "YVR", "YYZ", "YUL", "MEX", "CUN",
+    ],
+  },
+  {
+    value: "south-america",
+    label: "South America",
+    codes: ["GRU", "GIG", "EZE", "SCL", "LIM"],
+  },
+  {
+    value: "africa",
+    label: "Africa",
+    codes: ["JNB", "CPT", "CAI", "NBO", "ADD", "CMN", "MRU"],
+  },
+];
