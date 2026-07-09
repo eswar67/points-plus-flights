@@ -343,7 +343,7 @@ function Index() {
 
   // Group by departure date (each group's first entry is its best by the
   // active sort).
-  const byDate = new Map<string, RankedItinerary[]>();
+  const byDate = new Map<string, Enriched[]>();
   for (const a of sorted) {
     const d = (a.depart || "").slice(0, 10);
     const list = byDate.get(d) ?? [];
