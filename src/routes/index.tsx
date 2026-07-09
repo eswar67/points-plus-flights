@@ -1000,9 +1000,12 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>["balances"] }) {
-  const { user, loading: authLoading } = useAuth();
-
+function Portfolio({
+  balancesHook,
+}: {
+  balancesHook: ReturnType<typeof useUserBalances>;
+}) {
+  const { balances, addBalance, updateBalance, removeBalance, isGuest } = balancesHook;
   const totalPoints = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
 
   // Curated routes where any program's indicative business award is within
@@ -1028,62 +1031,28 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
     }, 0),
   );
 
-  if (authLoading) return null;
-
-  if (!user) {
-    return (
-      <div className="rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-10 md:p-14 text-center">
-        <span className="text-xs uppercase tracking-widest text-gold">Your points portfolio</span>
-        <h2 className="font-display text-3xl md:text-4xl mt-3">
-          Track every program in <span className="text-gold-gradient">one place</span>.
-        </h2>
-        <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-          Sign in and add the loyalty programs you hold. We'll rank premium-cabin awards by what you
-          can actually book with the points you have.
-        </p>
-        <Link
-          to="/auth"
-          className="inline-block mt-7 text-xs uppercase tracking-widest px-6 py-3 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
-        >
-          Sign in to start
-        </Link>
-      </div>
-    );
-  }
-
   return (
-    <div>
+    <div id="portfolio" className="scroll-mt-24">
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
           <span className="text-xs uppercase tracking-widest text-gold">Your portfolio</span>
-          <h2 className="font-display text-3xl mt-2">Your points, valued in AUD.</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Add or update balances on the Account page — values are benchmark estimates per
-            premium-cabin redemption.
+          <h2 className="font-display text-3xl mt-2">
+            Track every program in <span className="text-gold-gradient">one place</span>.
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+            {isGuest
+              ? "No sign-in required — balances stay private on this device. We'll value them in AUD and rank premium-cabin awards by what you can actually book."
+              : "Add or update balances on the Account page — values are benchmark estimates per premium-cabin redemption."}
           </p>
         </div>
-        <Link
-          to="/account"
-          className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
-        >
-          + Add / edit balances
-        </Link>
       </div>
 
       {balances.length === 0 ? (
-        <div className="rounded-lg border border-border bg-card p-10 text-center">
-          <h3 className="font-display text-xl">No balances yet.</h3>
-          <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-            Add the loyalty programs you hold and we'll show you how much your stash is worth — and
-            which premium redemptions are within reach.
-          </p>
-          <Link
-            to="/account"
-            className="inline-block mt-5 text-xs uppercase tracking-widest px-5 py-2.5 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition"
-          >
-            Add your first program
-          </Link>
-        </div>
+        <InlineBalanceAdder
+          balances={balances}
+          onAdd={addBalance}
+          emptyState
+        />
       ) : (
         <>
           <div className="rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-8 md:p-10 mb-6">
@@ -1153,26 +1122,156 @@ function Portfolio({ balances }: { balances: ReturnType<typeof useUserBalances>[
                       {p?.short ?? "•"}
                     </span>
                   </div>
-                  <div className="font-display text-3xl text-gold-gradient">
-                    {b.balance.toLocaleString()}
-                  </div>
+                  <input
+                    type="number"
+                    min={0}
+                    max={50_000_000}
+                    defaultValue={b.balance}
+                    onBlur={(e) => {
+                      const v = Number.parseInt(e.target.value, 10);
+                      if (Number.isFinite(v) && v !== b.balance) updateBalance(b.id, v);
+                    }}
+                    className="w-full bg-transparent font-display text-3xl text-gold-gradient tabular-nums focus:outline-none border-b border-transparent focus:border-gold/40"
+                  />
                   <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
                     points{p ? ` · ≈ ${fmtAud((b.balance * p.valueAudCents) / 100)}` : ""}
                   </div>
                   <div className="mt-5 flex items-center justify-end">
-                    <Link
-                      to="/account"
-                      className="text-xs uppercase tracking-widest text-gold hover:underline"
+                    <button
+                      type="button"
+                      onClick={() => removeBalance(b.id)}
+                      className="text-xs uppercase tracking-widest text-muted-foreground hover:text-destructive transition"
                     >
-                      Edit
-                    </Link>
+                      Remove
+                    </button>
                   </div>
                 </div>
               );
             })}
           </div>
+
+          <div className="mt-6">
+            <InlineBalanceAdder balances={balances} onAdd={addBalance} />
+          </div>
         </>
       )}
+    </div>
+  );
+}
+
+function InlineBalanceAdder({
+  balances,
+  onAdd,
+  emptyState,
+}: {
+  balances: ReturnType<typeof useUserBalances>["balances"];
+  onAdd: ReturnType<typeof useUserBalances>["addBalance"];
+  emptyState?: boolean;
+}) {
+  const held = new Set(balances.map((b) => b.program_id));
+  const available = PROGRAMS.filter((p) => !held.has(p.id));
+  const [programId, setProgramId] = useState<string>(available[0]?.id ?? "");
+  const [amount, setAmount] = useState("");
+  const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (available.length && !available.some((p) => p.id === programId)) {
+      setProgramId(available[0].id);
+    }
+  }, [available, programId]);
+
+  async function submit() {
+    setErr(null);
+    const program = PROGRAMS.find((p) => p.id === programId);
+    if (!program) {
+      setErr("Pick a program.");
+      return;
+    }
+    const value = Number.parseInt(amount.replace(/[^\d]/g, ""), 10);
+    if (!Number.isFinite(value) || value < 0 || value > 50_000_000) {
+      setErr("Enter a valid points balance (0–50,000,000).");
+      return;
+    }
+    setBusy(true);
+    try {
+      await onAdd({ program_id: program.id, program_name: program.name, balance: value });
+      setAmount("");
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (available.length === 0) {
+    return (
+      <p className="text-xs text-muted-foreground">
+        You've added every supported program. Update balances above as they change.
+      </p>
+    );
+  }
+
+  return (
+    <div
+      className={
+        emptyState
+          ? "rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-8 md:p-10"
+          : "rounded-lg border border-border bg-card p-5"
+      }
+    >
+      {emptyState && (
+        <div className="mb-5">
+          <h3 className="font-display text-xl">Add your first program</h3>
+          <p className="text-sm text-muted-foreground mt-2 max-w-lg">
+            Balances stay private on this device — no account required. We'll value them in AUD and
+            flag every premium-cabin seat you can already afford.
+          </p>
+        </div>
+      )}
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="flex-1 min-w-[180px]">
+          <label className="text-xs uppercase tracking-widest text-muted-foreground">
+            Program
+          </label>
+          <select
+            value={programId}
+            onChange={(e) => setProgramId(e.target.value)}
+            className="mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60"
+          >
+            {available.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="w-40">
+          <label className="text-xs uppercase tracking-widest text-muted-foreground">Points</label>
+          <input
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            inputMode="numeric"
+            placeholder="125000"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                submit();
+              }
+            }}
+            className="mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={submit}
+          disabled={busy}
+          className="text-xs uppercase tracking-widest px-4 py-2.5 rounded-full bg-gold text-gold-foreground hover:opacity-90 transition disabled:opacity-60"
+        >
+          {busy ? "Adding…" : "+ Add program"}
+        </button>
+      </div>
+      {err && <div className="mt-3 text-sm text-destructive">{err}</div>}
     </div>
   );
 }
