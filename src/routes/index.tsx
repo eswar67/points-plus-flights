@@ -48,7 +48,7 @@ export const Route = createFileRoute("/")({
         as: "image",
         href: heroWing800,
         type: "image/webp",
-        fetchpriority: "high",
+        fetchPriority: "high",
       },
     ],
   }),
