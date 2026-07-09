@@ -561,8 +561,8 @@ function BalancesEditor() {
     }
   }, [available, programId]);
 
-  async function addBalance(e: React.FormEvent) {
-    e.preventDefault();
+  async function addBalance(e?: React.FormEvent | React.MouseEvent) {
+    e?.preventDefault();
     if (!user) return;
     setErr(null);
     const program = PROGRAMS.find((p) => p.id === programId);
@@ -657,7 +657,7 @@ function BalancesEditor() {
       )}
 
       {available.length > 0 ? (
-        <form onSubmit={addBalance} className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-wrap items-end gap-3">
           <div className="flex-1 min-w-[180px]">
             <label className="text-xs uppercase tracking-widest text-muted-foreground">
               Program
@@ -683,17 +683,24 @@ function BalancesEditor() {
               onChange={(e) => setAmount(e.target.value)}
               inputMode="numeric"
               placeholder="125000"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addBalance();
+                }
+              }}
               className="mt-1 w-full rounded-lg bg-background border border-border px-3 py-2 text-sm focus:outline-none focus:border-gold/60"
             />
           </div>
           <button
-            type="submit"
+            type="button"
+            onClick={addBalance}
             disabled={busy}
             className="text-xs uppercase tracking-widest px-4 py-2.5 rounded-full hairline text-gold hover:bg-gold/10 transition disabled:opacity-60"
           >
             {busy ? "Adding…" : "+ Add program"}
           </button>
-        </form>
+        </div>
       ) : (
         <p className="text-xs text-muted-foreground">
           You've added every supported program. Edit balances above as they change.
