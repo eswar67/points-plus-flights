@@ -154,7 +154,10 @@ function Index() {
   }
 
   const itineraries: AwardItinerary[] = result?.itineraries ?? [];
-  const ranked = rankItineraries(itineraries, byProgramId);
+  const rankedRaw = rankItineraries(itineraries, byProgramId);
+  // Enrich with sweet-spot annotations (median-baseline detection per cabin)
+  const ranked = annotateSweetSpots(rankedRaw);
+  type Enriched = RankedItinerary & SweetSpotInfo;
 
   // Program facets (from unfiltered results, so counts stay stable)
   const programFacets = new Map<string, { name: string; accent: string; count: number }>();
@@ -179,15 +182,37 @@ function Index() {
     carrierFacets.set(key, cur);
   }
 
+  // Bookability derived from user's balances + transfer reach
+  const hasAnyBalance = Object.keys(byProgramId).length > 0;
+  const reach = hasAnyBalance ? effectiveBalances(byProgramId) : {};
+  function bookableKind(a: Enriched): "direct" | "transfer" | "short" | null {
+    if (!hasAnyBalance) return null;
+    const direct = byProgramId[a.programId] ?? 0;
+    if (direct >= a.miles) return "direct";
+    const total = reach[a.programId]?.total ?? direct;
+    if (total >= a.miles) return "transfer";
+    return "short";
+  }
+  const bookableNow = ranked.filter((a) => {
+    const k = bookableKind(a);
+    return k === "direct" || k === "transfer";
+  });
+  const sweetSpotCount = ranked.filter((a) => a.isSweetSpot).length;
+
   const filtered = ranked.filter(
     (a) =>
       (!nonstopOnly || a.direct || a.stops === 0) &&
       (!twoPlusSeats || a.seats >= 2) &&
       (!gradeFilter || gradeFilter.size === 0 || gradeFilter.has(a.grade)) &&
       (!programFilter || programFilter.size === 0 || programFilter.has(a.programId)) &&
-      (!carrierFilter || carrierFilter.size === 0 || carrierFilter.has((a.carrier || "").trim())),
+      (!carrierFilter || carrierFilter.size === 0 || carrierFilter.has((a.carrier || "").trim())) &&
+      (!sweetOnly || a.isSweetSpot) &&
+      (!bookableOnly || (() => {
+        const k = bookableKind(a);
+        return k === "direct" || k === "transfer";
+      })()),
   );
-  const sorted =
+  const sorted: Enriched[] =
     sortBy === "points"
       ? [...filtered].sort((a, b) => a.miles - b.miles)
       : sortBy === "taxes"
@@ -212,7 +237,14 @@ function Index() {
                       const tb = b.updatedAt ? Date.parse(b.updatedAt) : 0;
                       return tb - ta;
                     })
-                  : filtered; // "value" keeps the CPP-first ranking
+                  : sortBy === "sweet"
+                    ? [...filtered].sort(
+                        (a, b) =>
+                          Number(b.isSweetSpot) - Number(a.isSweetSpot) ||
+                          b.discountPct - a.discountPct ||
+                          a.miles - b.miles,
+                      )
+                    : filtered; // "value" keeps the CPP-first ranking
 
   function toggleGrade(g: string) {
     setGradeFilter((cur) => {
