@@ -167,7 +167,25 @@ function Index() {
         ? [...filtered].sort((a, b) => a.taxesUsd - b.taxesUsd || a.miles - b.miles)
         : sortBy === "seats"
           ? [...filtered].sort((a, b) => b.seats - a.seats || b.cpp - a.cpp)
-          : filtered; // "value" keeps the CPP-first ranking
+          : sortBy === "duration"
+            ? [...filtered].sort(
+                (a, b) =>
+                  (a.durationMin || Number.POSITIVE_INFINITY) -
+                    (b.durationMin || Number.POSITIVE_INFINITY) || a.miles - b.miles,
+              )
+            : sortBy === "stops"
+              ? [...filtered].sort(
+                  (a, b) => a.stops - b.stops || a.miles - b.miles,
+                )
+              : sortBy === "depart"
+                ? [...filtered].sort((a, b) => (a.depart < b.depart ? -1 : a.depart > b.depart ? 1 : 0))
+                : sortBy === "fresh"
+                  ? [...filtered].sort((a, b) => {
+                      const ta = a.updatedAt ? Date.parse(a.updatedAt) : 0;
+                      const tb = b.updatedAt ? Date.parse(b.updatedAt) : 0;
+                      return tb - ta;
+                    })
+                  : filtered; // "value" keeps the CPP-first ranking
 
   function toggleGrade(g: string) {
     setGradeFilter((cur) => {
