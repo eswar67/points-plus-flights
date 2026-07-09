@@ -178,3 +178,21 @@ export const CONTINENTS: { value: Continent; label: string; codes: string[] }[] 
     codes: ["JNB", "CPT", "CAI", "NBO", "ADD", "CMN", "MRU"],
   },
 ];
+
+/** Metro-area IATA codes: one tap expands to every airport in a city. */
+export const METROS: { code: string; label: string; airports: string[] }[] = [
+  { code: "NYC", label: "New York", airports: ["JFK", "EWR", "LGA"] },
+  { code: "LON", label: "London", airports: ["LHR", "LGW", "MAN"] },
+  { code: "TYO", label: "Tokyo", airports: ["HND", "NRT"] },
+  { code: "PAR", label: "Paris", airports: ["CDG", "ORY"] },
+  { code: "MIL", label: "Milan", airports: ["MXP"] },
+  { code: "ROM", label: "Rome", airports: ["FCO"] },
+  { code: "WAS", label: "Washington", airports: ["IAD", "DCA"] },
+  { code: "CHI", label: "Chicago", airports: ["ORD"] },
+  { code: "BJS", label: "Beijing", airports: ["PEK", "PKX"] },
+  { code: "SHA", label: "Shanghai", airports: ["PVG"] },
+  { code: "SEL", label: "Seoul", airports: ["ICN"] },
+  { code: "OSA", label: "Osaka", airports: ["KIX"] },
+  { code: "BER", label: "Berlin", airports: ["BER"] },
+  { code: "STO", label: "Stockholm", airports: ["ARN"] },
+];
