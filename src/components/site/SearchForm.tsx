@@ -126,14 +126,6 @@ export function SearchForm({
     });
   }
 
-  function addContinent(side: "from" | "to", codes: string[]) {
-    const setter = side === "from" ? setFrom : setTo;
-    const current = (side === "from" ? from : to).split(",").filter(Boolean);
-    const merged = Array.from(new Set([...current, ...codes]));
-    setter(merged.join(","));
-    setErrors((x) => ({ ...x, [side]: undefined }));
-  }
-
   function swap() {
     setFrom(to);
     setTo(from);
