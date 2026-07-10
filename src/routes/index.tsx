@@ -11,7 +11,7 @@ import { SearchWalkthrough, shouldAutoStart as shouldAutoStartTour } from "@/com
 import { AwardCard } from "@/components/site/AwardCard";
 import { AwardTable } from "@/components/site/AwardTable";
 import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
-import { CABIN_LONG, CABIN_BLURB } from "@/lib/concierge";
+import { CABIN_LONG, CABIN_BLURB, explainTopPick } from "@/lib/concierge";
 import { FlightScene } from "@/components/site/FlightScene";
 import { SearchingState } from "@/components/site/SearchingState";
 import { useCountUp } from "@/hooks/useCountUp";
@@ -993,6 +993,8 @@ function Index() {
                     const isExpanded = expandedCabins.has(cabin);
                     const shown = isExpanded ? cabinGroups : cabinGroups.slice(0, 5);
                     const remaining = cabinGroups.length - shown.length;
+                    const topPick = cabinGroups[0]?.best;
+                    const reasons = topPick ? explainTopPick(topPick, cabinItems) : [];
                     return (
                       <section key={cabin} aria-labelledby={`cabin-${cabin}`}>
                         <header className="mb-3 flex items-end justify-between gap-4">
@@ -1011,6 +1013,32 @@ function Index() {
                             {cabinGroups.length} option{cabinGroups.length === 1 ? "" : "s"}
                           </span>
                         </header>
+                        {topPick && reasons.length > 0 && (
+                          <details className="mb-3 group rounded-lg border border-border bg-card/40">
+                            <summary className="cursor-pointer list-none px-4 py-2.5 flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition">
+                              <span className="inline-flex items-center gap-2">
+                                <span className="text-gold">Why this ranks first</span>
+                                <span className="text-[10px] text-muted-foreground/70 normal-case tracking-normal">
+                                  {topPick.programName} · {topPick.miles.toLocaleString()} pts · {topPick.cpp.toFixed(2)}¢ / pt
+                                </span>
+                              </span>
+                              <span aria-hidden className="text-gold transition group-open:rotate-45">
+                                +
+                              </span>
+                            </summary>
+                            <ul className="px-4 pb-4 pt-1 space-y-2 border-t border-border-soft">
+                              {reasons.map((r, i) => (
+                                <li key={i} className="flex gap-3 text-sm">
+                                  <span className="mt-1.5 size-1.5 rounded-full bg-gold shrink-0" aria-hidden />
+                                  <div>
+                                    <div className="text-foreground">{r.label}</div>
+                                    <div className="text-muted-foreground text-xs mt-0.5">{r.detail}</div>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </details>
+                        )}
                         <AwardTable
                           groups={shown}
                           sortBy={sortBy}
