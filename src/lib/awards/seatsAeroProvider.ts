@@ -152,19 +152,16 @@ export class SeatsAeroProvider implements AwardProvider {
 
   async search(input: SearchInput): Promise<AwardItinerary[]> {
     const endDate = input.dateTo ?? input.date;
+    // No cabin filter and no `sources` filter — every trip for every program
+    // seats.aero tracks is returned. The UI renders one row per trip with
+    // separate cells for Economy / Premium / Business / First.
     const params = new URLSearchParams({
       origin_airport: input.from.toUpperCase(),
       destination_airport: input.to.toUpperCase(),
       start_date: input.date,
       end_date: endDate,
-      cabin: input.cabin,
-      // No `sources` filter: every program seats.aero tracks is searched.
       take: "1000",
       order_by: "lowest_mileage",
-      // Expand each daily availability into individual trip options
-      // (different routings / connections). Without this, we return one
-      // itinerary per (source, date) and hide dozens of alternates that
-      // seats.aero's own UI shows.
       include_trips: "true",
     });
 
@@ -189,14 +186,20 @@ export class SeatsAeroProvider implements AwardProvider {
     const out: AwardItinerary[] = [];
     for (const row of rows) {
       const trips = (row.AvailabilityTrips ?? []).filter(
-        (t) => t.Cabin === input.cabin && (t.MileageCost ?? 0) > 0,
+        (t) => (t.MileageCost ?? 0) > 0 && isCabin(t.Cabin),
       );
       if (trips.length > 0) {
-        for (const trip of trips) out.push(this.tripToItinerary(row, trip, input));
+        for (const trip of trips) {
+          const cabin = trip.Cabin as Cabin;
+          out.push(this.tripToItinerary(row, trip, cabin, input.pax));
+        }
       } else {
-        // Fallback: source didn't return trip breakdown — keep the daily row.
-        const it = this.toItinerary(row, input);
-        if (it) out.push(it);
+        // Fallback: source didn't return trip breakdown — emit one itinerary
+        // per cabin the availability row itself advertises.
+        for (const cabin of ALL_CABINS) {
+          const it = this.rowToItinerary(row, cabin, input.pax);
+          if (it) out.push(it);
+        }
       }
     }
     return out;
@@ -205,7 +208,8 @@ export class SeatsAeroProvider implements AwardProvider {
   private tripToItinerary(
     row: RawAvailability,
     trip: RawTrip,
-    input: SearchInput,
+    cabin: Cabin,
+    pax: number,
   ): AwardItinerary {
     const sourceSlug = trip.Source ?? row.Source ?? "";
     const programId = SOURCE_TO_PROGRAM[sourceSlug] ?? sourceSlug;
@@ -216,34 +220,41 @@ export class SeatsAeroProvider implements AwardProvider {
     const taxes = ((trip.TotalTaxes ?? 0) / 100) * fx;
     const stops = trip.Stops ?? 0;
     const carrier = (trip.Carriers ?? "").split(",")[0]?.trim() || "Multiple";
+    const tripKey = trip.ID || `${row.ID}-${trip.DepartsAt ?? ""}`;
     return {
-      id: `${trip.ID}-${CABIN_TO_FIELD[input.cabin]}`,
+      id: `${trip.ID}-${CABIN_TO_FIELD[cabin]}`,
+      tripKey,
       programId,
       programName: program?.name ?? sourceSlug,
       carrier,
       flightNo: trip.FlightNumbers ?? "",
-      from: trip.OriginAirport ?? row.Route?.OriginAirport ?? input.from.toUpperCase(),
-      to: trip.DestinationAirport ?? row.Route?.DestinationAirport ?? input.to.toUpperCase(),
-      depart: trip.DepartsAt ?? row.Date ?? input.date,
-      arrive: trip.ArrivesAt ?? row.Date ?? input.date,
+      from: trip.OriginAirport ?? row.Route?.OriginAirport ?? "",
+      to: trip.DestinationAirport ?? row.Route?.DestinationAirport ?? "",
+      depart: trip.DepartsAt ?? row.Date ?? "",
+      arrive: trip.ArrivesAt ?? row.Date ?? "",
       durationMin: trip.TotalDuration ?? 0,
       stops,
-      cabin: input.cabin,
-      miles: miles * input.pax,
-      pax: input.pax,
-      taxesUsd: Math.round(taxes * input.pax),
+      cabin,
+      miles: miles * pax,
+      pax,
+      taxesUsd: Math.round(taxes * pax),
       seats: trip.RemainingSeats ?? 0,
       direct: stops === 0,
       updatedAt: trip.UpdatedAt ?? row.UpdatedAt,
     };
   }
 
-  private toItinerary(row: RawAvailability, input: SearchInput): AwardItinerary | null {
-    const field = CABIN_TO_FIELD[input.cabin];
-    const available = row[`${field}Available`] as boolean | undefined;
+  private rowToItinerary(
+    row: RawAvailability,
+    cabin: Cabin,
+    pax: number,
+  ): AwardItinerary | null {
+    const field = CABIN_TO_FIELD[cabin];
+    const anyRow = row as unknown as Record<string, unknown>;
+    const available = anyRow[`${field}Available`] as boolean | undefined;
     if (!available) return null;
 
-    const mileageStr = row[`${field}MileageCost`] as string | undefined;
+    const mileageStr = anyRow[`${field}MileageCost`] as string | undefined;
     const miles = mileageStr ? parseInt(mileageStr, 10) : 0;
     if (!miles) return null;
 
@@ -255,34 +266,40 @@ export class SeatsAeroProvider implements AwardProvider {
     // TaxesCurrency (i.e. cents). Convert to whole units, then FX to USD so
     // downstream AUD conversion (× ~1.55) produces sane amounts regardless
     // of the source currency (many programs quote AUD, SGD, GBP, etc.).
-    const taxesRaw = (row[`${field}TotalTaxes`] as number | undefined) ?? 0;
+    const taxesRaw = (anyRow[`${field}TotalTaxes`] as number | undefined) ?? 0;
     const currency = (row.TaxesCurrency ?? "USD").toUpperCase();
     const fx = FX_TO_USD[currency] ?? 1;
     const taxes = (taxesRaw / 100) * fx;
-    const seats = (row[`${field}RemainingSeats`] as number | undefined) ?? 0;
-    const direct = (row[`${field}Direct`] as boolean | undefined) ?? false;
-    const airlines = (row[`${field}Airlines`] as string | undefined) ?? "";
+    const seats = (anyRow[`${field}RemainingSeats`] as number | undefined) ?? 0;
+    const direct = (anyRow[`${field}Direct`] as boolean | undefined) ?? false;
+    const airlines = (anyRow[`${field}Airlines`] as string | undefined) ?? "";
     const carrier = airlines.split(",")[0]?.trim() || "Multiple";
 
     return {
       id: `${row.ID}-${field}`,
+      tripKey: row.ID,
       programId,
       programName: program?.name ?? sourceSlug,
       carrier,
       flightNo: "",
-      from: row.Route?.OriginAirport ?? input.from.toUpperCase(),
-      to: row.Route?.DestinationAirport ?? input.to.toUpperCase(),
-      depart: row.Date ?? input.date,
-      arrive: row.Date ?? input.date,
+      from: row.Route?.OriginAirport ?? "",
+      to: row.Route?.DestinationAirport ?? "",
+      depart: row.Date ?? "",
+      arrive: row.Date ?? "",
       durationMin: 0,
       stops: direct ? 0 : 1,
-      cabin: input.cabin,
-      miles: miles * input.pax,
-      pax: input.pax,
-      taxesUsd: Math.round(taxes * input.pax),
+      cabin,
+      miles: miles * pax,
+      pax,
+      taxesUsd: Math.round(taxes * pax),
       seats,
       direct,
       updatedAt: row.UpdatedAt,
     };
   }
+}
+
+const ALL_CABINS: Cabin[] = ["economy", "premium", "business", "first"];
+function isCabin(x: unknown): x is Cabin {
+  return x === "economy" || x === "premium" || x === "business" || x === "first";
 }

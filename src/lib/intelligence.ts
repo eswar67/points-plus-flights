@@ -545,3 +545,49 @@ export function annotateSweetSpots<T extends AwardItinerary>(
     };
   });
 }
+
+// ---------------------------------------------------------------------------
+// Trip grouping: multiple cabins on the same physical trip share a `tripKey`.
+// The UI renders one row per trip with Y / W / J / F cells side by side.
+// ---------------------------------------------------------------------------
+export type TripGroup<T extends AwardItinerary> = {
+  tripKey: string;
+  /** Best (highest-CPP) variant on this trip — used for row-level metadata. */
+  best: T;
+  /** Cheapest miles across all cabins on this trip. */
+  minMiles: number;
+  /** Every cabin variant present on this trip. */
+  variants: T[];
+  byCabin: Partial<Record<Cabin, T>>;
+};
+
+export function groupByTrip<T extends AwardItinerary & { cpp?: number }>(
+  items: T[],
+): TripGroup<T>[] {
+  const groups = new Map<string, T[]>();
+  for (const a of items) {
+    const key = a.tripKey || a.id;
+    const list = groups.get(key) ?? [];
+    list.push(a);
+    groups.set(key, list);
+  }
+  const out: TripGroup<T>[] = [];
+  for (const [tripKey, variants] of groups) {
+    // Best = highest CPP (or lowest miles if CPP not present).
+    const best = variants.reduce((acc, v) =>
+      (v.cpp ?? 0) > (acc.cpp ?? 0) || ((v.cpp ?? 0) === (acc.cpp ?? 0) && v.miles < acc.miles)
+        ? v
+        : acc,
+    );
+    const byCabin: Partial<Record<Cabin, T>> = {};
+    for (const v of variants) byCabin[v.cabin] = v;
+    out.push({
+      tripKey,
+      best,
+      minMiles: Math.min(...variants.map((v) => v.miles)),
+      variants,
+      byCabin,
+    });
+  }
+  return out;
+}

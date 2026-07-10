@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AwardItinerary } from "@/lib/awards/types";
+import type { AwardItinerary, Cabin } from "@/lib/awards/types";
 import { PROGRAMS } from "@/lib/programs";
 import { PlaybookDrawer } from "./PlaybookDrawer";
 import {
@@ -17,6 +17,14 @@ import {
 import { AlertTriangle, Bookmark, BookmarkCheck, Check, GitCompare, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
 import { useShortlist } from "@/hooks/useShortlist";
 import { useCompare } from "@/hooks/useCompare";
+
+const CABIN_ORDER: Cabin[] = ["economy", "premium", "business", "first"];
+const CABIN_LABEL: Record<Cabin, string> = {
+  economy: "Economy",
+  premium: "Premium",
+  business: "Business",
+  first: "First",
+};
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -39,6 +47,7 @@ function fmtTime(value: string) {
 
 export function AwardCard({
   award,
+  variants,
   balances = {},
   reason,
   isSweetSpot,
@@ -47,6 +56,12 @@ export function AwardCard({
   discountPct,
 }: {
   award: AwardItinerary;
+  /**
+   * When present, renders a cabin selector strip above the card body listing
+   * every cabin available on this trip. Clicking a cabin swaps the card
+   * content to that redemption.
+   */
+  variants?: Partial<Record<Cabin, AwardItinerary>>;
   balances?: Record<string, number>;
   reason?: string;
   isSweetSpot?: boolean;
@@ -55,36 +70,40 @@ export function AwardCard({
   discountPct?: number;
 }) {
   const [open, setOpen] = useState(false);
+  const [selectedCabin, setSelectedCabin] = useState<Cabin>(award.cabin);
+  // Resolve the itinerary to display based on the selected cabin (falls
+  // back to the incoming `award` when the picker isn't in use).
+  const active = variants?.[selectedCabin] ?? award;
   const { has, toggle } = useShortlist();
-  const saved = has(award.id);
+  const saved = has(active.id);
   const [flash, setFlash] = useState(false);
   const compare = useCompare();
-  const compareSelected = compare.has(award.id);
+  const compareSelected = compare.has(active.id);
   const [compareShake, setCompareShake] = useState(false);
   const byProgramId = balances;
-  const program = PROGRAMS.find((p) => p.id === award.programId);
+  const program = PROGRAMS.find((p) => p.id === active.programId);
   const accent = program?.accent ?? "#c9a84c";
-  const programName = program?.name ?? award.programName;
+  const programName = program?.name ?? active.programName;
   const alliance = program?.alliance ?? "Partner program";
 
-  const cpp = calcCppAud(award);
-  const grade = gradeCpp(cpp, award.cabin);
-  const confidence = confidenceFor(award);
-  const fare = fareEstimateAud(award.from, award.to, award.cabin);
-  const balance = byProgramId[award.programId] ?? 0;
-  const shortfall = Math.max(0, award.miles - balance);
-  const fastest = shortfall > 0 ? transfersFor(award.programId)[0] : undefined;
+  const cpp = calcCppAud(active);
+  const grade = gradeCpp(cpp, active.cabin);
+  const confidence = confidenceFor(active);
+  const fare = fareEstimateAud(active.from, active.to, active.cabin);
+  const balance = byProgramId[active.programId] ?? 0;
+  const shortfall = Math.max(0, active.miles - balance);
+  const fastest = shortfall > 0 ? transfersFor(active.programId)[0] : undefined;
   const transferTooSlow = !!fastest && fastest.etaMin > 60 && confidence.ageMin < 30;
 
   // Bookability against the user's tracked balances (direct + transfer reach)
   const hasAnyBalance = Object.keys(byProgramId).length > 0;
   const reach = hasAnyBalance ? effectiveBalances(byProgramId) : {};
-  const effective = reach[award.programId]?.total ?? balance;
+  const effective = reach[active.programId]?.total ?? balance;
   const bookable: "direct" | "transfer" | "short" | null = !hasAnyBalance
     ? null
-    : balance >= award.miles
+    : balance >= active.miles
       ? "direct"
-      : effective >= award.miles
+      : effective >= active.miles
         ? "transfer"
         : "short";
 
@@ -102,11 +121,11 @@ export function AwardCard({
 
   // Value meter: how far this CPP sits along the road to "exceptional" for the cabin.
   const exceptionalCpp =
-    award.cabin === "first"
+    active.cabin === "first"
       ? 6.0
-      : award.cabin === "business"
+      : active.cabin === "business"
         ? 5.0
-        : award.cabin === "premium"
+        : active.cabin === "premium"
           ? 3.5
           : 2.5;
   const meterPct = Math.max(4, Math.min(100, (cpp / (exceptionalCpp * 1.15)) * 100));
@@ -140,7 +159,7 @@ export function AwardCard({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          const nowSaved = toggle(award);
+          const nowSaved = toggle(active);
           if (nowSaved) {
             setFlash(true);
             setTimeout(() => setFlash(false), 700);
@@ -173,7 +192,7 @@ export function AwardCard({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          const result = compare.toggle(award);
+          const result = compare.toggle(active);
           if (result === "full") {
             setCompareShake(true);
             setTimeout(() => setCompareShake(false), 500);
@@ -220,15 +239,15 @@ export function AwardCard({
           }}
           aria-hidden="true"
         >
-          {(program?.id ?? award.programId).slice(0, 2).toUpperCase()}
+          {(program?.id ?? active.programId).slice(0, 2).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
           <div className={`font-display truncate ${isSweetSpot ? "text-2xl" : "text-lg"}`}>
             {programName}
           </div>
           <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-0.5 truncate">
-            {alliance} · {award.carrier}
-            {award.flightNo ? ` ${award.flightNo}` : ""}
+            {alliance} · {active.carrier}
+            {active.flightNo ? ` ${active.flightNo}` : ""}
           </div>
         </div>
       </div>
@@ -242,6 +261,45 @@ export function AwardCard({
             {(baselineMiles ?? 0).toLocaleString()}
             {discountPct ? ` · ${Math.round(discountPct * 100)}% off` : ""}
           </span>
+        </div>
+      )}
+
+      {/* Cabin picker — one tile per cabin the trip advertises. Mirrors the
+          seats.aero row layout: Y / W / J / F side-by-side, clickable to swap
+          the card body to that redemption. */}
+      {variants && Object.keys(variants).length > 1 && (
+        <div
+          className={`mt-4 grid grid-cols-4 gap-2 ${isSweetSpot ? "px-8" : "px-6"}`}
+          role="tablist"
+          aria-label="Cabins on this trip"
+        >
+          {CABIN_ORDER.map((c) => {
+            const v = variants[c];
+            const isSelected = selectedCabin === c;
+            const disabled = !v || v.miles <= 0;
+            return (
+              <button
+                key={c}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                disabled={disabled}
+                onClick={() => v && setSelectedCabin(c)}
+                className={`text-left rounded-md border px-2.5 py-1.5 transition ${
+                  disabled
+                    ? "border-border-soft/60 text-muted-foreground/40 cursor-not-allowed"
+                    : isSelected
+                      ? "border-gold/60 bg-gold/10 text-gold"
+                      : "border-border-soft text-muted-foreground hover:border-gold/40 hover:text-foreground"
+                }`}
+              >
+                <div className="text-[9px] uppercase tracking-[0.2em]">{CABIN_LABEL[c]}</div>
+                <div className="font-mono tabular-nums text-sm mt-0.5">
+                  {v && v.miles > 0 ? v.miles.toLocaleString() : "—"}
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -271,8 +329,8 @@ export function AwardCard({
           </span>
         </span>
         <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/80 tabular-nums ml-auto">
-          {award.seats > 0
-            ? `${award.seats} seat${award.seats > 1 ? "s" : ""}`
+          {active.seats > 0
+            ? `${active.seats} seat${active.seats > 1 ? "s" : ""}`
             : "Availability confirmed"}
         </span>
       </div>
@@ -310,21 +368,21 @@ export function AwardCard({
               <div
                 className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}
               >
-                {fmtTime(award.depart)}
+                {fmtTime(active.depart)}
               </div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
-                {award.from}
+                {active.from}
               </div>
             </div>
             <div className="flex-1 relative">
               <div className="text-[10px] text-center text-muted-foreground/80 uppercase tracking-[0.2em] mb-2">
-                {award.durationMin ? fmtDuration(award.durationMin) : ""}
-                {award.durationMin && (award.direct || award.stops === 0 || award.stops) ? " · " : ""}
-                {award.direct
+                {active.durationMin ? fmtDuration(active.durationMin) : ""}
+                {active.durationMin && (active.direct || active.stops === 0 || active.stops) ? " · " : ""}
+                {active.direct
                   ? "Nonstop"
-                  : award.stops === 0
+                  : active.stops === 0
                     ? "Direct"
-                    : `${award.stops} stop${award.stops > 1 ? "s" : ""}`}
+                    : `${active.stops} stop${active.stops > 1 ? "s" : ""}`}
               </div>
               <div className="relative h-px bg-gradient-to-r from-gold/20 via-gold/60 to-gold/20">
                 <span className="absolute -top-[3px] left-0 size-1.5 rounded-full bg-gold" />
@@ -339,10 +397,10 @@ export function AwardCard({
               <div
                 className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}
               >
-                {fmtTime(award.arrive)}
+                {fmtTime(active.arrive)}
               </div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
-                {award.to}
+                {active.to}
               </div>
             </div>
           </div>
@@ -357,7 +415,7 @@ export function AwardCard({
           {bookable === "transfer" && fastest && (
             <div className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 border border-gold/40 bg-gold/5 text-gold tabular-nums">
               <ArrowRightLeft className="size-3" />
-              Transfer {Math.max(0, award.miles - balance).toLocaleString()} from{" "}
+              Transfer {Math.max(0, active.miles - balance).toLocaleString()} from{" "}
               {fastest.bank}
               <span className="opacity-70">
                 · {fastest.etaMin < 60 ? "instant" : `~${Math.round(fastest.etaMin / 60)}h`}
@@ -366,7 +424,7 @@ export function AwardCard({
           )}
           {bookable === "short" && (
             <div className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 border border-border-soft bg-muted/30 text-muted-foreground tabular-nums">
-              Short {(award.miles - effective).toLocaleString()} pts
+              Short {(active.miles - effective).toLocaleString()} pts
             </div>
           )}
           </div>
@@ -384,7 +442,7 @@ export function AwardCard({
                   isSweetSpot ? "text-4xl text-gold-gradient" : "text-2xl"
                 }`}
               >
-                {award.miles.toLocaleString()}
+                {active.miles.toLocaleString()}
               </div>
             </div>
             <div>
@@ -392,8 +450,8 @@ export function AwardCard({
                 Taxes
               </div>
               <div className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}>
-                {award.taxesUsd ? `$${Math.round(taxesAudFromUsd(award.taxesUsd))}` : "—"}
-                {award.taxesUsd ? (
+                {active.taxesUsd ? `$${Math.round(taxesAudFromUsd(active.taxesUsd))}` : "—"}
+                {active.taxesUsd ? (
                   <span className="text-[11px] font-sans align-top ml-1 opacity-40 uppercase tracking-normal">
                     aud
                   </span>
@@ -421,7 +479,7 @@ export function AwardCard({
         </div>
       </div>
 
-      {(transferTooSlow || award.seats <= 1) && (
+      {(transferTooSlow || active.seats <= 1) && (
         <div className={`pb-4 -mt-2 ${isSweetSpot ? "px-8" : "px-6"}`}>
           <div className="inline-flex items-start gap-2 text-xs text-amber-300/90 bg-amber-500/5 border border-amber-500/20 rounded-md px-2.5 py-1.5">
             <AlertTriangle className="size-3.5 mt-px flex-shrink-0" />
@@ -431,7 +489,7 @@ export function AwardCard({
                 Seat may be gone before points land — consider a faster program if you have one.
               </span>
             ) : (
-              <span>Only {award.seats} seat left — book within minutes once miles arrive.</span>
+              <span>Only {active.seats} seat left — book within minutes once miles arrive.</span>
             )}
           </div>
         </div>

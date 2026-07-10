@@ -1,9 +1,25 @@
-import type { RankedItinerary, SweetSpotInfo } from "@/lib/intelligence";
+import type { Cabin } from "@/lib/awards/types";
+import type { RankedItinerary, SweetSpotInfo, TripGroup } from "@/lib/intelligence";
 import { fmtAud, fmtCpp, fmtAge, taxesAudFromUsd } from "@/lib/intelligence";
 import { getProgram } from "@/lib/programs";
-import { ArrowDown, ArrowUp, Sparkles } from "lucide-react";
+import { ArrowDown, Sparkles } from "lucide-react";
 
 type Row = RankedItinerary & SweetSpotInfo;
+type Group = TripGroup<Row>;
+
+const CABIN_ORDER: Cabin[] = ["economy", "premium", "business", "first"];
+const CABIN_SHORT: Record<Cabin, string> = {
+  economy: "Y",
+  premium: "W",
+  business: "J",
+  first: "F",
+};
+const CABIN_LABEL: Record<Cabin, string> = {
+  economy: "Economy",
+  premium: "Premium",
+  business: "Business",
+  first: "First",
+};
 
 type SortKey =
   | "value"
@@ -68,17 +84,17 @@ function HeaderButton({
 }
 
 export function AwardTable({
-  rows,
+  groups,
   sortBy,
   onSort,
   pax,
 }: {
-  rows: Row[];
+  groups: Group[];
   sortBy: SortKey;
   onSort: (key: SortKey) => void;
   pax: number;
 }) {
-  if (!rows.length) return null;
+  if (!groups.length) return null;
   return (
     <div className="rounded-lg border border-border bg-card overflow-x-auto">
       <table className="w-full text-sm">
@@ -92,34 +108,6 @@ export function AwardTable({
             <th className="text-left px-4 py-3 font-normal">
               <HeaderButton active={sortBy === "depart"} onClick={() => onSort("depart")}>
                 Route · Date
-              </HeaderButton>
-            </th>
-            <th className="text-left px-4 py-3 font-normal">Cabin</th>
-            <th className="text-right px-4 py-3 font-normal">
-              <HeaderButton
-                align="right"
-                active={sortBy === "points"}
-                onClick={() => onSort("points")}
-              >
-                Miles
-              </HeaderButton>
-            </th>
-            <th className="text-right px-4 py-3 font-normal">
-              <HeaderButton
-                align="right"
-                active={sortBy === "taxes"}
-                onClick={() => onSort("taxes")}
-              >
-                Taxes
-              </HeaderButton>
-            </th>
-            <th className="text-right px-4 py-3 font-normal">
-              <HeaderButton
-                align="right"
-                active={sortBy === "seats"}
-                onClick={() => onSort("seats")}
-              >
-                Seats
               </HeaderButton>
             </th>
             <th className="text-right px-4 py-3 font-normal">
@@ -140,15 +128,13 @@ export function AwardTable({
                 Duration
               </HeaderButton>
             </th>
-            <th className="text-right px-4 py-3 font-normal">
-              <HeaderButton
-                align="right"
-                active={sortBy === "value"}
-                onClick={() => onSort("value")}
-              >
-                Value
-              </HeaderButton>
-            </th>
+            {CABIN_ORDER.map((c) => (
+              <th key={c} className="text-right px-3 py-3 font-normal">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {CABIN_LABEL[c]}
+                </div>
+              </th>
+            ))}
             <th className="text-right px-4 py-3 font-normal">
               <HeaderButton
                 align="right"
@@ -158,22 +144,24 @@ export function AwardTable({
                 Updated
               </HeaderButton>
             </th>
-            <th className="text-right px-4 py-3 font-normal" aria-label="Action" />
           </tr>
         </thead>
         <tbody>
-          {rows.map((a) => {
-            const program = getProgram(a.programId);
+          {groups.map((g) => {
+            const base = g.best;
+            const program = getProgram(base.programId);
             const accent = program?.accent ?? "#c9a84c";
-            const programName = program?.name ?? a.programName;
-            const taxesAud = taxesAudFromUsd(a.taxesUsd);
+            const programName = program?.name ?? base.programName;
             const stopsLabel =
-              a.direct || a.stops === 0 ? "Nonstop" : `${a.stops} stop${a.stops === 1 ? "" : "s"}`;
+              base.direct || base.stops === 0
+                ? "Nonstop"
+                : `${base.stops} stop${base.stops === 1 ? "" : "s"}`;
+            const anySweet = g.variants.some((v) => v.isSweetSpot);
             return (
               <tr
-                key={a.id}
+                key={g.tripKey}
                 className={`border-t border-border-soft hover:bg-background/40 transition-colors ${
-                  a.isSweetSpot ? "bg-gold/[0.03]" : ""
+                  anySweet ? "bg-gold/[0.03]" : ""
                 }`}
               >
                 <td className="px-4 py-3">
@@ -191,70 +179,66 @@ export function AwardTable({
                     <div className="min-w-0">
                       <div className="truncate">{programName}</div>
                       <div className="text-[10px] uppercase tracking-widest text-muted-foreground truncate">
-                        {a.carrier || "Multiple"}
+                        {base.carrier || "Multiple"}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <div className="font-mono tabular-nums">
-                    {a.from} <span className="text-gold">→</span> {a.to}
+                    {base.from} <span className="text-gold">→</span> {base.to}
                   </div>
                   <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                    {fmtDate(a.depart)}
+                    {fmtDate(base.depart)}
                   </div>
-                </td>
-                <td className="px-4 py-3 capitalize text-muted-foreground">{a.cabin}</td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums">
-                  <div className="inline-flex items-center gap-1.5 justify-end">
-                    {a.isSweetSpot && (
-                      <span
-                        className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest text-gold"
-                        title={`~${Math.round(a.discountPct * 100)}% below the median for this cabin`}
-                      >
-                        <Sparkles className="size-3" aria-hidden="true" />
-                      </span>
-                    )}
-                    {a.miles.toLocaleString()}
-                  </div>
-                  {pax > 1 && (
-                    <div className="text-[10px] text-muted-foreground">
-                      {pax}× {(a.miles / pax).toLocaleString()}
-                    </div>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums text-muted-foreground">
-                  {taxesAud ? fmtAud(taxesAud) : "—"}
-                </td>
-                <td className="px-4 py-3 text-right font-mono tabular-nums">
-                  <span className={a.seats <= 1 ? "text-muted-foreground" : ""}>
-                    {a.seats > 0 ? a.seats : "0"}
-                  </span>
                 </td>
                 <td className="px-4 py-3 text-right text-muted-foreground text-xs">
                   {stopsLabel}
                 </td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-muted-foreground">
-                  {fmtDuration(a.durationMin)}
+                  {fmtDuration(base.durationMin)}
                 </td>
-                <td className="px-4 py-3 text-right">
-                  <span
-                    className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-widest ${GRADE_STYLES[a.grade]}`}
-                    title={`${fmtCpp(a.cpp)} — ${a.grade}`}
-                  >
-                    {fmtCpp(a.cpp)}
-                  </span>
-                </td>
+                {CABIN_ORDER.map((c) => {
+                  const v = g.byCabin[c];
+                  if (!v || v.miles <= 0) {
+                    return (
+                      <td
+                        key={c}
+                        className="px-3 py-3 text-right text-muted-foreground/40 font-mono tabular-nums"
+                      >
+                        —
+                      </td>
+                    );
+                  }
+                  const taxesAud = taxesAudFromUsd(v.taxesUsd);
+                  return (
+                    <td key={c} className="px-3 py-3 text-right align-top">
+                      <a
+                        href={`/book?id=${encodeURIComponent(v.id)}`}
+                        className="block group"
+                        title={`${CABIN_LABEL[c]} · ${fmtCpp(v.cpp)}`}
+                      >
+                        <div className="inline-flex items-center gap-1 justify-end font-mono tabular-nums text-foreground group-hover:text-gold transition">
+                          {v.isSweetSpot && (
+                            <Sparkles className="size-3 text-gold" aria-hidden="true" />
+                          )}
+                          {v.miles.toLocaleString()}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
+                          {taxesAud ? fmtAud(taxesAud) : "—"} ·{" "}
+                          {v.seats > 0 ? `${v.seats} seat${v.seats > 1 ? "s" : ""}` : "0 seats"}
+                        </div>
+                        <span
+                          className={`inline-flex mt-1 items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[9px] uppercase tracking-widest ${GRADE_STYLES[v.grade]}`}
+                        >
+                          {CABIN_SHORT[c]} · {fmtCpp(v.cpp)}
+                        </span>
+                      </a>
+                    </td>
+                  );
+                })}
                 <td className="px-4 py-3 text-right text-[10px] uppercase tracking-widest text-muted-foreground whitespace-nowrap">
-                  {a.confidence?.ageMin != null ? fmtAge(a.confidence.ageMin) : "—"}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <a
-                    href={`/book?id=${encodeURIComponent(a.id)}`}
-                    className="text-[10px] uppercase tracking-widest text-gold hover:underline"
-                  >
-                    Book →
-                  </a>
+                  {base.confidence?.ageMin != null ? fmtAge(base.confidence.ageMin) : "—"}
                 </td>
               </tr>
             );

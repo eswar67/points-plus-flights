@@ -27,6 +27,8 @@ import {
   type RankedItinerary,
   annotateSweetSpots,
   type SweetSpotInfo,
+  groupByTrip,
+  type TripGroup,
 } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
@@ -175,7 +177,11 @@ function Index() {
       try {
         const range = rangeFor(q);
         const res = await searchAwards({
-          data: { from: q.from, to: q.to, ...range, cabin: q.cabin, pax: q.pax },
+          // Provider no longer filters by cabin — every cabin the source
+          // advertises for the trip is returned and the UI renders them
+          // side by side. We still keep `q.cabin` on the search query for
+          // downstream helpers (share URL, benchmark strip, PDF header).
+          data: { from: q.from, to: q.to, ...range, pax: q.pax },
         });
         setResult(res);
       } catch (e) {
@@ -397,6 +403,14 @@ function Index() {
     daySummaries[d] = { cpp: list[0].cpp, grade: list[0].grade, count: list.length };
   }
 
+  // Trip grouping: multiple cabin variants share a tripKey. Groups preserve
+  // the underlying sort order via the position of their first (best-ranked)
+  // variant in `sorted`.
+  const groupsByDate = new Map<string, TripGroup<Enriched>[]>();
+  for (const [d, list] of byDate) {
+    groupsByDate.set(d, groupByTrip(list));
+  }
+
   const monthStart = query ? query.date.slice(0, 8) + "01" : "";
   const currentMonthStart = new Date().toISOString().slice(0, 8) + "01";
 
@@ -500,7 +514,7 @@ function Index() {
                         `${animatedCount.toLocaleString()} option${sorted.length === 1 ? "" : "s"}`,
                         minMiles ? `from ${minMiles.toLocaleString()} pts` : null,
                         `${programFacets.size} program${programFacets.size === 1 ? "" : "s"}`,
-                        `${query.cabin} · ${query.pax} pax`,
+                        `All cabins · ${query.pax} pax`,
                         query.mode === "month"
                           ? new Date(monthStart + "T00:00:00").toLocaleDateString([], {
                               month: "long",
@@ -874,7 +888,7 @@ function Index() {
               />
             ) : itineraries.length === 0 && !error ? (
               <div className="rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">
-                No award space found for this route and date. Try a different cabin or nearby dates.
+                No award space found for this route and date. Try nearby dates or a different city pair.
               </div>
             ) : sorted.length === 0 && !error ? (
               <div className="rounded-lg border border-border bg-card p-10 text-center">
@@ -951,21 +965,24 @@ function Index() {
                       )}
                       {viewMode === "table" ? (
                         <AwardTable
-                          rows={byDate.get(d) ?? []}
+                          groups={groupsByDate.get(d) ?? []}
                           sortBy={sortBy}
                           onSort={setSortBy}
                           pax={query.pax}
                         />
                       ) : (
                       <div className="space-y-3">
-                        {(byDate.get(d) ?? []).map((a, i) => (
+                        {(groupsByDate.get(d) ?? []).map((g, i) => {
+                          const a = g.best;
+                          return (
                           <div
-                            key={a.id}
+                            key={g.tripKey}
                             className="animate-card-in"
                             style={{ "--stagger": Math.min(i, 8) } as React.CSSProperties}
                           >
                             <AwardCard
                               award={a}
+                              variants={g.byCabin}
                               balances={byProgramId}
                               reason={reasonFor(a)}
                               isSweetSpot={a.isSweetSpot}
@@ -974,7 +991,8 @@ function Index() {
                               discountPct={a.discountPct}
                             />
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                       )}
                     </div>
