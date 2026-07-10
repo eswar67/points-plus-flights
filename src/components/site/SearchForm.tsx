@@ -173,7 +173,7 @@ export function SearchForm({
           Reset
         </button>
         <span className="text-xs text-muted-foreground ml-1 hidden sm:inline">
-          Tip: combine codes with commas (e.g. <span className="tabular-nums">SYD,MEL</span>) or tap a continent below.
+          Tip: combine codes with commas — e.g. <span className="tabular-nums">SYD,MEL</span>.
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1.2fr_1fr_0.8fr_auto] gap-2">
@@ -285,18 +285,6 @@ export function SearchForm({
           </button>
         ))}
       </div>
-
-      <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 px-1">
-        <ContinentRow
-          label="From continent"
-          onPick={(codes) => addContinent("from", codes)}
-        />
-        <ContinentRow
-          label="To continent"
-          onPick={(codes) => addContinent("to", codes)}
-        />
-      </div>
-
 
       <datalist id="ml-airports">
         {AIRPORTS.map((a) => (
