@@ -696,7 +696,17 @@ function Index() {
 
             {/* Results toolbar: sort, stops, program facets */}
             {!pending && !error && query.mode !== "month" && ranked.length > 0 && (
-              <div className="mb-6 space-y-3">
+              <details className="mb-6 group rounded-lg border border-border bg-card/40">
+                <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition">
+                  <span className="inline-flex items-center gap-2">
+                    <span>Refine</span>
+                    <span className="text-[10px] text-muted-foreground/70 normal-case tracking-normal">
+                      sort, filters & advanced options
+                    </span>
+                  </span>
+                  <span aria-hidden className="text-gold transition group-open:rotate-45">+</span>
+                </summary>
+                <div className="p-4 pt-2 space-y-3 border-t border-border-soft">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs text-muted-foreground mr-1">Sort</span>
                   {(
@@ -726,32 +736,6 @@ function Index() {
                       {label}
                     </button>
                   ))}
-                  <div
-                    className="ml-auto inline-flex rounded-full border border-border p-0.5"
-                    role="group"
-                    aria-label="Results view"
-                  >
-                    {(
-                      [
-                        ["cards", "Cards"],
-                        ["table", "Table"],
-                      ] as const
-                    ).map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        aria-pressed={viewMode === key}
-                        onClick={() => setViewMode(key)}
-                        className={`text-[10px] uppercase tracking-widest px-3 py-2 rounded-full transition ${
-                          viewMode === key
-                            ? "bg-gold/15 text-gold"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
                   <button
                     type="button"
                     aria-pressed={nonstopOnly}
@@ -896,7 +880,8 @@ function Index() {
                       })}
                   </div>
                 )}
-              </div>
+                </div>
+              </details>
             )}
 
             {pending ? (
