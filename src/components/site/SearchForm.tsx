@@ -332,9 +332,8 @@ export function SearchForm({
         </div>
       )}
 
-      {/* Per-field datalists so the "From" suggestions never bleed into
-          "To" and vice versa. We seed each with the curated list, then
-          merge live matches from the worldwide index on top. */}
+      {/* Per-field datalists: only the user's live matches are shown, so the
+          autocomplete stays small and relevant to what they typed. */}
       <AirportDatalist id="ml-airports-from" matches={fromMatches} />
       <AirportDatalist id="ml-airports-to" matches={toMatches} />
     </form>
