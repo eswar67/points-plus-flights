@@ -72,6 +72,36 @@ const CABIN_TO_FIELD: Record<Cabin, "Y" | "W" | "J" | "F"> = {
   first: "F",
 };
 
+// Approximate FX rates → USD. seats.aero returns TotalTaxes in the smallest
+// unit of TaxesCurrency, and our itinerary shape carries taxes as USD (the
+// UI converts USD → AUD downstream). Rates only need to be roughly right;
+// they're refreshed manually.
+const FX_TO_USD: Record<string, number> = {
+  USD: 1,
+  AUD: 0.65,
+  NZD: 0.6,
+  EUR: 1.08,
+  GBP: 1.27,
+  CAD: 0.73,
+  SGD: 0.74,
+  HKD: 0.128,
+  JPY: 0.0067,
+  CNY: 0.14,
+  KRW: 0.00072,
+  INR: 0.012,
+  AED: 0.27,
+  QAR: 0.27,
+  CHF: 1.12,
+  THB: 0.028,
+  MYR: 0.21,
+  IDR: 0.000063,
+  TWD: 0.031,
+  PHP: 0.017,
+  ZAR: 0.055,
+  MXN: 0.055,
+  BRL: 0.2,
+};
+
 export class SeatsAeroProvider implements AwardProvider {
   readonly name = "seats.aero" as const;
 
@@ -127,9 +157,13 @@ export class SeatsAeroProvider implements AwardProvider {
     const program = getProgram(programId);
 
     // seats.aero returns TotalTaxes in the smallest denomination of
-    // TaxesCurrency (i.e. cents), so always divide by 100.
+    // TaxesCurrency (i.e. cents). Convert to whole units, then FX to USD so
+    // downstream AUD conversion (× ~1.55) produces sane amounts regardless
+    // of the source currency (many programs quote AUD, SGD, GBP, etc.).
     const taxesRaw = (row[`${field}TotalTaxes`] as number | undefined) ?? 0;
-    const taxes = taxesRaw / 100;
+    const currency = (row.TaxesCurrency ?? "USD").toUpperCase();
+    const fx = FX_TO_USD[currency] ?? 1;
+    const taxes = (taxesRaw / 100) * fx;
     const seats = (row[`${field}RemainingSeats`] as number | undefined) ?? 0;
     const direct = (row[`${field}Direct`] as boolean | undefined) ?? false;
     const airlines = (row[`${field}Airlines`] as string | undefined) ?? "";
