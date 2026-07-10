@@ -177,7 +177,11 @@ function Index() {
       try {
         const range = rangeFor(q);
         const res = await searchAwards({
-          data: { from: q.from, to: q.to, ...range, cabin: q.cabin, pax: q.pax },
+          // Provider no longer filters by cabin — every cabin the source
+          // advertises for the trip is returned and the UI renders them
+          // side by side. We still keep `q.cabin` on the search query for
+          // downstream helpers (share URL, benchmark strip, PDF header).
+          data: { from: q.from, to: q.to, ...range, pax: q.pax },
         });
         setResult(res);
       } catch (e) {
@@ -510,7 +514,7 @@ function Index() {
                         `${animatedCount.toLocaleString()} option${sorted.length === 1 ? "" : "s"}`,
                         minMiles ? `from ${minMiles.toLocaleString()} pts` : null,
                         `${programFacets.size} program${programFacets.size === 1 ? "" : "s"}`,
-                        `${query.cabin} · ${query.pax} pax`,
+                        `All cabins · ${query.pax} pax`,
                         query.mode === "month"
                           ? new Date(monthStart + "T00:00:00").toLocaleDateString([], {
                               month: "long",
@@ -884,7 +888,7 @@ function Index() {
               />
             ) : itineraries.length === 0 && !error ? (
               <div className="rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">
-                No award space found for this route and date. Try a different cabin or nearby dates.
+                No award space found for this route and date. Try nearby dates or a different city pair.
               </div>
             ) : sorted.length === 0 && !error ? (
               <div className="rounded-lg border border-border bg-card p-10 text-center">
