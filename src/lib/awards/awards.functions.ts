@@ -25,7 +25,7 @@ const SearchSchema = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD")
       .optional(),
-    cabin: z.enum(["economy", "premium", "business", "first"]),
+    cabin: z.enum(["economy", "premium", "business", "first"]).optional(),
     pax: z.number().int().min(1).max(9),
   })
   .refine((d) => !d.dateTo || d.dateTo >= d.date, {
@@ -103,7 +103,9 @@ export const searchAwards = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<SearchResult> => {
     assertRateLimit(clientIp());
 
-    const cacheKey = [data.from, data.to, data.date, data.dateTo ?? "", data.cabin, data.pax]
+    // Cache key no longer includes cabin — one provider call returns every
+    // cabin for the trip, and the client renders them side-by-side.
+    const cacheKey = [data.from, data.to, data.date, data.dateTo ?? "", data.pax]
       .join("|")
       .toUpperCase();
     const cached = cacheGet(cacheKey);
