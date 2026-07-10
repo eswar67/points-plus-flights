@@ -54,7 +54,9 @@ export type DealReason = { label: string; detail: string };
  * Explain why a top pick leads its cabin, by comparing it against peers on the
  * same cabin. Returns 2–4 short bullets suitable for an expandable panel.
  */
-export function explainTopPick<T extends RankedItinerary & { isSweetSpot?: boolean; discountPct?: number }>(
+export function explainTopPick<
+  T extends RankedItinerary & { isSweetSpot?: boolean; discountPct?: number; baselineMiles?: number },
+>(
   top: T,
   peers: T[],
 ): DealReason[] {
