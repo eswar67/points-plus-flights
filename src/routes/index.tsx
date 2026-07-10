@@ -10,6 +10,7 @@ import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
 import { AwardCard } from "@/components/site/AwardCard";
 import { AwardTable } from "@/components/site/AwardTable";
 import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
+import { CABIN_LONG, CABIN_BLURB } from "@/lib/concierge";
 import { FlightScene } from "@/components/site/FlightScene";
 import { SearchingState } from "@/components/site/SearchingState";
 import { useCountUp } from "@/hooks/useCountUp";
@@ -132,7 +133,7 @@ function Index() {
     | "w-points"
     | "j-points"
     | "f-points"
-  >("points");
+  >("value");
   const [programFilter, setProgramFilter] = useState<Set<string> | null>(null);
   const [carrierFilter, setCarrierFilter] = useState<Set<string> | null>(null);
   const [gradeFilter, setGradeFilter] = useState<Set<string> | null>(null);
@@ -141,7 +142,8 @@ function Index() {
   const [bookableOnly, setBookableOnly] = useState(false);
   const [sweetOnly, setSweetOnly] = useState(false);
   const [hideZeroAvailability, setHideZeroAvailability] = useState(true);
-  const [viewMode, setViewMode] = useState<"cards" | "table">("table");
+  // Legacy view toggle removed — results always render as cabin-scoped tables.
+  const [expandedCabins, setExpandedCabins] = useState<Set<Cabin>>(new Set());
 
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
@@ -164,7 +166,7 @@ function Index() {
     pushRecent(q);
     setError(null);
     setSelectedDate(null);
-    setSortBy("points");
+    setSortBy("value");
     setProgramFilter(null);
     setCarrierFilter(null);
     setGradeFilter(null);
@@ -694,7 +696,17 @@ function Index() {
 
             {/* Results toolbar: sort, stops, program facets */}
             {!pending && !error && query.mode !== "month" && ranked.length > 0 && (
-              <div className="mb-6 space-y-3">
+              <details className="mb-6 group rounded-lg border border-border bg-card/40">
+                <summary className="cursor-pointer list-none px-4 py-3 flex items-center justify-between text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground transition">
+                  <span className="inline-flex items-center gap-2">
+                    <span>Refine</span>
+                    <span className="text-[10px] text-muted-foreground/70 normal-case tracking-normal">
+                      sort, filters & advanced options
+                    </span>
+                  </span>
+                  <span aria-hidden className="text-gold transition group-open:rotate-45">+</span>
+                </summary>
+                <div className="p-4 pt-2 space-y-3 border-t border-border-soft">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs text-muted-foreground mr-1">Sort</span>
                   {(
@@ -724,32 +736,6 @@ function Index() {
                       {label}
                     </button>
                   ))}
-                  <div
-                    className="ml-auto inline-flex rounded-full border border-border p-0.5"
-                    role="group"
-                    aria-label="Results view"
-                  >
-                    {(
-                      [
-                        ["cards", "Cards"],
-                        ["table", "Table"],
-                      ] as const
-                    ).map(([key, label]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        aria-pressed={viewMode === key}
-                        onClick={() => setViewMode(key)}
-                        className={`text-[10px] uppercase tracking-widest px-3 py-2 rounded-full transition ${
-                          viewMode === key
-                            ? "bg-gold/15 text-gold"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
                   <button
                     type="button"
                     aria-pressed={nonstopOnly}
@@ -894,7 +880,8 @@ function Index() {
                       })}
                   </div>
                 )}
-              </div>
+                </div>
+              </details>
             )}
 
             {pending ? (
@@ -975,52 +962,60 @@ function Index() {
                     })}
                   </div>
                 )}
-                <div className="space-y-8">
-                  {visibleDates.map((d) => (
-                    <div key={d}>
-                      {multiDate && !selectedDate && (
-                        <h3 className="text-xs uppercase tracking-widest text-muted-foreground mb-3">
-                          {new Date(d + "T00:00:00").toLocaleDateString([], {
-                            weekday: "long",
-                            day: "numeric",
-                            month: "long",
-                          })}
-                        </h3>
-                      )}
-                      {viewMode === "table" ? (
+                <div className="space-y-10">
+                  {(["economy", "premium", "business", "first"] as const).map((cabin) => {
+                    const cabinItems = sorted.filter((a) => a.cabin === cabin);
+                    if (cabinItems.length === 0) return null;
+                    if (cabin === "premium" && cabinItems.length < 2) return null;
+                    const cabinGroups = groupByTrip(cabinItems);
+                    const isExpanded = expandedCabins.has(cabin);
+                    const shown = isExpanded ? cabinGroups : cabinGroups.slice(0, 5);
+                    const remaining = cabinGroups.length - shown.length;
+                    return (
+                      <section key={cabin} aria-labelledby={`cabin-${cabin}`}>
+                        <header className="mb-3 flex items-end justify-between gap-4">
+                          <div>
+                            <h3
+                              id={`cabin-${cabin}`}
+                              className="font-display text-2xl md:text-3xl text-foreground"
+                            >
+                              {CABIN_LONG[cabin]}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+                              {CABIN_BLURB[cabin]}
+                            </p>
+                          </div>
+                          <span className="text-xs uppercase tracking-widest text-muted-foreground shrink-0">
+                            {cabinGroups.length} option{cabinGroups.length === 1 ? "" : "s"}
+                          </span>
+                        </header>
                         <AwardTable
-                          groups={groupsByDate.get(d) ?? []}
+                          groups={shown}
                           sortBy={sortBy}
                           onSort={setSortBy}
                           pax={query.pax}
+                          cabinScope={cabin}
                         />
-                      ) : (
-                      <div className="space-y-3">
-                        {(groupsByDate.get(d) ?? []).map((g, i) => {
-                          const a = g.best;
-                          return (
-                          <div
-                            key={g.tripKey}
-                            className="animate-card-in"
-                            style={{ "--stagger": Math.min(i, 8) } as React.CSSProperties}
-                          >
-                            <AwardCard
-                              award={a}
-                              variants={g.byCabin}
-                              balances={byProgramId}
-                              reason={reasonFor(a)}
-                              isSweetSpot={a.isSweetSpot}
-                              baselineMiles={a.baselineMiles}
-                              savingsMiles={a.savingsMiles}
-                              discountPct={a.discountPct}
-                            />
+                        {remaining > 0 && (
+                          <div className="mt-3 text-center">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpandedCabins((cur) => {
+                                  const next = new Set(cur);
+                                  next.add(cabin);
+                                  return next;
+                                })
+                              }
+                              className="text-xs uppercase tracking-widest px-4 py-2 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/50 transition"
+                            >
+                              Show {remaining} more in {CABIN_LONG[cabin]}
+                            </button>
                           </div>
-                          );
-                        })}
-                      </div>
-                      )}
-                    </div>
-                  ))}
+                        )}
+                      </section>
+                    );
+                  })}
                 </div>
               </>
             )}
