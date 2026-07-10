@@ -19,6 +19,12 @@ export type AwardItinerary = {
   seats: number;
   direct: boolean;
   updatedAt?: string; // ISO timestamp from provider; drives confidence score
+  /**
+   * Stable per-trip key. All itineraries sharing this key represent the
+   * same physical trip (source × availability × routing) — they only differ
+   * in cabin. Used to render seats.aero-style multi-cabin rows.
+   */
+  tripKey: string;
 };
 
 export type SearchInput = {
@@ -26,7 +32,11 @@ export type SearchInput = {
   to: string; // IATA, comma-allowed
   date: string; // YYYY-MM-DD (range start)
   dateTo?: string; // YYYY-MM-DD inclusive range end; defaults to `date`
-  cabin: Cabin;
+  /**
+   * Optional cabin hint. Provider ignores it and always returns every
+   * cabin the source advertises for the trip.
+   */
+  cabin?: Cabin;
   pax: number;
 };
 
