@@ -7,6 +7,7 @@ import heroWing800 from "@/assets/hero-wing-800.webp";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
+import { SearchWalkthrough, shouldAutoStart as shouldAutoStartTour } from "@/components/site/SearchWalkthrough";
 import { AwardCard } from "@/components/site/AwardCard";
 import { AwardTable } from "@/components/site/AwardTable";
 import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
@@ -117,6 +118,16 @@ function Index() {
   const { items: recent, push: pushRecent, clear: clearRecent } = useRecentSearches();
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [tourOpen, setTourOpen] = useState(false);
+
+  // Auto-start the walkthrough for first-time visitors, once the search form is on screen.
+  useEffect(() => {
+    if (urlSearch.from && urlSearch.to) return; // skip when arriving from a landing page
+    if (!shouldAutoStartTour()) return;
+    const t = setTimeout(() => setTourOpen(true), 900);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Results toolbar (point.me-grade result controls)
   const [sortBy, setSortBy] = useState<
@@ -490,6 +501,17 @@ function Index() {
 
           <div className="mt-6 md:mt-8">
             <SearchForm onSearch={runSearch} initial={query ?? undefined} />
+            {!query && (
+              <div className="mt-3 text-center md:text-left">
+                <button
+                  type="button"
+                  onClick={() => setTourOpen(true)}
+                  className="text-xs uppercase tracking-widest text-muted-foreground hover:text-gold transition inline-flex items-center gap-1.5"
+                >
+                  <span aria-hidden>✨</span> Show me around · 30-second tour
+                </button>
+              </div>
+            )}
           </div>
 
           {!query && (
@@ -1034,6 +1056,7 @@ function Index() {
       )}
 
       <Footer />
+      <SearchWalkthrough open={tourOpen} onClose={() => setTourOpen(false)} />
     </div>
   );
 }
