@@ -24,8 +24,8 @@ function expandMetros(codes: string): string {
 }
 
 const DEFAULTS: Pick<SearchFormQuery, "from" | "to" | "cabin" | "pax" | "mode"> = {
-  from: "SYD",
-  to: "SIN",
+  from: "",
+  to: "",
   cabin: "business",
   pax: 1,
   mode: "exact",
@@ -85,8 +85,8 @@ export function SearchForm({
   onSearch: (q: SearchFormQuery) => void;
   initial?: SearchFormQuery;
 }) {
-  const [from, setFrom] = useState(initial?.from ?? "SYD");
-  const [to, setTo] = useState(initial?.to ?? "SIN");
+  const [from, setFrom] = useState(initial?.from ?? "");
+  const [to, setTo] = useState(initial?.to ?? "");
   const [date, setDate] = useState(
     initial?.date ?? new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
   );
