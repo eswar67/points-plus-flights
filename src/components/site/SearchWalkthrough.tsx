@@ -128,18 +128,19 @@ export function SearchWalkthrough({
 
   return (
     <div className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="Walkthrough">
-      {/* Dimmed backdrop with a cut-out around the target */}
+      {/* Clickable backdrop outside the spotlight. The dimming itself comes from the
+          spotlight ring's outer shadow so the highlighted field stays crisp and readable. */}
       <button
         type="button"
         aria-label="Skip walkthrough"
         onClick={finish}
-        className="absolute inset-0 bg-background/80 backdrop-blur-[2px] cursor-default"
+        className="absolute inset-0 bg-transparent cursor-default"
         style={{ pointerEvents: "auto" }}
       />
-      {/* Spotlight ring */}
+      {/* Spotlight ring — outer shadow dims the rest of the page; the centre is fully transparent. */}
       <div
         aria-hidden
-        className="absolute rounded-lg ring-2 ring-gold shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] pointer-events-none transition-all duration-300"
+        className="absolute rounded-lg ring-2 ring-gold shadow-[0_0_0_9999px_rgba(0,0,0,0.55)] pointer-events-none transition-all duration-300"
         style={{
           top: highlight.top - window.scrollY,
           left: highlight.left,
