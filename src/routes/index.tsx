@@ -961,21 +961,24 @@ function Index() {
                       )}
                       {viewMode === "table" ? (
                         <AwardTable
-                          rows={byDate.get(d) ?? []}
+                          groups={groupsByDate.get(d) ?? []}
                           sortBy={sortBy}
                           onSort={setSortBy}
                           pax={query.pax}
                         />
                       ) : (
                       <div className="space-y-3">
-                        {(byDate.get(d) ?? []).map((a, i) => (
+                        {(groupsByDate.get(d) ?? []).map((g, i) => {
+                          const a = g.best;
+                          return (
                           <div
-                            key={a.id}
+                            key={g.tripKey}
                             className="animate-card-in"
                             style={{ "--stagger": Math.min(i, 8) } as React.CSSProperties}
                           >
                             <AwardCard
                               award={a}
+                              variants={g.byCabin}
                               balances={byProgramId}
                               reason={reasonFor(a)}
                               isSweetSpot={a.isSweetSpot}
@@ -984,7 +987,8 @@ function Index() {
                               discountPct={a.discountPct}
                             />
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                       )}
                     </div>
