@@ -30,7 +30,18 @@ type SortKey =
   | "stops"
   | "depart"
   | "fresh"
-  | "sweet";
+  | "sweet"
+  | "y-points"
+  | "w-points"
+  | "j-points"
+  | "f-points";
+
+const CABIN_SORT_KEY: Record<Cabin, SortKey> = {
+  economy: "y-points",
+  premium: "w-points",
+  business: "j-points",
+  first: "f-points",
+};
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -130,9 +141,13 @@ export function AwardTable({
             </th>
             {CABIN_ORDER.map((c) => (
               <th key={c} className="text-right px-3 py-3 font-normal">
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                <HeaderButton
+                  align="right"
+                  active={sortBy === CABIN_SORT_KEY[c]}
+                  onClick={() => onSort(CABIN_SORT_KEY[c])}
+                >
                   {CABIN_LABEL[c]}
-                </div>
+                </HeaderButton>
               </th>
             ))}
             <th className="text-right px-4 py-3 font-normal">
