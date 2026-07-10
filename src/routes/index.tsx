@@ -288,7 +288,27 @@ function Index() {
                           b.discountPct - a.discountPct ||
                           a.miles - b.miles,
                       )
-                    : filtered; // "value" keeps the CPP-first ranking
+                    : sortBy === "y-points" ||
+                        sortBy === "w-points" ||
+                        sortBy === "j-points" ||
+                        sortBy === "f-points"
+                      ? (() => {
+                          const cabinFor: Record<string, "economy" | "premium" | "business" | "first"> = {
+                            "y-points": "economy",
+                            "w-points": "premium",
+                            "j-points": "business",
+                            "f-points": "first",
+                          };
+                          const target = cabinFor[sortBy];
+                          return [...filtered].sort((a, b) => {
+                            const aMatch = a.cabin === target;
+                            const bMatch = b.cabin === target;
+                            if (aMatch && !bMatch) return -1;
+                            if (!aMatch && bMatch) return 1;
+                            return a.miles - b.miles;
+                          });
+                        })()
+                      : filtered; // "value" keeps the CPP-first ranking
 
   function toggleGrade(g: string) {
     setGradeFilter((cur) => {
