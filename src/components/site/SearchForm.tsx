@@ -1,6 +1,12 @@
-import { useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
-import { AIRPORTS, METROS } from "@/lib/airports";
+import {
+  AIRPORTS,
+  METROS,
+  searchAirports,
+  warmAirportIndex,
+  type Airport,
+} from "@/lib/airports";
 
 export type SearchMode = "exact" | "flex1" | "flex" | "month";
 
@@ -96,14 +102,44 @@ export function SearchForm({
   const [mode, setMode] = useState<SearchMode>(initial?.mode ?? "flex");
   const [errors, setErrors] = useState<{ from?: string; to?: string }>({});
   const [showMore, setShowMore] = useState(false);
+  const [fromMatches, setFromMatches] = useState<Airport[]>([]);
+  const [toMatches, setToMatches] = useState<Airport[]>([]);
+
+  // Warm the worldwide airport index on mount so typing feels instant.
+  useEffect(() => {
+    warmAirportIndex();
+  }, []);
 
   const today = new Date().toISOString().slice(0, 10);
+
+  /** Extract the last comma-separated token — that's what the user is
+   *  currently typing, e.g. "SYD,MEL,HYD" → "HYD". */
+  function activeToken(v: string): string {
+    const parts = v.split(",");
+    return (parts[parts.length - 1] ?? "").trim();
+  }
+
+  async function refreshMatches(
+    raw: string,
+    setter: (a: Airport[]) => void,
+  ): Promise<void> {
+    const token = activeToken(raw);
+    if (!token || token.length < 2) {
+      setter([]);
+      return;
+    }
+    const hits = await searchAirports(token, 10);
+    setter(hits);
+  }
 
   function submit(e: FormEvent) {
     e.preventDefault();
     // Expand any metro codes (NYC → JFK,EWR,LGA) just before validation/search.
-    const fromExpanded = expandMetros(from);
-    const toExpanded = expandMetros(to);
+    // Free-text city names (e.g. "Hyderabad") are also allowed — the input
+    // handler swaps them to the matching IATA code as the user picks from
+    // the autocomplete list, so by submit-time we should only see codes.
+    const fromExpanded = expandMetros(from.toUpperCase());
+    const toExpanded = expandMetros(to.toUpperCase());
     if (fromExpanded !== from) setFrom(fromExpanded);
     if (toExpanded !== to) setTo(toExpanded);
     const errs: { from?: string; to?: string } = {};
@@ -140,6 +176,8 @@ export function SearchForm({
     setPax(DEFAULTS.pax);
     setMode(DEFAULTS.mode);
     setErrors({});
+    setFromMatches([]);
+    setToMatches([]);
   }
 
   return (
@@ -152,15 +190,22 @@ export function SearchForm({
           <input
             value={from}
             onChange={(e) => {
-              setFrom(normalizeCodes(e.target.value));
+              const raw = e.target.value;
+              // Allow letters, digits, spaces and commas while typing so
+              // city names like "Hyderabad" are searchable. We normalise
+              // to IATA codes when a match is picked or on submit.
+              const cleaned = raw.replace(/[^A-Za-z, ]/g, "");
+              setFrom(cleaned);
               setErrors((x) => ({ ...x, from: undefined }));
+              void refreshMatches(cleaned, setFromMatches);
             }}
+            onBlur={() => setFrom((v) => normalizeCodes(v))}
             maxLength={400}
             required
             aria-invalid={!!errors.from}
-            placeholder="City or airport (e.g. SYD)"
-            title="Airport code, e.g. SYD. Combine with commas for multiple: SYD,MEL"
-            list="ml-airports"
+            placeholder="City or airport (e.g. Sydney or SYD)"
+            title="Type any city name or IATA code. Combine with commas for multiple: SYD,MEL"
+            list="ml-airports-from"
             autoComplete="off"
             spellCheck={false}
             className="w-full bg-transparent text-xl md:text-2xl font-display tracking-wider text-foreground outline-none"
@@ -170,15 +215,19 @@ export function SearchForm({
           <input
             value={to}
             onChange={(e) => {
-              setTo(normalizeCodes(e.target.value));
+              const raw = e.target.value;
+              const cleaned = raw.replace(/[^A-Za-z, ]/g, "");
+              setTo(cleaned);
               setErrors((x) => ({ ...x, to: undefined }));
+              void refreshMatches(cleaned, setToMatches);
             }}
+            onBlur={() => setTo((v) => normalizeCodes(v))}
             maxLength={400}
             required
             aria-invalid={!!errors.to}
-            placeholder="City or airport (e.g. LHR)"
-            title="Airport code, e.g. LHR. Combine with commas for multiple: LHR,CDG"
-            list="ml-airports"
+            placeholder="City or airport (e.g. London or LHR)"
+            title="Type any city name or IATA code. Combine with commas for multiple: LHR,CDG"
+            list="ml-airports-to"
             autoComplete="off"
             spellCheck={false}
             className="w-full bg-transparent text-xl md:text-2xl font-display tracking-wider text-foreground outline-none"
@@ -284,12 +333,36 @@ export function SearchForm({
         </div>
       )}
 
-      <datalist id="ml-airports">
-        {AIRPORTS.map((a) => (
-          <option key={a.code} value={a.code} label={`${a.city} · ${a.country}`} />
-        ))}
-      </datalist>
+      {/* Per-field datalists so the "From" suggestions never bleed into
+          "To" and vice versa. We seed each with the curated list, then
+          merge live matches from the worldwide index on top. */}
+      <AirportDatalist id="ml-airports-from" matches={fromMatches} />
+      <AirportDatalist id="ml-airports-to" matches={toMatches} />
     </form>
+  );
+}
+
+function AirportDatalist({ id, matches }: { id: string; matches: Airport[] }) {
+  // De-dupe: matches from the global index win over curated when both are
+  // present, so a live "Hyderabad" hit replaces a stale curated entry.
+  const seen = new Set<string>();
+  const combined: Airport[] = [];
+  for (const a of matches) {
+    if (seen.has(a.code)) continue;
+    seen.add(a.code);
+    combined.push(a);
+  }
+  for (const a of AIRPORTS) {
+    if (seen.has(a.code)) continue;
+    seen.add(a.code);
+    combined.push(a);
+  }
+  return (
+    <datalist id={id}>
+      {combined.map((a) => (
+        <option key={a.code} value={a.code} label={`${a.city} · ${a.country}`} />
+      ))}
+    </datalist>
   );
 }
 

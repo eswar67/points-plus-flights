@@ -196,3 +196,86 @@ export const METROS: { code: string; label: string; airports: string[] }[] = [
   { code: "BER", label: "Berlin", airports: ["BER"] },
   { code: "STO", label: "Stockholm", airports: ["ARN"] },
 ];
+
+// ---------------------------------------------------------------------------
+// Global airport search (lazy-loaded)
+// ---------------------------------------------------------------------------
+// The curated `AIRPORTS` list above powers hero autocomplete for the routes
+// we know and love. For everything else, we lazy-load a compact worldwide
+// IATA index (~260KB gzipped smaller) so users can search by code (HYD) or
+// city name ("Hyderabad") without us having to hand-curate every route.
+
+type CompactAirport = { c: string; y: string; n: string };
+
+let fullIndexPromise: Promise<Airport[]> | null = null;
+
+/** 2-letter ISO country codes → human-readable names via the browser's
+ *  built-in Intl.DisplayNames (no data cost). Falls back to the code. */
+function countryName(iso2: string): string {
+  try {
+    // eslint-disable-next-line new-cap
+    const dn = new Intl.DisplayNames(["en"], { type: "region" });
+    return dn.of(iso2) ?? iso2;
+  } catch {
+    return iso2;
+  }
+}
+
+async function loadFullIndex(): Promise<Airport[]> {
+  if (!fullIndexPromise) {
+    fullIndexPromise = import("@/data/airports-full.json").then((mod) => {
+      const raw = (mod.default ?? mod) as CompactAirport[];
+      return raw.map((a) => ({
+        code: a.c,
+        city: a.y,
+        country: countryName(a.n),
+      }));
+    });
+  }
+  return fullIndexPromise;
+}
+
+/** Warm the global airport index on idle so the first keystroke is instant. */
+export function warmAirportIndex(): void {
+  if (typeof window === "undefined") return;
+  const idle =
+    (window as unknown as { requestIdleCallback?: (cb: () => void) => void })
+      .requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 400));
+  idle(() => {
+    void loadFullIndex();
+  });
+}
+
+/**
+ * Fuzzy-ish search across code, city and country. Returns at most `limit`
+ * matches, curated list first (so hand-picked "Sydney" beats "Sidney, MT").
+ */
+export async function searchAirports(query: string, limit = 12): Promise<Airport[]> {
+  const q = query.trim().toUpperCase();
+  if (!q) return [];
+  const all = await loadFullIndex();
+
+  // Rank: exact code (0) > code prefix (1) > city startsWith (2) > city
+  // contains (3) > country contains (4). Lower score = better.
+  const scored: { a: Airport; s: number }[] = [];
+  for (const a of all) {
+    const code = a.code;
+    const cityU = a.city.toUpperCase();
+    const countryU = a.country.toUpperCase();
+    let s = -1;
+    if (code === q) s = 0;
+    else if (code.startsWith(q)) s = 1;
+    else if (cityU.startsWith(q)) s = 2;
+    else if (cityU.includes(q)) s = 3;
+    else if (countryU.includes(q)) s = 4;
+    if (s >= 0) scored.push({ a, s });
+  }
+  scored.sort((x, y) => x.s - y.s || x.a.code.localeCompare(y.a.code));
+  return scored.slice(0, limit).map((x) => x.a);
+}
+
+/** Sync lookup for a single code — checks curated first, then the full
+ *  index if it has already been loaded. Returns undefined otherwise. */
+export function lookupAirport(code: string): Airport | undefined {
+  return AIRPORT_BY_CODE[code.toUpperCase()];
+}
