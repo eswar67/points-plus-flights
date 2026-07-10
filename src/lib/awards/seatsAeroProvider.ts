@@ -78,6 +78,27 @@ type RawAvailability = {
   JTotalTaxes?: number;
   FTotalTaxes?: number;
   TaxesCurrency?: string; // usually "USD"
+  AvailabilityTrips?: RawTrip[];
+};
+
+type RawTrip = {
+  ID: string;
+  AvailabilityID?: string;
+  TotalDuration?: number;
+  Stops?: number;
+  Carriers?: string;
+  RemainingSeats?: number;
+  MileageCost?: number;
+  TotalTaxes?: number;
+  TaxesCurrency?: string;
+  OriginAirport?: string;
+  DestinationAirport?: string;
+  FlightNumbers?: string;
+  DepartsAt?: string;
+  ArrivesAt?: string;
+  Cabin?: string;
+  Source?: string;
+  UpdatedAt?: string;
 };
 
 type SearchResponse = {
@@ -140,6 +161,11 @@ export class SeatsAeroProvider implements AwardProvider {
       // No `sources` filter: every program seats.aero tracks is searched.
       take: "1000",
       order_by: "lowest_mileage",
+      // Expand each daily availability into individual trip options
+      // (different routings / connections). Without this, we return one
+      // itinerary per (source, date) and hide dozens of alternates that
+      // seats.aero's own UI shows.
+      include_trips: "true",
     });
 
     const url = `${BASE_URL}?${params.toString()}`;
@@ -160,9 +186,56 @@ export class SeatsAeroProvider implements AwardProvider {
     const json = (await res.json()) as SearchResponse;
     const rows = json.data ?? [];
 
-    return rows
-      .map((row) => this.toItinerary(row, input))
-      .filter((x): x is AwardItinerary => x !== null);
+    const out: AwardItinerary[] = [];
+    for (const row of rows) {
+      const trips = (row.AvailabilityTrips ?? []).filter(
+        (t) => t.Cabin === input.cabin && (t.MileageCost ?? 0) > 0,
+      );
+      if (trips.length > 0) {
+        for (const trip of trips) out.push(this.tripToItinerary(row, trip, input));
+      } else {
+        // Fallback: source didn't return trip breakdown — keep the daily row.
+        const it = this.toItinerary(row, input);
+        if (it) out.push(it);
+      }
+    }
+    return out;
+  }
+
+  private tripToItinerary(
+    row: RawAvailability,
+    trip: RawTrip,
+    input: SearchInput,
+  ): AwardItinerary {
+    const sourceSlug = trip.Source ?? row.Source ?? "";
+    const programId = SOURCE_TO_PROGRAM[sourceSlug] ?? sourceSlug;
+    const program = getProgram(programId);
+    const miles = trip.MileageCost ?? 0;
+    const currency = (trip.TaxesCurrency ?? row.TaxesCurrency ?? "USD").toUpperCase();
+    const fx = FX_TO_USD[currency] ?? 1;
+    const taxes = ((trip.TotalTaxes ?? 0) / 100) * fx;
+    const stops = trip.Stops ?? 0;
+    const carrier = (trip.Carriers ?? "").split(",")[0]?.trim() || "Multiple";
+    return {
+      id: `${trip.ID}-${CABIN_TO_FIELD[input.cabin]}`,
+      programId,
+      programName: program?.name ?? sourceSlug,
+      carrier,
+      flightNo: trip.FlightNumbers ?? "",
+      from: trip.OriginAirport ?? row.Route?.OriginAirport ?? input.from.toUpperCase(),
+      to: trip.DestinationAirport ?? row.Route?.DestinationAirport ?? input.to.toUpperCase(),
+      depart: trip.DepartsAt ?? row.Date ?? input.date,
+      arrive: trip.ArrivesAt ?? row.Date ?? input.date,
+      durationMin: trip.TotalDuration ?? 0,
+      stops,
+      cabin: input.cabin,
+      miles: miles * input.pax,
+      pax: input.pax,
+      taxesUsd: Math.round(taxes * input.pax),
+      seats: trip.RemainingSeats ?? 0,
+      direct: stops === 0,
+      updatedAt: trip.UpdatedAt ?? row.UpdatedAt,
+    };
   }
 
   private toItinerary(row: RawAvailability, input: SearchInput): AwardItinerary | null {
