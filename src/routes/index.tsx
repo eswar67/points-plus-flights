@@ -27,6 +27,8 @@ import {
   type RankedItinerary,
   annotateSweetSpots,
   type SweetSpotInfo,
+  groupByTrip,
+  type TripGroup,
 } from "@/lib/intelligence";
 import { useUserBalances } from "@/hooks/useUserBalances";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
@@ -395,6 +397,14 @@ function Index() {
   const daySummaries: Record<string, DaySummary> = {};
   for (const [d, list] of byDate) {
     daySummaries[d] = { cpp: list[0].cpp, grade: list[0].grade, count: list.length };
+  }
+
+  // Trip grouping: multiple cabin variants share a tripKey. Groups preserve
+  // the underlying sort order via the position of their first (best-ranked)
+  // variant in `sorted`.
+  const groupsByDate = new Map<string, TripGroup<Enriched>[]>();
+  for (const [d, list] of byDate) {
+    groupsByDate.set(d, groupByTrip(list));
   }
 
   const monthStart = query ? query.date.slice(0, 8) + "01" : "";
