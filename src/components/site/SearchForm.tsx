@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
-import { AIRPORTS, CONTINENTS, METROS } from "@/lib/airports";
+import { AIRPORTS, METROS } from "@/lib/airports";
 
 export type SearchMode = "exact" | "flex1" | "flex" | "month";
 
@@ -126,14 +126,6 @@ export function SearchForm({
     });
   }
 
-  function addContinent(side: "from" | "to", codes: string[]) {
-    const setter = side === "from" ? setFrom : setTo;
-    const current = (side === "from" ? from : to).split(",").filter(Boolean);
-    const merged = Array.from(new Set([...current, ...codes]));
-    setter(merged.join(","));
-    setErrors((x) => ({ ...x, [side]: undefined }));
-  }
-
   function swap() {
     setFrom(to);
     setTo(from);
@@ -173,7 +165,7 @@ export function SearchForm({
           Reset
         </button>
         <span className="text-xs text-muted-foreground ml-1 hidden sm:inline">
-          Tip: combine codes with commas (e.g. <span className="tabular-nums">SYD,MEL</span>) or tap a continent below.
+          Tip: combine codes with commas — e.g. <span className="tabular-nums">SYD,MEL</span>.
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1.2fr_1fr_0.8fr_auto] gap-2">
@@ -286,51 +278,12 @@ export function SearchForm({
         ))}
       </div>
 
-      <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 px-1">
-        <ContinentRow
-          label="From continent"
-          onPick={(codes) => addContinent("from", codes)}
-        />
-        <ContinentRow
-          label="To continent"
-          onPick={(codes) => addContinent("to", codes)}
-        />
-      </div>
-
-
       <datalist id="ml-airports">
         {AIRPORTS.map((a) => (
           <option key={a.code} value={a.code} label={`${a.city} · ${a.country}`} />
         ))}
       </datalist>
     </form>
-  );
-}
-
-function ContinentRow({
-  label,
-  onPick,
-}: {
-  label: string;
-  onPick: (codes: string[]) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5" aria-label={label}>
-      <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">
-        {label}
-      </span>
-      {CONTINENTS.map((c) => (
-        <button
-          key={c.value}
-          type="button"
-          onClick={() => onPick(c.codes)}
-          title={`Add all ${c.codes.length} airports in ${c.label}`}
-          className="text-xs px-2.5 py-1.5 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/50 transition"
-        >
-          {c.label}
-        </button>
-      ))}
-    </div>
   );
 }
 
