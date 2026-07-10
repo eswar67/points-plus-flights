@@ -287,33 +287,6 @@ export function SearchForm({
   );
 }
 
-function ContinentRow({
-  label,
-  onPick,
-}: {
-  label: string;
-  onPick: (codes: string[]) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5" aria-label={label}>
-      <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">
-        {label}
-      </span>
-      {CONTINENTS.map((c) => (
-        <button
-          key={c.value}
-          type="button"
-          onClick={() => onPick(c.codes)}
-          title={`Add all ${c.codes.length} airports in ${c.label}`}
-          className="text-xs px-2.5 py-1.5 rounded-full border border-border text-muted-foreground hover:text-gold hover:border-gold/50 transition"
-        >
-          {c.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function Field({
   label,
   error,
