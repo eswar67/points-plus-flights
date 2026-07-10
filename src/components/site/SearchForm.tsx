@@ -2,13 +2,6 @@ import { useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
 import { AIRPORTS, CONTINENTS, METROS } from "@/lib/airports";
 
-const CABINS: { value: Cabin; label: string }[] = [
-  { value: "economy", label: "Economy" },
-  { value: "premium", label: "Premium" },
-  { value: "business", label: "Business" },
-  { value: "first", label: "First" },
-];
-
 export type SearchMode = "exact" | "flex1" | "flex" | "month";
 
 const MODES: { value: SearchMode; label: string }[] = [
@@ -74,6 +67,12 @@ export type SearchFormQuery = {
   from: string;
   to: string;
   date: string;
+  /**
+   * Legacy field kept so existing recent-searches / shared URLs / downstream
+   * code that references a "selected cabin" continues to work. The search
+   * itself no longer filters by cabin — every cabin is returned and rendered
+   * side by side in the results table.
+   */
   cabin: Cabin;
   pax: number;
   mode: SearchMode;
@@ -91,7 +90,8 @@ export function SearchForm({
   const [date, setDate] = useState(
     initial?.date ?? new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
   );
-  const [cabin, setCabin] = useState<Cabin>(initial?.cabin ?? "business");
+  // Kept in state for `initial` compat; not user-editable anymore.
+  const [cabin] = useState<Cabin>(initial?.cabin ?? "business");
   const [pax, setPax] = useState(initial?.pax ?? 1);
   const [mode, setMode] = useState<SearchMode>(initial?.mode ?? "exact");
   const [errors, setErrors] = useState<{ from?: string; to?: string }>({});
@@ -144,7 +144,6 @@ export function SearchForm({
     setFrom(DEFAULTS.from);
     setTo(DEFAULTS.to);
     setDate(new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10));
-    setCabin(DEFAULTS.cabin);
     setPax(DEFAULTS.pax);
     setMode(DEFAULTS.mode);
     setErrors({});
@@ -177,7 +176,7 @@ export function SearchForm({
           Tip: combine codes with commas (e.g. <span className="tabular-nums">SYD,MEL</span>) or tap a continent below.
         </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1.2fr_1fr_1fr_0.8fr_auto] gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1.2fr_1fr_0.8fr_auto] gap-2">
         <Field label="From" error={errors.from}>
           <input
             value={from}
@@ -220,19 +219,6 @@ export function SearchForm({
             onChange={(e) => setDate(e.target.value)}
             className="w-full bg-transparent text-sm text-foreground outline-none [color-scheme:dark]"
           />
-        </Field>
-        <Field label="Cabin">
-          <select
-            value={cabin}
-            onChange={(e) => setCabin(e.target.value as Cabin)}
-            className="w-full bg-transparent text-sm text-foreground outline-none"
-          >
-            {CABINS.map((c) => (
-              <option key={c.value} value={c.value} className="bg-card">
-                {c.label}
-              </option>
-            ))}
-          </select>
         </Field>
         <Field label="Pax">
           <input
