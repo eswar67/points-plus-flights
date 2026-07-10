@@ -343,8 +343,9 @@ export function SearchForm({
 }
 
 function AirportDatalist({ id, matches }: { id: string; matches: Airport[] }) {
-  // De-dupe: matches from the global index win over curated when both are
-  // present, so a live "Hyderabad" hit replaces a stale curated entry.
+  // Only show live matches; don't seed the list with every curated airport.
+  // This keeps the browser's autocomplete dropdown small and relevant to
+  // what the user is currently typing.
   const seen = new Set<string>();
   const combined: Airport[] = [];
   for (const a of matches) {
@@ -352,11 +353,7 @@ function AirportDatalist({ id, matches }: { id: string; matches: Airport[] }) {
     seen.add(a.code);
     combined.push(a);
   }
-  for (const a of AIRPORTS) {
-    if (seen.has(a.code)) continue;
-    seen.add(a.code);
-    combined.push(a);
-  }
+  if (combined.length === 0) return null;
   return (
     <datalist id={id}>
       {combined.map((a) => (
