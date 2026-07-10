@@ -264,6 +264,45 @@ export function AwardCard({
         </div>
       )}
 
+      {/* Cabin picker — one tile per cabin the trip advertises. Mirrors the
+          seats.aero row layout: Y / W / J / F side-by-side, clickable to swap
+          the card body to that redemption. */}
+      {variants && Object.keys(variants).length > 1 && (
+        <div
+          className={`mt-4 grid grid-cols-4 gap-2 ${isSweetSpot ? "px-8" : "px-6"}`}
+          role="tablist"
+          aria-label="Cabins on this trip"
+        >
+          {CABIN_ORDER.map((c) => {
+            const v = variants[c];
+            const isSelected = selectedCabin === c;
+            const disabled = !v || v.miles <= 0;
+            return (
+              <button
+                key={c}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                disabled={disabled}
+                onClick={() => v && setSelectedCabin(c)}
+                className={`text-left rounded-md border px-2.5 py-1.5 transition ${
+                  disabled
+                    ? "border-border-soft/60 text-muted-foreground/40 cursor-not-allowed"
+                    : isSelected
+                      ? "border-gold/60 bg-gold/10 text-gold"
+                      : "border-border-soft text-muted-foreground hover:border-gold/40 hover:text-foreground"
+                }`}
+              >
+                <div className="text-[9px] uppercase tracking-[0.2em]">{CABIN_LABEL[c]}</div>
+                <div className="font-mono tabular-nums text-sm mt-0.5">
+                  {v && v.miles > 0 ? v.miles.toLocaleString() : "—"}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Grade + cash-comparison strip */}
       <div
         className={`flex flex-wrap items-center gap-2 mt-4 ${
