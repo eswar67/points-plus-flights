@@ -124,11 +124,11 @@ export function SearchForm({
     setter: (a: Airport[]) => void,
   ): Promise<void> {
     const token = activeToken(raw);
-    if (!token || token.length < 2) {
+    if (!token || token.length < 3) {
       setter([]);
       return;
     }
-    const hits = await searchAirports(token, 10);
+    const hits = await searchAirports(token, 5);
     setter(hits);
   }
 
