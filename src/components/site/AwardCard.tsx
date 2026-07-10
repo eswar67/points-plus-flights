@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AwardItinerary } from "@/lib/awards/types";
+import type { AwardItinerary, Cabin } from "@/lib/awards/types";
 import { PROGRAMS } from "@/lib/programs";
 import { PlaybookDrawer } from "./PlaybookDrawer";
 import {
@@ -17,6 +17,14 @@ import {
 import { AlertTriangle, Bookmark, BookmarkCheck, Check, GitCompare, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
 import { useShortlist } from "@/hooks/useShortlist";
 import { useCompare } from "@/hooks/useCompare";
+
+const CABIN_ORDER: Cabin[] = ["economy", "premium", "business", "first"];
+const CABIN_LABEL: Record<Cabin, string> = {
+  economy: "Economy",
+  premium: "Premium",
+  business: "Business",
+  first: "First",
+};
 
 function fmtDuration(min: number) {
   if (!min) return "—";
@@ -39,6 +47,7 @@ function fmtTime(value: string) {
 
 export function AwardCard({
   award,
+  variants,
   balances = {},
   reason,
   isSweetSpot,
@@ -47,6 +56,12 @@ export function AwardCard({
   discountPct,
 }: {
   award: AwardItinerary;
+  /**
+   * When present, renders a cabin selector strip above the card body listing
+   * every cabin available on this trip. Clicking a cabin swaps the card
+   * content to that redemption.
+   */
+  variants?: Partial<Record<Cabin, AwardItinerary>>;
   balances?: Record<string, number>;
   reason?: string;
   isSweetSpot?: boolean;
@@ -55,36 +70,40 @@ export function AwardCard({
   discountPct?: number;
 }) {
   const [open, setOpen] = useState(false);
+  const [selectedCabin, setSelectedCabin] = useState<Cabin>(award.cabin);
+  // Resolve the itinerary to display based on the selected cabin (falls
+  // back to the incoming `award` when the picker isn't in use).
+  const active = variants?.[selectedCabin] ?? award;
   const { has, toggle } = useShortlist();
-  const saved = has(award.id);
+  const saved = has(active.id);
   const [flash, setFlash] = useState(false);
   const compare = useCompare();
-  const compareSelected = compare.has(award.id);
+  const compareSelected = compare.has(active.id);
   const [compareShake, setCompareShake] = useState(false);
   const byProgramId = balances;
-  const program = PROGRAMS.find((p) => p.id === award.programId);
+  const program = PROGRAMS.find((p) => p.id === active.programId);
   const accent = program?.accent ?? "#c9a84c";
-  const programName = program?.name ?? award.programName;
+  const programName = program?.name ?? active.programName;
   const alliance = program?.alliance ?? "Partner program";
 
-  const cpp = calcCppAud(award);
-  const grade = gradeCpp(cpp, award.cabin);
-  const confidence = confidenceFor(award);
-  const fare = fareEstimateAud(award.from, award.to, award.cabin);
-  const balance = byProgramId[award.programId] ?? 0;
-  const shortfall = Math.max(0, award.miles - balance);
-  const fastest = shortfall > 0 ? transfersFor(award.programId)[0] : undefined;
+  const cpp = calcCppAud(active);
+  const grade = gradeCpp(cpp, active.cabin);
+  const confidence = confidenceFor(active);
+  const fare = fareEstimateAud(active.from, active.to, active.cabin);
+  const balance = byProgramId[active.programId] ?? 0;
+  const shortfall = Math.max(0, active.miles - balance);
+  const fastest = shortfall > 0 ? transfersFor(active.programId)[0] : undefined;
   const transferTooSlow = !!fastest && fastest.etaMin > 60 && confidence.ageMin < 30;
 
   // Bookability against the user's tracked balances (direct + transfer reach)
   const hasAnyBalance = Object.keys(byProgramId).length > 0;
   const reach = hasAnyBalance ? effectiveBalances(byProgramId) : {};
-  const effective = reach[award.programId]?.total ?? balance;
+  const effective = reach[active.programId]?.total ?? balance;
   const bookable: "direct" | "transfer" | "short" | null = !hasAnyBalance
     ? null
-    : balance >= award.miles
+    : balance >= active.miles
       ? "direct"
-      : effective >= award.miles
+      : effective >= active.miles
         ? "transfer"
         : "short";
 
@@ -102,11 +121,11 @@ export function AwardCard({
 
   // Value meter: how far this CPP sits along the road to "exceptional" for the cabin.
   const exceptionalCpp =
-    award.cabin === "first"
+    active.cabin === "first"
       ? 6.0
-      : award.cabin === "business"
+      : active.cabin === "business"
         ? 5.0
-        : award.cabin === "premium"
+        : active.cabin === "premium"
           ? 3.5
           : 2.5;
   const meterPct = Math.max(4, Math.min(100, (cpp / (exceptionalCpp * 1.15)) * 100));
