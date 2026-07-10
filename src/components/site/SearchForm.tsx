@@ -1,7 +1,6 @@
 import { useEffect, useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
 import {
-  AIRPORTS,
   METROS,
   searchAirports,
   warmAirportIndex,
@@ -124,11 +123,11 @@ export function SearchForm({
     setter: (a: Airport[]) => void,
   ): Promise<void> {
     const token = activeToken(raw);
-    if (!token || token.length < 2) {
+    if (!token || token.length < 3) {
       setter([]);
       return;
     }
-    const hits = await searchAirports(token, 10);
+    const hits = await searchAirports(token, 5);
     setter(hits);
   }
 
@@ -333,9 +332,8 @@ export function SearchForm({
         </div>
       )}
 
-      {/* Per-field datalists so the "From" suggestions never bleed into
-          "To" and vice versa. We seed each with the curated list, then
-          merge live matches from the worldwide index on top. */}
+      {/* Per-field datalists: only the user's live matches are shown, so the
+          autocomplete stays small and relevant to what they typed. */}
       <AirportDatalist id="ml-airports-from" matches={fromMatches} />
       <AirportDatalist id="ml-airports-to" matches={toMatches} />
     </form>
@@ -343,8 +341,9 @@ export function SearchForm({
 }
 
 function AirportDatalist({ id, matches }: { id: string; matches: Airport[] }) {
-  // De-dupe: matches from the global index win over curated when both are
-  // present, so a live "Hyderabad" hit replaces a stale curated entry.
+  // Only show live matches; don't seed the list with every curated airport.
+  // This keeps the browser's autocomplete dropdown small and relevant to
+  // what the user is currently typing.
   const seen = new Set<string>();
   const combined: Airport[] = [];
   for (const a of matches) {
@@ -352,11 +351,7 @@ function AirportDatalist({ id, matches }: { id: string; matches: Airport[] }) {
     seen.add(a.code);
     combined.push(a);
   }
-  for (const a of AIRPORTS) {
-    if (seen.has(a.code)) continue;
-    seen.add(a.code);
-    combined.push(a);
-  }
+  if (combined.length === 0) return null;
   return (
     <datalist id={id}>
       {combined.map((a) => (
