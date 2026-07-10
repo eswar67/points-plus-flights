@@ -10,6 +10,7 @@ import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
 import { AwardCard } from "@/components/site/AwardCard";
 import { AwardTable } from "@/components/site/AwardTable";
 import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
+import { CABIN_LONG, CABIN_BLURB } from "@/lib/concierge";
 import { FlightScene } from "@/components/site/FlightScene";
 import { SearchingState } from "@/components/site/SearchingState";
 import { useCountUp } from "@/hooks/useCountUp";
@@ -132,7 +133,7 @@ function Index() {
     | "w-points"
     | "j-points"
     | "f-points"
-  >("points");
+  >("value");
   const [programFilter, setProgramFilter] = useState<Set<string> | null>(null);
   const [carrierFilter, setCarrierFilter] = useState<Set<string> | null>(null);
   const [gradeFilter, setGradeFilter] = useState<Set<string> | null>(null);
@@ -141,7 +142,8 @@ function Index() {
   const [bookableOnly, setBookableOnly] = useState(false);
   const [sweetOnly, setSweetOnly] = useState(false);
   const [hideZeroAvailability, setHideZeroAvailability] = useState(true);
-  const [viewMode, setViewMode] = useState<"cards" | "table">("table");
+  // Legacy view toggle removed — results always render as cabin-scoped tables.
+  const [expandedCabins, setExpandedCabins] = useState<Set<Cabin>>(new Set());
 
   // Auto-run a search when arriving from an /awards landing page.
   const urlSearch = Route.useSearch();
@@ -164,7 +166,7 @@ function Index() {
     pushRecent(q);
     setError(null);
     setSelectedDate(null);
-    setSortBy("points");
+    setSortBy("value");
     setProgramFilter(null);
     setCarrierFilter(null);
     setGradeFilter(null);
