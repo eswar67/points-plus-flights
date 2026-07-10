@@ -1,7 +1,6 @@
 import { useEffect, useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
 import {
-  AIRPORTS,
   METROS,
   searchAirports,
   warmAirportIndex,
