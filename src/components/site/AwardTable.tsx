@@ -30,7 +30,18 @@ type SortKey =
   | "stops"
   | "depart"
   | "fresh"
-  | "sweet";
+  | "sweet"
+  | "y-points"
+  | "w-points"
+  | "j-points"
+  | "f-points";
+
+const CABIN_SORT_KEY: Record<Cabin, SortKey> = {
+  economy: "y-points",
+  premium: "w-points",
+  business: "j-points",
+  first: "f-points",
+};
 
 function fmtDuration(min: number) {
   if (!min) return "—";
