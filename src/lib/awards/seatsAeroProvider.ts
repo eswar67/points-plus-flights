@@ -21,8 +21,30 @@ const BASE_URL = "https://seats.aero/partnerapi/search";
 // here, everything else uses the slug as the id. Unknown slugs still render
 // via the fallback (slug as id/name) so new seats.aero sources never vanish.
 const SOURCE_TO_PROGRAM: Record<string, string> = {
+  // Virgin Australia Velocity — seats.aero has used both slugs across API versions.
   virginaustralia: "velocity",
+  velocity: "velocity",
+  // Singapore KrisFlyer
   singapore: "krisflyer",
+  singaporeairlines: "krisflyer",
+  // American AAdvantage
+  americanairlines: "american",
+  aa: "american",
+  // Avianca LifeMiles
+  avianca: "lifemiles",
+  // British Airways Avios
+  britishairways: "avios_ba",
+  ba: "avios_ba",
+  // Cathay Asia Miles
+  cathay: "asia_miles",
+  cathaypacific: "asia_miles",
+  // Air France / KLM Flying Blue
+  airfrance: "flyingblue",
+  klm: "flyingblue",
+  // Qatar Privilege Club
+  qatarairways: "qatar",
+  // Aeroplan
+  aircanada: "aeroplan",
 };
 
 type RawAvailability = {
