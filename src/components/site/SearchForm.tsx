@@ -1,6 +1,6 @@
 import { useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
-import { AIRPORTS, CONTINENTS, METROS } from "@/lib/airports";
+import { AIRPORTS, METROS } from "@/lib/airports";
 
 export type SearchMode = "exact" | "flex1" | "flex" | "month";
 
