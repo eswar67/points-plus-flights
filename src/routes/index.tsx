@@ -128,6 +128,10 @@ function Index() {
     | "depart"
     | "fresh"
     | "sweet"
+    | "y-points"
+    | "w-points"
+    | "j-points"
+    | "f-points"
   >("points");
   const [programFilter, setProgramFilter] = useState<Set<string> | null>(null);
   const [carrierFilter, setCarrierFilter] = useState<Set<string> | null>(null);
