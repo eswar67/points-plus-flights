@@ -148,7 +148,7 @@ export function SearchForm({
       className="relative rounded-lg bg-card/80 backdrop-blur-xl border border-border shadow-elevated p-3 md:p-4"
     >
       <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1.3fr_1fr_auto] gap-2">
-        <Field label="From" error={errors.from}>
+        <Field label="From" error={errors.from} data-tour="from">
           <input
             value={from}
             onChange={(e) => {
@@ -166,7 +166,7 @@ export function SearchForm({
             className="w-full bg-transparent text-xl md:text-2xl font-display tracking-wider text-foreground outline-none"
           />
         </Field>
-        <Field label="To" error={errors.to}>
+        <Field label="To" error={errors.to} data-tour="to">
           <input
             value={to}
             onChange={(e) => {
@@ -184,7 +184,7 @@ export function SearchForm({
             className="w-full bg-transparent text-xl md:text-2xl font-display tracking-wider text-foreground outline-none"
           />
         </Field>
-        <Field label="When">
+        <Field label="When" data-tour="when">
           <input
             type="date"
             value={date}
@@ -193,7 +193,11 @@ export function SearchForm({
             className="w-full bg-transparent text-sm text-foreground outline-none [color-scheme:dark]"
           />
         </Field>
-        <button type="submit" className="btn btn-primary rounded-lg px-8 font-semibold shadow-gold">
+        <button
+          type="submit"
+          data-tour="submit"
+          className="btn btn-primary rounded-lg px-8 font-semibold shadow-gold"
+        >
           Find my trip
         </button>
       </div>
@@ -293,13 +297,14 @@ function Field({
   label,
   error,
   children,
+  ...rest
 }: {
   label: string;
   error?: string;
   children: React.ReactNode;
-}) {
+} & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div>
+    <div {...rest}>
       <label
         className={`rounded-lg bg-background/40 hover:bg-background/60 transition px-4 py-3 flex flex-col gap-1 border ${
           error ? "border-destructive/60" : "border-transparent hover:border-border"
