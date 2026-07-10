@@ -174,7 +174,7 @@ export function SearchForm({
           Reset
         </button>
         <span className="text-xs text-muted-foreground ml-1 hidden sm:inline">
-          Tip: combine codes with commas (e.g. <span className="tabular-nums">SYD,MEL</span>) or tap a metro / continent below.
+          Tip: combine codes with commas (e.g. <span className="tabular-nums">SYD,MEL</span>) or tap a continent below.
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1.2fr_1fr_1fr_0.8fr_auto] gap-2">
@@ -311,45 +311,6 @@ export function SearchForm({
         />
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-1.5 px-1" aria-label="Metro shortcuts">
-        <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">
-          Metros
-        </span>
-        {METROS.map((m) => (
-          <span
-            key={m.code}
-            className="inline-flex rounded-full border border-border overflow-hidden"
-          >
-            <button
-              type="button"
-              onClick={() =>
-                setFrom((cur) =>
-                  Array.from(new Set([...cur.split(",").filter(Boolean), ...m.airports])).join(","),
-                )
-              }
-              title={`Add ${m.label} (${m.airports.join(", ")}) to origin`}
-              className="text-xs px-2 py-1.5 text-muted-foreground hover:text-gold hover:bg-gold/5 transition"
-            >
-              +From
-            </button>
-            <span className="text-xs px-2 py-1.5 text-foreground bg-background/40 tabular-nums">
-              {m.code}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                setTo((cur) =>
-                  Array.from(new Set([...cur.split(",").filter(Boolean), ...m.airports])).join(","),
-                )
-              }
-              title={`Add ${m.label} (${m.airports.join(", ")}) to destination`}
-              className="text-xs px-2 py-1.5 text-muted-foreground hover:text-gold hover:bg-gold/5 transition"
-            >
-              +To
-            </button>
-          </span>
-        ))}
-      </div>
 
       <datalist id="ml-airports">
         {AIRPORTS.map((a) => (
