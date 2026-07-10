@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WatchlistsRouteImport } from './routes/watchlists'
 import { Route as RequestsRouteImport } from './routes/requests'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ConciergeRouteImport } from './routes/concierge'
@@ -33,6 +34,11 @@ const WatchlistsRoute = WatchlistsRouteImport.update({
 const RequestsRoute = RequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/concierge': typeof ConciergeRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/pricing': typeof PricingRoute
   '/requests': typeof RequestsRoute
   '/watchlists': typeof WatchlistsRoute
   '/awards/$route': typeof AwardsRouteRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/concierge': typeof ConciergeRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/pricing': typeof PricingRoute
   '/requests': typeof RequestsRoute
   '/watchlists': typeof WatchlistsRoute
   '/awards/$route': typeof AwardsRouteRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   '/concierge': typeof ConciergeRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/pricing': typeof PricingRoute
   '/requests': typeof RequestsRoute
   '/watchlists': typeof WatchlistsRoute
   '/awards/$route': typeof AwardsRouteRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/concierge'
     | '/faq'
     | '/how-it-works'
+    | '/pricing'
     | '/requests'
     | '/watchlists'
     | '/awards/$route'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/concierge'
     | '/faq'
     | '/how-it-works'
+    | '/pricing'
     | '/requests'
     | '/watchlists'
     | '/awards/$route'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/concierge'
     | '/faq'
     | '/how-it-works'
+    | '/pricing'
     | '/requests'
     | '/watchlists'
     | '/awards/$route'
@@ -218,6 +230,7 @@ export interface RootRouteChildren {
   ConciergeRoute: typeof ConciergeRoute
   FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  PricingRoute: typeof PricingRoute
   RequestsRoute: typeof RequestsRoute
   WatchlistsRoute: typeof WatchlistsRoute
   AwardsRouteRoute: typeof AwardsRouteRoute
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/requests'
       fullPath: '/requests'
       preLoaderRoute: typeof RequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -346,6 +366,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConciergeRoute: ConciergeRoute,
   FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
+  PricingRoute: PricingRoute,
   RequestsRoute: RequestsRoute,
   WatchlistsRoute: WatchlistsRoute,
   AwardsRouteRoute: AwardsRouteRoute,
