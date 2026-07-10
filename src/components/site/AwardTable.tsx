@@ -1,6 +1,7 @@
 import type { Cabin } from "@/lib/awards/types";
 import type { RankedItinerary, SweetSpotInfo, TripGroup } from "@/lib/intelligence";
 import { fmtAud, fmtCpp, fmtAge, taxesAudFromUsd } from "@/lib/intelligence";
+import { conciergeFor, type ConciergeTone } from "@/lib/concierge";
 import { getProgram } from "@/lib/programs";
 import { ArrowDown, Sparkles } from "lucide-react";
 
@@ -68,6 +69,13 @@ const GRADE_STYLES: Record<Row["grade"], string> = {
   skip: "border-border-soft text-muted-foreground/70",
 };
 
+const TONE_STYLES: Record<ConciergeTone, string> = {
+  great: "text-gold",
+  good: "text-emerald-300",
+  fair: "text-muted-foreground",
+  skip: "text-muted-foreground/60",
+};
+
 function HeaderButton({
   active,
   onClick,
@@ -99,13 +107,24 @@ export function AwardTable({
   sortBy,
   onSort,
   pax,
+  cabinScope,
 }: {
   groups: Group[];
   sortBy: SortKey;
   onSort: (key: SortKey) => void;
   pax: number;
+  /**
+   * When set, the table shows a single Points column for that cabin plus a
+   * plain-English "Recommendation" column — used by the split-by-cabin
+   * results view on the homepage.
+   */
+  cabinScope?: Cabin;
 }) {
   if (!groups.length) return null;
+  const scoped = cabinScope
+    ? groups.filter((g) => g.byCabin[cabinScope] && (g.byCabin[cabinScope]!.miles ?? 0) > 0)
+    : groups;
+  if (!scoped.length) return null;
   return (
     <div className="rounded-lg border border-border bg-card overflow-x-auto">
       <table className="w-full text-sm">
@@ -139,7 +158,25 @@ export function AwardTable({
                 Duration
               </HeaderButton>
             </th>
-            {CABIN_ORDER.map((c) => (
+            {cabinScope ? (
+              <>
+                <th className="text-right px-3 py-3 font-normal">
+                  <HeaderButton
+                    align="right"
+                    active={sortBy === CABIN_SORT_KEY[cabinScope]}
+                    onClick={() => onSort(CABIN_SORT_KEY[cabinScope])}
+                  >
+                    Points
+                  </HeaderButton>
+                </th>
+                <th className="text-left px-4 py-3 font-normal">
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Recommendation
+                  </span>
+                </th>
+              </>
+            ) : (
+              CABIN_ORDER.map((c) => (
               <th key={c} className="text-right px-3 py-3 font-normal">
                 <HeaderButton
                   align="right"
@@ -149,7 +186,8 @@ export function AwardTable({
                   {CABIN_LABEL[c]}
                 </HeaderButton>
               </th>
-            ))}
+              ))
+            )}
             <th className="text-right px-4 py-3 font-normal">
               <HeaderButton
                 align="right"
@@ -162,8 +200,8 @@ export function AwardTable({
           </tr>
         </thead>
         <tbody>
-          {groups.map((g) => {
-            const base = g.best;
+          {scoped.map((g) => {
+            const base = cabinScope ? (g.byCabin[cabinScope] ?? g.best) : g.best;
             const program = getProgram(base.programId);
             const accent = program?.accent ?? "#c9a84c";
             const programName = program?.name ?? base.programName;
@@ -213,7 +251,35 @@ export function AwardTable({
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-muted-foreground">
                   {fmtDuration(base.durationMin)}
                 </td>
-                {CABIN_ORDER.map((c) => {
+                {cabinScope ? (() => {
+                  const v = g.byCabin[cabinScope]!;
+                  const taxesAud = taxesAudFromUsd(v.taxesUsd);
+                  const rec = conciergeFor(v);
+                  return (
+                    <>
+                      <td className="px-3 py-3 text-right align-top">
+                        <a
+                          href={`/book?id=${encodeURIComponent(v.id)}`}
+                          className="block group"
+                        >
+                          <div className="inline-flex items-center gap-1 justify-end font-mono tabular-nums text-foreground group-hover:text-gold transition text-base">
+                            {v.isSweetSpot && (
+                              <Sparkles className="size-3 text-gold" aria-hidden="true" />
+                            )}
+                            {v.miles.toLocaleString()}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
+                            + {taxesAud ? fmtAud(taxesAud) : "—"} taxes ·{" "}
+                            {v.seats > 0 ? `${v.seats} seat${v.seats > 1 ? "s" : ""}` : "0 seats"}
+                          </div>
+                        </a>
+                      </td>
+                      <td className="px-4 py-3 align-top">
+                        <div className={`text-xs ${TONE_STYLES[rec.tone]}`}>{rec.headline}</div>
+                      </td>
+                    </>
+                  );
+                })() : CABIN_ORDER.map((c) => {
                   const v = g.byCabin[c];
                   if (!v || v.miles <= 0) {
                     return (
