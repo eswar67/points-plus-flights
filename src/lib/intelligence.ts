@@ -516,9 +516,7 @@ function median(nums: number[]): number {
  * asymmetric-value redemptions (e.g. ANA 75k J to Europe when the group
  * median is 120k).
  */
-export function annotateSweetSpots<T extends AwardItinerary>(
-  items: T[],
-): (T & SweetSpotInfo)[] {
+export function annotateSweetSpots<T extends AwardItinerary>(items: T[]): (T & SweetSpotInfo)[] {
   const groups = new Map<Cabin, number[]>();
   for (const a of items) {
     const arr = groups.get(a.cabin) ?? [];

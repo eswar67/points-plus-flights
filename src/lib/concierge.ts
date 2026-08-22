@@ -55,11 +55,12 @@ export type DealReason = { label: string; detail: string };
  * same cabin. Returns 2–4 short bullets suitable for an expandable panel.
  */
 export function explainTopPick<
-  T extends RankedItinerary & { isSweetSpot?: boolean; discountPct?: number; baselineMiles?: number },
->(
-  top: T,
-  peers: T[],
-): DealReason[] {
+  T extends RankedItinerary & {
+    isSweetSpot?: boolean;
+    discountPct?: number;
+    baselineMiles?: number;
+  },
+>(top: T, peers: T[]): DealReason[] {
   const others = peers.filter((p) => p !== top);
   const reasons: DealReason[] = [];
 

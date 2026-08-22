@@ -9,13 +9,13 @@ import type { Cabin } from "./types";
  */
 
 export type SweetSpot = {
-  programId: string;    // matches PROGRAMS.id
+  programId: string; // matches PROGRAMS.id
   cabin: Cabin;
-  miles: number;        // indicative one-way, per seat
-  taxesAud?: number;    // rough one-way surcharges/taxes in AUD
-  headline: string;     // short editorial title
-  why: string;          // 1–2 sentence rationale
-  source?: string;      // community reference (name only, not a link)
+  miles: number; // indicative one-way, per seat
+  taxesAud?: number; // rough one-way surcharges/taxes in AUD
+  headline: string; // short editorial title
+  why: string; // 1–2 sentence rationale
+  source?: string; // community reference (name only, not a link)
 };
 
 /** Key: "FROM-TO" (one direction; helper looks up reverse too). */
@@ -282,12 +282,7 @@ export const EXPERT_TIPS: Tip[] = [
 // Region grouping for the landing page
 // -----------------------------------------------------------------------
 
-export type Region =
-  | "Trans-Pacific"
-  | "Asia"
-  | "India"
-  | "Europe"
-  | "Middle East";
+export type Region = "Trans-Pacific" | "Asia" | "India" | "Europe" | "Middle East";
 
 const ROUTE_REGION: Record<string, Region> = {
   "SYD-LAX": "Trans-Pacific",
@@ -309,7 +304,5 @@ const ROUTE_REGION: Record<string, Region> = {
 };
 
 export function regionForRoute(from: string, to: string): Region {
-  return (
-    ROUTE_REGION[`${from}-${to}`] ?? ROUTE_REGION[`${to}-${from}`] ?? "Asia"
-  );
+  return ROUTE_REGION[`${from}-${to}`] ?? ROUTE_REGION[`${to}-${from}`] ?? "Asia";
 }

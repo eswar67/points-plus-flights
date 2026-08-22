@@ -88,15 +88,14 @@ function AwardRoutePage() {
   const spots = sweetSpotsFor(from, to);
 
   // Best cents-per-point per cabin, across airline programs — highlights the smart choice.
-  const bestByCabin = CABINS.reduce<Record<Cabin, { id: string; miles: number; cpp: number } | null>>(
+  const bestByCabin = CABINS.reduce<
+    Record<Cabin, { id: string; miles: number; cpp: number } | null>
+  >(
     (acc, c) => {
       let best: { id: string; miles: number; cpp: number } | null = null;
       airlinePrograms.forEach((p) => {
         const fare = fareEstimateAud(from, to, c.value);
-        const miles = Math.max(
-          1000,
-          Math.round((fare * 100) / p.valueAudCents / 1000) * 1000,
-        );
+        const miles = Math.max(1000, Math.round((fare * 100) / p.valueAudCents / 1000) * 1000);
         const cpp = (fare * 100) / miles;
         if (!best || cpp > best.cpp) best = { id: p.id, miles, cpp };
       });
@@ -157,8 +156,8 @@ function AwardRoutePage() {
               </span>
             </div>
             <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-              Redemptions the points community keeps returning to — the miles, the taxes, and
-              why they beat the alternatives.
+              Redemptions the points community keeps returning to — the miles, the taxes, and why
+              they beat the alternatives.
             </p>
             <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3">
               {spots.map((s, i) => {
@@ -174,9 +173,7 @@ function AwardRoutePage() {
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span
-                        className="inline-flex items-center gap-2"
-                      >
+                      <span className="inline-flex items-center gap-2">
                         <span
                           className="size-8 rounded-full grid place-items-center font-display text-xs"
                           style={{
@@ -249,8 +246,8 @@ function AwardRoutePage() {
         <section className="mt-14">
           <h2 className="font-display text-2xl">Indicative miles — every cabin, every program</h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-2xl">
-            Modeled at each program's typical redemption value. Gold rows mark the smartest
-            balance for that cabin. Economy is included — it's often the true value pick.
+            Modeled at each program's typical redemption value. Gold rows mark the smartest balance
+            for that cabin. Economy is included — it's often the true value pick.
           </p>
           <div className="mt-4 rounded-lg border border-border overflow-x-auto">
             <table className="w-full text-sm">
@@ -269,8 +266,9 @@ function AwardRoutePage() {
                   const milesFor = (cabin: Cabin) =>
                     Math.max(
                       1000,
-                      Math.round((fareEstimateAud(from, to, cabin) * 100) / p.valueAudCents / 1000) *
-                        1000,
+                      Math.round(
+                        (fareEstimateAud(from, to, cabin) * 100) / p.valueAudCents / 1000,
+                      ) * 1000,
                     );
                   return (
                     <tr
@@ -324,13 +322,15 @@ function AwardRoutePage() {
         </section>
 
         <section className="mt-14 rounded-lg hairline bg-card/50 p-6">
-          <span className="text-[10px] uppercase tracking-widest text-gold">Taxes reality check</span>
+          <span className="text-[10px] uppercase tracking-widest text-gold">
+            Taxes reality check
+          </span>
           <h2 className="font-display text-2xl mt-2">You'll pay cash on top. Plan for it.</h2>
           <p className="text-sm text-muted-foreground mt-3 max-w-2xl leading-relaxed">
             Award tickets aren't free — expect airport taxes, government charges, and (on some
-            programs) fuel surcharges. Long-haul economy typically runs $100–$300 in taxes,
-            business $150–$500, and Qantas–Emirates business to Europe can exceed $1,200 in
-            surcharges alone. Compare taxes as carefully as miles.
+            programs) fuel surcharges. Long-haul economy typically runs $100–$300 in taxes, business
+            $150–$500, and Qantas–Emirates business to Europe can exceed $1,200 in surcharges alone.
+            Compare taxes as carefully as miles.
           </p>
         </section>
 
@@ -353,8 +353,8 @@ function AwardRoutePage() {
         )}
 
         <p className="mt-16 text-[10px] uppercase tracking-widest text-muted-foreground/60 max-w-2xl">
-          Editorial intelligence synthesised from Point Hacks AU, God Save the Points, One Mile
-          at a Time, Frequent Miler, The Points Guy and Australian Frequent Flyer. Confirm live
+          Editorial intelligence synthesised from Point Hacks AU, God Save the Points, One Mile at a
+          Time, Frequent Miler, The Points Guy and Australian Frequent Flyer. Confirm live
           in-program before transferring.
         </p>
       </main>

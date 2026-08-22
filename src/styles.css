@@ -40,7 +40,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   /* 3-step border hierarchy: soft (dividers) / border (default) / strong (emphasis) */
-  --color-border-soft: oklch(0.30 0.03 265 / 0.35);
+  --color-border-soft: oklch(0.3 0.03 265 / 0.35);
   --color-border-strong: color-mix(in oklab, var(--gold) 30%, oklch(0.28 0.03 265));
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -60,7 +60,7 @@
   --popover: oklch(0.18 0.025 265);
   --popover-foreground: oklch(0.96 0.01 90);
 
-  --primary: oklch(0.80 0.12 84);
+  --primary: oklch(0.8 0.12 84);
   --primary-foreground: oklch(0.13 0 0);
 
   --secondary: oklch(0.24 0.02 265);
@@ -70,11 +70,11 @@
   /* WCAG AA on noir surfaces (was 0.62 — borderline on card backgrounds) */
   --muted-foreground: oklch(0.72 0.01 90);
 
-  --accent: oklch(0.90 0.09 88);
+  --accent: oklch(0.9 0.09 88);
   --accent-foreground: oklch(0.13 0 0);
 
-  --gold: oklch(0.80 0.12 84);
-  --gold-soft: oklch(0.90 0.09 88);
+  --gold: oklch(0.8 0.12 84);
+  --gold-soft: oklch(0.9 0.09 88);
   --gold-foreground: oklch(0.13 0 0);
 
   /* Cool accent for live/status data (freshness, source, poller health) */
@@ -84,14 +84,14 @@
   --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.30 0.03 265 / 0.55);
+  --border: oklch(0.3 0.03 265 / 0.55);
   --input: oklch(0.22 0.02 265);
-  --ring: oklch(0.80 0.12 84);
+  --ring: oklch(0.8 0.12 84);
 
-  --gradient-gold: linear-gradient(135deg, oklch(0.90 0.09 88), oklch(0.74 0.13 82));
+  --gradient-gold: linear-gradient(135deg, oklch(0.9 0.09 88), oklch(0.74 0.13 82));
   --gradient-noir:
-    radial-gradient(ellipse at top, oklch(0.30 0.08 260 / 0.35), transparent 60%),
-    radial-gradient(ellipse at bottom, oklch(0.24 0.05 265 / 0.30), transparent 65%),
+    radial-gradient(ellipse at top, oklch(0.3 0.08 260 / 0.35), transparent 60%),
+    radial-gradient(ellipse at bottom, oklch(0.24 0.05 265 / 0.3), transparent 65%),
     linear-gradient(180deg, oklch(0.09 0.02 265), oklch(0.14 0.02 265));
 }
 

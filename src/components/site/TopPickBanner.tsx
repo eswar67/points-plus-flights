@@ -37,35 +37,13 @@ export function TopPickBanner({
   range?: TopPickBannerRange;
 }) {
   const { user } = useAuth();
-  const [alertState, setAlertState] = useState<"idle" | "saving" | "active" | "error">(
-    "idle",
-  );
+  const [alertState, setAlertState] = useState<"idle" | "saving" | "active" | "error">("idle");
   const [existingWatchlistId, setExistingWatchlistId] = useState<string | null>(null);
-
-  if (!items || items.length === 0) return null;
-
-  // Score: sweet spots first, then CPP, then miles.
-  const pick = [...items].sort(
-    (a, b) =>
-      Number(b.isSweetSpot) - Number(a.isSweetSpot) ||
-      b.cpp - a.cpp ||
-      a.miles - b.miles,
-  )[0];
-
-  const cash = fareEstimateAud(pick.from, pick.to, pick.cabin) * pax;
-  const taxesAud = pick.taxesUsd * 1.55; // rough USD→AUD, purely indicative
-  const cashSaved = Math.max(0, cash - taxesAud);
-
-  const reason = pick.isSweetSpot
-    ? `Sweet spot — ${Math.round(pick.discountPct * 100)}% under the typical ${pick.cabin} rate.`
-    : pick.cpp >= 2.5
-      ? `Exceptional value at ${pick.cpp.toFixed(1)}¢ per point.`
-      : `Best value we found — ${pick.cpp.toFixed(1)}¢ per point.`;
 
   // Detect an existing matching watchlist so we can toggle to "Active" state
   // without letting the user create a duplicate.
   useEffect(() => {
-    if (!user || !range) return;
+    if (!user || !range || !items || items.length === 0) return;
     let cancelled = false;
     (async () => {
       const { data } = await supabase
@@ -92,6 +70,23 @@ export function TopPickBanner({
       cancelled = true;
     };
   }, [user, range?.from, range?.to, range?.cabin, range?.dateFrom, range?.dateTo]);
+
+  if (!items || items.length === 0) return null;
+
+  // Score: sweet spots first, then CPP, then miles.
+  const pick = [...items].sort(
+    (a, b) => Number(b.isSweetSpot) - Number(a.isSweetSpot) || b.cpp - a.cpp || a.miles - b.miles,
+  )[0];
+
+  const cash = fareEstimateAud(pick.from, pick.to, pick.cabin) * pax;
+  const taxesAud = pick.taxesUsd * 1.55; // rough USD→AUD, purely indicative
+  const cashSaved = Math.max(0, cash - taxesAud);
+
+  const reason = pick.isSweetSpot
+    ? `Sweet spot — ${Math.round(pick.discountPct * 100)}% under the typical ${pick.cabin} rate.`
+    : pick.cpp >= 2.5
+      ? `Exceptional value at ${pick.cpp.toFixed(1)}¢ per point.`
+      : `Best value we found — ${pick.cpp.toFixed(1)}¢ per point.`;
 
   async function createOrUpdateAlert() {
     if (!user || !range) return;
@@ -153,8 +148,7 @@ export function TopPickBanner({
         </div>
         <div className="flex-1 min-w-0">
           <div className="font-display text-lg md:text-xl">
-            {pick.programName} ·{" "}
-            <span className="tabular-nums">{pick.miles.toLocaleString()}</span>{" "}
+            {pick.programName} · <span className="tabular-nums">{pick.miles.toLocaleString()}</span>{" "}
             <span className="text-muted-foreground text-sm">pts</span>
             <span className="text-muted-foreground text-sm"> · </span>
             <span className="text-muted-foreground text-sm tabular-nums">
@@ -165,9 +159,10 @@ export function TopPickBanner({
             {reason}
             {cashSaved > 300 ? (
               <span className="text-foreground">
-                {" "}Save ~
-                <span className="text-gold font-medium tabular-nums">{fmtAud(cashSaved)}</span>{" "}
-                vs cash.
+                {" "}
+                Save ~
+                <span className="text-gold font-medium tabular-nums">{fmtAud(cashSaved)}</span> vs
+                cash.
               </span>
             ) : null}
           </div>
@@ -177,12 +172,14 @@ export function TopPickBanner({
             <TrendingUp className="size-3.5" />
             {pick.cpp.toFixed(1)}¢ / pt
           </div>
-          {range && <AlertButton
-            state={alertState}
-            onClick={createOrUpdateAlert}
-            isAuthed={!!user}
-            pickCpp={pick.cpp}
-          />}
+          {range && (
+            <AlertButton
+              state={alertState}
+              onClick={createOrUpdateAlert}
+              isAuthed={!!user}
+              pickCpp={pick.cpp}
+            />
+          )}
         </div>
       </div>
       {alertState === "active" && (
@@ -190,7 +187,10 @@ export function TopPickBanner({
           <Check className="size-3.5" />
           Alert set — we&apos;ll notify you if a new Top Pick beats {pick.cpp.toFixed(1)}¢/pt on
           this route.{" "}
-          <Link to="/watchlists" className="underline decoration-dotted underline-offset-2 hover:text-gold">
+          <Link
+            to="/watchlists"
+            className="underline decoration-dotted underline-offset-2 hover:text-gold"
+          >
             Manage
           </Link>
         </div>
@@ -218,9 +218,9 @@ function AlertButton({
   if (!isAuthed) {
     return (
       <Link
-        to="/auth"
+        to="/watchlists"
         className="inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-card/70 backdrop-blur px-3 py-1.5 text-[10px] uppercase tracking-widest text-gold hover:bg-gold/10 transition"
-        title="Sign in to enable improvement alerts"
+        title="Create a watchlist for this route"
       >
         <Bell className="size-3" />
         Alert me

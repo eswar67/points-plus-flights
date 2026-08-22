@@ -35,8 +35,7 @@ const CABINS = [
 type Cabin = (typeof CABINS)[number]["value"];
 
 function BookPage() {
-  const { user, loading: authLoading } = useAuth();
-  const gated = !authLoading && !user;
+  const { user } = useAuth();
 
   const submit = useServerFn(submitBookingRequest);
   const [submitting, setSubmitting] = useState(false);
@@ -101,31 +100,7 @@ function BookPage() {
           </p>
         </div>
 
-        {gated ? (
-          <div className="rounded-lg border border-gold/40 bg-gradient-to-b from-gold/10 to-transparent p-8">
-            <div className="text-xs uppercase tracking-widest text-gold mb-2">Sign in required</div>
-            <h2 className="font-display text-2xl">Sign in to request concierge ticketing.</h2>
-            <p className="text-muted-foreground mt-3 max-w-xl">
-              An award specialist hunts the seats, holds them, and tickets on your behalf — across
-              30+ programs. Sign in and we'll get to work.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                to="/auth"
-                search={{ redirect: "/book" }}
-                className="text-xs uppercase tracking-widest px-5 py-3 rounded-full bg-gold text-gold-foreground hover:bg-gold-soft transition shadow-gold"
-              >
-                Sign in
-              </Link>
-              <Link
-                to="/"
-                className="text-xs uppercase tracking-widest px-5 py-3 rounded-full text-muted-foreground hover:text-foreground transition"
-              >
-                Back to search
-              </Link>
-            </div>
-          </div>
-        ) : success ? (
+        {success ? (
           <div className="rounded-lg border border-gold/40 bg-gold/5 p-8">
             <div className="text-xs uppercase tracking-widest text-gold mb-2">Request received</div>
             <h2 className="font-display text-2xl">We're on it.</h2>

@@ -177,15 +177,15 @@ export function AwardTable({
               </>
             ) : (
               CABIN_ORDER.map((c) => (
-              <th key={c} className="text-right px-3 py-3 font-normal">
-                <HeaderButton
-                  align="right"
-                  active={sortBy === CABIN_SORT_KEY[c]}
-                  onClick={() => onSort(CABIN_SORT_KEY[c])}
-                >
-                  {CABIN_LABEL[c]}
-                </HeaderButton>
-              </th>
+                <th key={c} className="text-right px-3 py-3 font-normal">
+                  <HeaderButton
+                    align="right"
+                    active={sortBy === CABIN_SORT_KEY[c]}
+                    onClick={() => onSort(CABIN_SORT_KEY[c])}
+                  >
+                    {CABIN_LABEL[c]}
+                  </HeaderButton>
+                </th>
               ))
             )}
             <th className="text-right px-4 py-3 font-normal">
@@ -245,79 +245,81 @@ export function AwardTable({
                     {fmtDate(base.depart)}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-right text-muted-foreground text-xs">
-                  {stopsLabel}
-                </td>
+                <td className="px-4 py-3 text-right text-muted-foreground text-xs">{stopsLabel}</td>
                 <td className="px-4 py-3 text-right font-mono tabular-nums text-muted-foreground">
                   {fmtDuration(base.durationMin)}
                 </td>
-                {cabinScope ? (() => {
-                  const v = g.byCabin[cabinScope]!;
-                  const taxesAud = taxesAudFromUsd(v.taxesUsd);
-                  const rec = conciergeFor(v);
-                  return (
-                    <>
-                      <td className="px-3 py-3 text-right align-top">
-                        <a
-                          href={`/book?id=${encodeURIComponent(v.id)}`}
-                          className="block group"
-                        >
-                          <div className="inline-flex items-center gap-1 justify-end font-mono tabular-nums text-foreground group-hover:text-gold transition text-base">
-                            {v.isSweetSpot && (
-                              <Sparkles className="size-3 text-gold" aria-hidden="true" />
-                            )}
-                            {v.miles.toLocaleString()}
-                          </div>
-                          <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
-                            + {taxesAud ? fmtAud(taxesAud) : "—"} taxes ·{" "}
-                            {v.seats > 0 ? `${v.seats} seat${v.seats > 1 ? "s" : ""}` : "0 seats"}
-                          </div>
-                        </a>
-                      </td>
-                      <td className="px-4 py-3 align-top">
-                        <div className={`text-xs ${TONE_STYLES[rec.tone]}`}>{rec.headline}</div>
-                      </td>
-                    </>
-                  );
-                })() : CABIN_ORDER.map((c) => {
-                  const v = g.byCabin[c];
-                  if (!v || v.miles <= 0) {
-                    return (
-                      <td
-                        key={c}
-                        className="px-3 py-3 text-right text-muted-foreground/40 font-mono tabular-nums"
-                      >
-                        —
-                      </td>
-                    );
-                  }
-                  const taxesAud = taxesAudFromUsd(v.taxesUsd);
-                  return (
-                    <td key={c} className="px-3 py-3 text-right align-top">
-                      <a
-                        href={`/book?id=${encodeURIComponent(v.id)}`}
-                        className="block group"
-                        title={`${CABIN_LABEL[c]} · ${fmtCpp(v.cpp)}`}
-                      >
-                        <div className="inline-flex items-center gap-1 justify-end font-mono tabular-nums text-foreground group-hover:text-gold transition">
-                          {v.isSweetSpot && (
-                            <Sparkles className="size-3 text-gold" aria-hidden="true" />
-                          )}
-                          {v.miles.toLocaleString()}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
-                          {taxesAud ? fmtAud(taxesAud) : "—"} ·{" "}
-                          {v.seats > 0 ? `${v.seats} seat${v.seats > 1 ? "s" : ""}` : "0 seats"}
-                        </div>
-                        <span
-                          className={`inline-flex mt-1 items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[9px] uppercase tracking-widest ${GRADE_STYLES[v.grade]}`}
-                        >
-                          {CABIN_SHORT[c]} · {fmtCpp(v.cpp)}
-                        </span>
-                      </a>
-                    </td>
-                  );
-                })}
+                {cabinScope
+                  ? (() => {
+                      const v = g.byCabin[cabinScope]!;
+                      const taxesAud = taxesAudFromUsd(v.taxesUsd);
+                      const rec = conciergeFor(v);
+                      return (
+                        <>
+                          <td className="px-3 py-3 text-right align-top">
+                            <a
+                              href={`/book?id=${encodeURIComponent(v.id)}`}
+                              className="block group"
+                            >
+                              <div className="inline-flex items-center gap-1 justify-end font-mono tabular-nums text-foreground group-hover:text-gold transition text-base">
+                                {v.isSweetSpot && (
+                                  <Sparkles className="size-3 text-gold" aria-hidden="true" />
+                                )}
+                                {v.miles.toLocaleString()}
+                              </div>
+                              <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
+                                + {taxesAud ? fmtAud(taxesAud) : "—"} taxes ·{" "}
+                                {v.seats > 0
+                                  ? `${v.seats} seat${v.seats > 1 ? "s" : ""}`
+                                  : "0 seats"}
+                              </div>
+                            </a>
+                          </td>
+                          <td className="px-4 py-3 align-top">
+                            <div className={`text-xs ${TONE_STYLES[rec.tone]}`}>{rec.headline}</div>
+                          </td>
+                        </>
+                      );
+                    })()
+                  : CABIN_ORDER.map((c) => {
+                      const v = g.byCabin[c];
+                      if (!v || v.miles <= 0) {
+                        return (
+                          <td
+                            key={c}
+                            className="px-3 py-3 text-right text-muted-foreground/40 font-mono tabular-nums"
+                          >
+                            —
+                          </td>
+                        );
+                      }
+                      const taxesAud = taxesAudFromUsd(v.taxesUsd);
+                      return (
+                        <td key={c} className="px-3 py-3 text-right align-top">
+                          <a
+                            href={`/book?id=${encodeURIComponent(v.id)}`}
+                            className="block group"
+                            title={`${CABIN_LABEL[c]} · ${fmtCpp(v.cpp)}`}
+                          >
+                            <div className="inline-flex items-center gap-1 justify-end font-mono tabular-nums text-foreground group-hover:text-gold transition">
+                              {v.isSweetSpot && (
+                                <Sparkles className="size-3 text-gold" aria-hidden="true" />
+                              )}
+                              {v.miles.toLocaleString()}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">
+                              {taxesAud ? fmtAud(taxesAud) : "—"} ·{" "}
+                              {v.seats > 0 ? `${v.seats} seat${v.seats > 1 ? "s" : ""}` : "0 seats"}
+                            </div>
+                            <span
+                              className={`inline-flex mt-1 items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[9px] uppercase tracking-widest ${GRADE_STYLES[v.grade]}`}
+                            >
+                              {CABIN_SHORT[c]} · {fmtCpp(v.cpp)}
+                            </span>
+                          </a>
+                        </td>
+                      );
+                    })}
                 <td className="px-4 py-3 text-right text-[10px] uppercase tracking-widest text-muted-foreground whitespace-nowrap">
                   {base.confidence?.ageMin != null ? fmtAge(base.confidence.ageMin) : "—"}
                 </td>

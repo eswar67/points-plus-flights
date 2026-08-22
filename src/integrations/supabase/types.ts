@@ -1,491 +1,483 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
+    PostgrestVersion: "14.5";
+  };
   public: {
     Tables: {
       alerts_sent: {
         Row: {
-          cpp_aud: number | null
-          fingerprint: string
-          id: string
-          miles: number | null
-          sent_at: string
-          watchlist_id: string
-        }
+          cpp_aud: number | null;
+          fingerprint: string;
+          id: string;
+          miles: number | null;
+          sent_at: string;
+          watchlist_id: string;
+        };
         Insert: {
-          cpp_aud?: number | null
-          fingerprint: string
-          id?: string
-          miles?: number | null
-          sent_at?: string
-          watchlist_id: string
-        }
+          cpp_aud?: number | null;
+          fingerprint: string;
+          id?: string;
+          miles?: number | null;
+          sent_at?: string;
+          watchlist_id: string;
+        };
         Update: {
-          cpp_aud?: number | null
-          fingerprint?: string
-          id?: string
-          miles?: number | null
-          sent_at?: string
-          watchlist_id?: string
-        }
+          cpp_aud?: number | null;
+          fingerprint?: string;
+          id?: string;
+          miles?: number | null;
+          sent_at?: string;
+          watchlist_id?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "alerts_sent_watchlist_id_fkey"
-            columns: ["watchlist_id"]
-            isOneToOne: false
-            referencedRelation: "watchlists"
-            referencedColumns: ["id"]
+            foreignKeyName: "alerts_sent_watchlist_id_fkey";
+            columns: ["watchlist_id"];
+            isOneToOne: false;
+            referencedRelation: "watchlists";
+            referencedColumns: ["id"];
           },
-        ]
-      }
+        ];
+      };
       booking_requests: {
         Row: {
-          agent_notes: string | null
-          cabin: string
-          carrier: string | null
-          contact_email: string
-          contact_name: string
-          created_at: string
-          id: string
-          miles_required: number | null
-          notes: string | null
-          passenger_count: number
-          program: string
-          route_from: string
-          route_to: string
-          status: string
-          travel_date: string
-          updated_at: string
-          user_id: string | null
-        }
+          agent_notes: string | null;
+          cabin: string;
+          carrier: string | null;
+          contact_email: string;
+          contact_name: string;
+          created_at: string;
+          id: string;
+          miles_required: number | null;
+          notes: string | null;
+          passenger_count: number;
+          program: string;
+          route_from: string;
+          route_to: string;
+          status: string;
+          travel_date: string;
+          updated_at: string;
+          user_id: string | null;
+        };
         Insert: {
-          agent_notes?: string | null
-          cabin: string
-          carrier?: string | null
-          contact_email: string
-          contact_name: string
-          created_at?: string
-          id?: string
-          miles_required?: number | null
-          notes?: string | null
-          passenger_count?: number
-          program: string
-          route_from: string
-          route_to: string
-          status?: string
-          travel_date: string
-          updated_at?: string
-          user_id?: string | null
-        }
+          agent_notes?: string | null;
+          cabin: string;
+          carrier?: string | null;
+          contact_email: string;
+          contact_name: string;
+          created_at?: string;
+          id?: string;
+          miles_required?: number | null;
+          notes?: string | null;
+          passenger_count?: number;
+          program: string;
+          route_from: string;
+          route_to: string;
+          status?: string;
+          travel_date: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
         Update: {
-          agent_notes?: string | null
-          cabin?: string
-          carrier?: string | null
-          contact_email?: string
-          contact_name?: string
-          created_at?: string
-          id?: string
-          miles_required?: number | null
-          notes?: string | null
-          passenger_count?: number
-          program?: string
-          route_from?: string
-          route_to?: string
-          status?: string
-          travel_date?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+          agent_notes?: string | null;
+          cabin?: string;
+          carrier?: string | null;
+          contact_email?: string;
+          contact_name?: string;
+          created_at?: string;
+          id?: string;
+          miles_required?: number | null;
+          notes?: string | null;
+          passenger_count?: number;
+          program?: string;
+          route_from?: string;
+          route_to?: string;
+          status?: string;
+          travel_date?: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       poller_runs: {
         Row: {
-          alerts_sent: number
-          duration_ms: number | null
-          errors: Json
-          finished_at: string | null
-          id: string
-          ok: boolean
-          processed: number
-          started_at: string
-        }
+          alerts_sent: number;
+          duration_ms: number | null;
+          errors: Json;
+          finished_at: string | null;
+          id: string;
+          ok: boolean;
+          processed: number;
+          started_at: string;
+        };
         Insert: {
-          alerts_sent?: number
-          duration_ms?: number | null
-          errors?: Json
-          finished_at?: string | null
-          id?: string
-          ok?: boolean
-          processed?: number
-          started_at?: string
-        }
+          alerts_sent?: number;
+          duration_ms?: number | null;
+          errors?: Json;
+          finished_at?: string | null;
+          id?: string;
+          ok?: boolean;
+          processed?: number;
+          started_at?: string;
+        };
         Update: {
-          alerts_sent?: number
-          duration_ms?: number | null
-          errors?: Json
-          finished_at?: string | null
-          id?: string
-          ok?: boolean
-          processed?: number
-          started_at?: string
-        }
-        Relationships: []
-      }
+          alerts_sent?: number;
+          duration_ms?: number | null;
+          errors?: Json;
+          finished_at?: string | null;
+          id?: string;
+          ok?: boolean;
+          processed?: number;
+          started_at?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
-          created_at: string
-          display_name: string | null
-          id: string
-          programs_held: string[]
-          telegram_chat_id: string | null
-          updated_at: string
-          user_id: string
-        }
+          created_at: string;
+          display_name: string | null;
+          id: string;
+          programs_held: string[];
+          telegram_chat_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          programs_held?: string[]
-          telegram_chat_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
+          created_at?: string;
+          display_name?: string | null;
+          id?: string;
+          programs_held?: string[];
+          telegram_chat_id?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          programs_held?: string[]
-          telegram_chat_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          display_name?: string | null;
+          id?: string;
+          programs_held?: string[];
+          telegram_chat_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       subscriptions: {
         Row: {
-          cancel_at_period_end: boolean | null
-          created_at: string | null
-          current_period_end: string | null
-          current_period_start: string | null
-          environment: string
-          id: string
-          price_id: string
-          product_id: string
-          status: string
-          stripe_customer_id: string
-          stripe_subscription_id: string
-          updated_at: string | null
-          user_id: string
-        }
+          cancel_at_period_end: boolean | null;
+          created_at: string | null;
+          current_period_end: string | null;
+          current_period_start: string | null;
+          environment: string;
+          id: string;
+          price_id: string;
+          product_id: string;
+          status: string;
+          stripe_customer_id: string;
+          stripe_subscription_id: string;
+          updated_at: string | null;
+          user_id: string;
+        };
         Insert: {
-          cancel_at_period_end?: boolean | null
-          created_at?: string | null
-          current_period_end?: string | null
-          current_period_start?: string | null
-          environment?: string
-          id?: string
-          price_id: string
-          product_id: string
-          status?: string
-          stripe_customer_id: string
-          stripe_subscription_id: string
-          updated_at?: string | null
-          user_id: string
-        }
+          cancel_at_period_end?: boolean | null;
+          created_at?: string | null;
+          current_period_end?: string | null;
+          current_period_start?: string | null;
+          environment?: string;
+          id?: string;
+          price_id: string;
+          product_id: string;
+          status?: string;
+          stripe_customer_id: string;
+          stripe_subscription_id: string;
+          updated_at?: string | null;
+          user_id: string;
+        };
         Update: {
-          cancel_at_period_end?: boolean | null
-          created_at?: string | null
-          current_period_end?: string | null
-          current_period_start?: string | null
-          environment?: string
-          id?: string
-          price_id?: string
-          product_id?: string
-          status?: string
-          stripe_customer_id?: string
-          stripe_subscription_id?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
+          cancel_at_period_end?: boolean | null;
+          created_at?: string | null;
+          current_period_end?: string | null;
+          current_period_start?: string | null;
+          environment?: string;
+          id?: string;
+          price_id?: string;
+          product_id?: string;
+          status?: string;
+          stripe_customer_id?: string;
+          stripe_subscription_id?: string;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       user_program_balances: {
         Row: {
-          balance: number
-          created_at: string
-          id: string
-          note: string | null
-          program_id: string
-          program_name: string
-          updated_at: string
-          user_id: string
-        }
+          balance: number;
+          created_at: string;
+          id: string;
+          note: string | null;
+          program_id: string;
+          program_name: string;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          balance?: number
-          created_at?: string
-          id?: string
-          note?: string | null
-          program_id: string
-          program_name: string
-          updated_at?: string
-          user_id: string
-        }
+          balance?: number;
+          created_at?: string;
+          id?: string;
+          note?: string | null;
+          program_id: string;
+          program_name: string;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          balance?: number
-          created_at?: string
-          id?: string
-          note?: string | null
-          program_id?: string
-          program_name?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
+          balance?: number;
+          created_at?: string;
+          id?: string;
+          note?: string | null;
+          program_id?: string;
+          program_name?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       user_roles: {
         Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
+          created_at: string;
+          id: string;
+          role: Database["public"]["Enums"]["app_role"];
+          user_id: string;
+        };
         Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
+          created_at?: string;
+          id?: string;
+          role: Database["public"]["Enums"]["app_role"];
+          user_id: string;
+        };
         Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
+          created_at?: string;
+          id?: string;
+          role?: Database["public"]["Enums"]["app_role"];
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       watchlists: {
         Row: {
-          active: boolean
-          cabin: string
-          channel: string
-          created_at: string
-          date_from: string
-          date_to: string
-          destination: string
-          id: string
-          label: string | null
-          max_miles: number | null
-          min_cpp_aud: number | null
-          origin: string
-          pax: number
-          updated_at: string
-          user_id: string
-        }
+          active: boolean;
+          cabin: string;
+          channel: string;
+          created_at: string;
+          date_from: string;
+          date_to: string;
+          destination: string;
+          id: string;
+          label: string | null;
+          max_miles: number | null;
+          min_cpp_aud: number | null;
+          origin: string;
+          pax: number;
+          updated_at: string;
+          user_id: string;
+        };
         Insert: {
-          active?: boolean
-          cabin: string
-          channel?: string
-          created_at?: string
-          date_from: string
-          date_to: string
-          destination: string
-          id?: string
-          label?: string | null
-          max_miles?: number | null
-          min_cpp_aud?: number | null
-          origin: string
-          pax?: number
-          updated_at?: string
-          user_id: string
-        }
+          active?: boolean;
+          cabin: string;
+          channel?: string;
+          created_at?: string;
+          date_from: string;
+          date_to: string;
+          destination: string;
+          id?: string;
+          label?: string | null;
+          max_miles?: number | null;
+          min_cpp_aud?: number | null;
+          origin: string;
+          pax?: number;
+          updated_at?: string;
+          user_id: string;
+        };
         Update: {
-          active?: boolean
-          cabin?: string
-          channel?: string
-          created_at?: string
-          date_from?: string
-          date_to?: string
-          destination?: string
-          id?: string
-          label?: string | null
-          max_miles?: number | null
-          min_cpp_aud?: number | null
-          origin?: string
-          pax?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-    }
+          active?: boolean;
+          cabin?: string;
+          channel?: string;
+          created_at?: string;
+          date_from?: string;
+          date_to?: string;
+          destination?: string;
+          id?: string;
+          label?: string | null;
+          max_miles?: number | null;
+          min_cpp_aud?: number | null;
+          origin?: string;
+          pax?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
       active_watchlist_count: {
-        Args: { exclude_id?: string; uid: string }
-        Returns: number
-      }
+        Args: { exclude_id?: string; uid: string };
+        Returns: number;
+      };
       admin_get_cron_secret_meta: {
-        Args: never
+        Args: never;
         Returns: {
-          has_secret: boolean
-          updated_at: string
-        }[]
-      }
+          has_secret: boolean;
+          updated_at: string;
+        }[];
+      };
       admin_rotate_cron_secret: {
-        Args: { _new_value: string }
-        Returns: string
-      }
+        Args: { _new_value: string };
+        Returns: string;
+      };
       has_active_subscription: {
-        Args: { check_env?: string; user_uuid: string }
-        Returns: boolean
-      }
+        Args: { check_env?: string; user_uuid: string };
+        Returns: boolean;
+      };
       has_role: {
         Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      user_has_plus: { Args: { uid: string }; Returns: boolean }
-    }
+          _role: Database["public"]["Enums"]["app_role"];
+          _user_id: string;
+        };
+        Returns: boolean;
+      };
+      user_has_plus: { Args: { uid: string }; Returns: boolean };
+    };
     Enums: {
-      app_role: "admin" | "agent"
-    }
+      app_role: "admin" | "agent";
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
       DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+      Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+      Insert: infer I;
     }
     ? I
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+      Update: infer U;
     }
     ? U
     : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
     ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    schema: keyof DatabaseWithoutInternals;
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+    : never;
 
 export const Constants = {
   public: {
@@ -493,4 +485,4 @@ export const Constants = {
       app_role: ["admin", "agent"],
     },
   },
-} as const
+} as const;

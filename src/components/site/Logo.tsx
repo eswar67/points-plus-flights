@@ -26,7 +26,10 @@ export function LogoMark({ className = "size-7" }: { className?: string }) {
         strokeWidth="1"
       />
       {/* M mark for Miles Expert */}
-      <path d="M5.5 25.5 V7 L11.2 7 L16 16.5 L20.8 7 L26.5 7 V25.5 H23.2 V12.4 L17.4 23.6 H14.6 L8.8 12.4 V25.5 Z" fill="url(#aureum-gold)" />
+      <path
+        d="M5.5 25.5 V7 L11.2 7 L16 16.5 L20.8 7 L26.5 7 V25.5 H23.2 V12.4 L17.4 23.6 H14.6 L8.8 12.4 V25.5 Z"
+        fill="url(#aureum-gold)"
+      />
       {/* Contrail crossing the M like a flight path */}
       <path
         d="M4.5 22.5 C 11 21, 19 17.5, 26.5 11.5"

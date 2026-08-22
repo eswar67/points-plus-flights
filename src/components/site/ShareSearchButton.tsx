@@ -2,15 +2,7 @@ import { Check, Share2 } from "lucide-react";
 import { useState } from "react";
 import type { Cabin } from "@/lib/awards/types";
 
-export function ShareSearchButton({
-  from,
-  to,
-  cabin,
-}: {
-  from: string;
-  to: string;
-  cabin: Cabin;
-}) {
+export function ShareSearchButton({ from, to, cabin }: { from: string; to: string; cabin: Cabin }) {
   const [copied, setCopied] = useState(false);
 
   async function onShare() {

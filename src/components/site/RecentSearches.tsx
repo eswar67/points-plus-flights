@@ -42,9 +42,7 @@ export function RecentSearches({
             <span className="font-display text-sm tabular-nums">{r.from}</span>
             <ArrowRight className="size-3 text-gold opacity-70 group-hover:translate-x-0.5 transition" />
             <span className="font-display text-sm tabular-nums">{r.to}</span>
-            <span className="text-muted-foreground/80 hidden sm:inline">
-              · {cityFor(r.to)}
-            </span>
+            <span className="text-muted-foreground/80 hidden sm:inline">· {cityFor(r.to)}</span>
             <span className="text-[10px] uppercase tracking-widest text-gold/80 pl-1 border-l border-border-soft ml-1">
               {r.cabin}
             </span>

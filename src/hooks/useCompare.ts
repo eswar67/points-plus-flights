@@ -34,10 +34,7 @@ export function useCompare() {
     return () => window.removeEventListener("me:compare-changed", onChange);
   }, []);
 
-  const has = useCallback(
-    (id: string) => items.some((it) => it.id === id),
-    [items],
-  );
+  const has = useCallback((id: string) => items.some((it) => it.id === id), [items]);
 
   const toggle = useCallback((award: AwardItinerary): "added" | "removed" | "full" => {
     const cur = read();

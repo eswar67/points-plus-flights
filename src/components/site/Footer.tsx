@@ -22,7 +22,8 @@ export function Footer() {
           </Link>
         </nav>
         <p className="opacity-70">
-          © {new Date().getFullYear()} Miles Expert. Availability via seats.aero, refreshed continuously.
+          © {new Date().getFullYear()} Miles Expert. Availability via seats.aero, refreshed
+          continuously.
         </p>
       </div>
     </footer>

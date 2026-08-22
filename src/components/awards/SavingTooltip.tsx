@@ -2,11 +2,7 @@
 
 import { Info } from "lucide-react";
 import { fmtAud } from "@/lib/intelligence";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function SavingTooltip({
   cash,
@@ -71,9 +67,8 @@ export function SavingTooltip({
             </p>
           </div>
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            The saving percentage is the cash outlay avoided by paying reward
-            taxes instead of the full fare. It does not include the value of
-            the points or miles redeemed.
+            The saving percentage is the cash outlay avoided by paying reward taxes instead of the
+            full fare. It does not include the value of the points or miles redeemed.
           </p>
         </div>
       </TooltipContent>

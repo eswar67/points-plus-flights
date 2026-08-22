@@ -1,11 +1,6 @@
 import { useEffect, useState, FormEvent } from "react";
 import type { Cabin } from "@/lib/awards/types";
-import {
-  METROS,
-  searchAirports,
-  warmAirportIndex,
-  type Airport,
-} from "@/lib/airports";
+import { METROS, searchAirports, warmAirportIndex, type Airport } from "@/lib/airports";
 
 export type SearchMode = "exact" | "flex1" | "flex" | "month";
 
@@ -118,10 +113,7 @@ export function SearchForm({
     return (parts[parts.length - 1] ?? "").trim();
   }
 
-  async function refreshMatches(
-    raw: string,
-    setter: (a: Airport[]) => void,
-  ): Promise<void> {
+  async function refreshMatches(raw: string, setter: (a: Airport[]) => void): Promise<void> {
     const token = activeToken(raw);
     if (!token || token.length < 3) {
       setter([]);
@@ -293,8 +285,14 @@ export function SearchForm({
               Reset
             </button>
           </div>
-          <div className="flex items-center gap-1.5 flex-wrap" role="radiogroup" aria-label="Date flexibility">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">Dates</span>
+          <div
+            className="flex items-center gap-1.5 flex-wrap"
+            role="radiogroup"
+            aria-label="Date flexibility"
+          >
+            <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">
+              Dates
+            </span>
             {MODES.map((m) => (
               <button
                 key={m.value}
@@ -313,7 +311,9 @@ export function SearchForm({
             ))}
           </div>
           <div className="flex flex-wrap items-center gap-1.5" aria-label="Popular routes">
-            <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">Popular</span>
+            <span className="text-xs uppercase tracking-widest text-muted-foreground mr-1">
+              Popular
+            </span>
             {PRESETS.map((p) => (
               <button
                 key={`${p.from}${p.to}`}

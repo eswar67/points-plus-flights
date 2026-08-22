@@ -1,9 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  Check,
-  Clock,
-  ExternalLink,
-} from "lucide-react";
+import { Check, Clock, ExternalLink } from "lucide-react";
 import type { AwardItinerary } from "@/lib/awards/types";
 import { buildPlaybook } from "@/lib/playbook";
 import { useUserBalances } from "@/hooks/useUserBalances";
@@ -75,42 +71,40 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
 
         <div className="p-6">
           <FeasibilityBanner playbook={playbook} />
-              {playbook.riskNote && (
-                <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/5 text-amber-300 px-4 py-3 text-sm">
-                  ⚠ {playbook.riskNote}
-                </div>
-              )}
-              <ol className="mt-6 space-y-4">
-                {playbook.steps.map((s, i) => (
-                  <li key={i} className="relative pl-10">
-                    <span className="absolute left-0 top-0.5 size-7 rounded-full grid place-items-center font-display text-xs bg-gold/15 text-gold border border-gold/30">
-                      {i + 1}
+          {playbook.riskNote && (
+            <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/5 text-amber-300 px-4 py-3 text-sm">
+              ⚠ {playbook.riskNote}
+            </div>
+          )}
+          <ol className="mt-6 space-y-4">
+            {playbook.steps.map((s, i) => (
+              <li key={i} className="relative pl-10">
+                <span className="absolute left-0 top-0.5 size-7 rounded-full grid place-items-center font-display text-xs bg-gold/15 text-gold border border-gold/30">
+                  {i + 1}
+                </span>
+                <div className="font-display text-base">{s.title}</div>
+                <p className="text-sm text-muted-foreground mt-1">{s.detail}</p>
+                <div className="mt-2 flex items-center gap-3">
+                  {s.href && s.cta && (
+                    <a
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-full bg-gold/10 text-gold border border-gold/30 hover:bg-gold/20 transition"
+                    >
+                      {s.cta} <ExternalLink className="size-3" />
+                    </a>
+                  )}
+                  {s.etaMinutes !== undefined && s.kind !== "wait" && (
+                    <span className="inline-flex items-center gap-1 text-xs uppercase tracking-widest text-muted-foreground">
+                      <Clock className="size-3" /> ~
+                      {s.etaMinutes < 60 ? `${s.etaMinutes}m` : `${Math.round(s.etaMinutes / 60)}h`}
                     </span>
-                    <div className="font-display text-base">{s.title}</div>
-                    <p className="text-sm text-muted-foreground mt-1">{s.detail}</p>
-                    <div className="mt-2 flex items-center gap-3">
-                      {s.href && s.cta && (
-                        <a
-                          href={s.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-full bg-gold/10 text-gold border border-gold/30 hover:bg-gold/20 transition"
-                        >
-                          {s.cta} <ExternalLink className="size-3" />
-                        </a>
-                      )}
-                      {s.etaMinutes !== undefined && s.kind !== "wait" && (
-                        <span className="inline-flex items-center gap-1 text-xs uppercase tracking-widest text-muted-foreground">
-                          <Clock className="size-3" /> ~
-                          {s.etaMinutes < 60
-                            ? `${s.etaMinutes}m`
-                            : `${Math.round(s.etaMinutes / 60)}h`}
-                        </span>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ol>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </div>
@@ -132,4 +126,3 @@ function FeasibilityBanner({ playbook }: { playbook: ReturnType<typeof buildPlay
     </div>
   );
 }
-

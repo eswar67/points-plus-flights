@@ -244,11 +244,7 @@ export class SeatsAeroProvider implements AwardProvider {
     };
   }
 
-  private rowToItinerary(
-    row: RawAvailability,
-    cabin: Cabin,
-    pax: number,
-  ): AwardItinerary | null {
+  private rowToItinerary(row: RawAvailability, cabin: Cabin, pax: number): AwardItinerary | null {
     const field = CABIN_TO_FIELD[cabin];
     const anyRow = row as unknown as Record<string, unknown>;
     const available = anyRow[`${field}Available`] as boolean | undefined;

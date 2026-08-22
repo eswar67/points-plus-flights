@@ -120,7 +120,6 @@ function Index() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
 
-
   // Results toolbar (point.me-grade result controls)
   const [sortBy, setSortBy] = useState<
     | "value"
@@ -256,10 +255,11 @@ function Index() {
       (!carrierFilter || carrierFilter.size === 0 || carrierFilter.has((a.carrier || "").trim())) &&
       (!sweetOnly || a.isSweetSpot) &&
       (!hideZeroAvailability || a.seats > 0) &&
-      (!bookableOnly || (() => {
-        const k = bookableKind(a);
-        return k === "direct" || k === "transfer";
-      })()),
+      (!bookableOnly ||
+        (() => {
+          const k = bookableKind(a);
+          return k === "direct" || k === "transfer";
+        })()),
   );
   const sorted: Enriched[] =
     sortBy === "points"
@@ -275,11 +275,11 @@ function Index() {
                     (b.durationMin || Number.POSITIVE_INFINITY) || a.miles - b.miles,
               )
             : sortBy === "stops"
-              ? [...filtered].sort(
-                  (a, b) => a.stops - b.stops || a.miles - b.miles,
-                )
+              ? [...filtered].sort((a, b) => a.stops - b.stops || a.miles - b.miles)
               : sortBy === "depart"
-                ? [...filtered].sort((a, b) => (a.depart < b.depart ? -1 : a.depart > b.depart ? 1 : 0))
+                ? [...filtered].sort((a, b) =>
+                    a.depart < b.depart ? -1 : a.depart > b.depart ? 1 : 0,
+                  )
                 : sortBy === "fresh"
                   ? [...filtered].sort((a, b) => {
                       const ta = a.updatedAt ? Date.parse(a.updatedAt) : 0;
@@ -298,7 +298,10 @@ function Index() {
                         sortBy === "j-points" ||
                         sortBy === "f-points"
                       ? (() => {
-                          const cabinFor: Record<string, "economy" | "premium" | "business" | "first"> = {
+                          const cabinFor: Record<
+                            string,
+                            "economy" | "premium" | "business" | "first"
+                          > = {
                             "y-points": "economy",
                             "w-points": "premium",
                             "j-points": "business",
@@ -482,12 +485,11 @@ function Index() {
               A smarter way to find award flights from Australia
             </div>
             <h1 className="font-display text-4xl md:text-6xl font-semibold tracking-tight leading-[1.02]">
-              Turn your points into{" "}
-              <span className="text-gold-shimmer">first-class</span> memories.
+              Turn your points into <span className="text-gold-shimmer">first-class</span> memories.
             </h1>
             <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-xl md:mx-0 mx-auto">
-              The smartest way for Australians to search Qantas, Velocity, KrisFlyer,
-              Flying Blue and 20+ global programs — ranked in AUD by real cents-per-point value.
+              The smartest way for Australians to search Qantas, Velocity, KrisFlyer, Flying Blue
+              and 20+ global programs — ranked in AUD by real cents-per-point value.
             </p>
           </div>
 
@@ -509,14 +511,16 @@ function Index() {
           {!query && (
             <RecentSearches
               items={recent}
-              onPick={(r) => runSearch({
-                from: r.from,
-                to: r.to,
-                date: r.date,
-                cabin: r.cabin,
-                pax: r.pax,
-                mode: r.mode,
-              })}
+              onPick={(r) =>
+                runSearch({
+                  from: r.from,
+                  to: r.to,
+                  date: r.date,
+                  cabin: r.cabin,
+                  pax: r.pax,
+                  mode: r.mode,
+                })
+              }
               onClear={clearRecent}
             />
           )}
@@ -535,13 +539,12 @@ function Index() {
 
       <ProgramRail />
 
-      <section
-        ref={resultsRef}
-        id="results"
-        className="mx-auto max-w-7xl px-6 py-16 scroll-mt-24"
-      >
+      <section ref={resultsRef} id="results" className="mx-auto max-w-7xl px-6 py-16 scroll-mt-24">
         {query ? (
-          <div key={`${query.from}-${query.to}-${query.date}-${query.mode}`} className="animate-fade-in">
+          <div
+            key={`${query.from}-${query.to}-${query.date}-${query.mode}`}
+            className="animate-fade-in"
+          >
             <div className="flex items-end justify-between mb-6">
               <div>
                 <h2 className="font-display text-3xl">
@@ -696,13 +699,9 @@ function Index() {
                     <span className="font-display text-2xl tabular-nums text-foreground">
                       {sweetSpotCount}
                     </span>{" "}
-                    {sweetSpotCount === 1 ? "outlier" : "outliers"} priced ≥25% below the
-                    typical rate for this cabin
-                    {sweetSpotCount > 0
-                      ? sweetOnly
-                        ? " — filtered"
-                        : ". Click to filter."
-                      : "."}
+                    {sweetSpotCount === 1 ? "outlier" : "outliers"} priced ≥25% below the typical
+                    rate for this cabin
+                    {sweetSpotCount > 0 ? (sweetOnly ? " — filtered" : ". Click to filter.") : "."}
                   </div>
                 </button>
               </div>
@@ -718,182 +717,184 @@ function Index() {
                       sort, filters & advanced options
                     </span>
                   </span>
-                  <span aria-hidden className="text-gold transition group-open:rotate-45">+</span>
+                  <span aria-hidden className="text-gold transition group-open:rotate-45">
+                    +
+                  </span>
                 </summary>
                 <div className="p-4 pt-2 space-y-3 border-t border-border-soft">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-muted-foreground mr-1">Sort</span>
-                  {(
-                    [
-                      ["value", "Best value"],
-                      ["sweet", "Sweet spots"],
-                      ["points", "Fewest points"],
-                      ["taxes", "Lowest taxes"],
-                      ["seats", "Most seats"],
-                      ["duration", "Shortest"],
-                      ["stops", "Fewest stops"],
-                      ["depart", "Earliest depart"],
-                      ["fresh", "Freshest data"],
-                    ] as const
-                  ).map(([key, label]) => (
-                    <button
-                      key={key}
-                      type="button"
-                      aria-pressed={sortBy === key}
-                      onClick={() => setSortBy(key)}
-                      className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
-                        sortBy === key
-                          ? "bg-gold/15 text-gold border-gold/50"
-                          : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    aria-pressed={nonstopOnly}
-                    onClick={() => setNonstopOnly((v) => !v)}
-                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
-                      nonstopOnly
-                        ? "bg-gold/15 text-gold border-gold/50"
-                        : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
-                    }`}
-                  >
-                    Nonstop
-                  </button>
-                  <button
-                    type="button"
-                    aria-pressed={twoPlusSeats}
-                    onClick={() => setTwoPlusSeats((v) => !v)}
-                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
-                      twoPlusSeats
-                        ? "bg-gold/15 text-gold border-gold/50"
-                        : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
-                    }`}
-                  >
-                    2+ seats
-                  </button>
-                  <button
-                    type="button"
-                    aria-pressed={!hideZeroAvailability}
-                    onClick={() => setHideZeroAvailability((v) => !v)}
-                    className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition inline-flex items-center gap-2 ${
-                      !hideZeroAvailability
-                        ? "bg-gold/15 text-gold border-gold/50"
-                        : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
-                    }`}
-                  >
-                    Zero availability
-                    {zeroAvailabilityCount > 0 && (
-                      <span
-                        key={`zero-${hideZeroAvailability ? "hidden" : "shown"}`}
-                        aria-label={
-                          hideZeroAvailability
-                            ? `${zeroAvailabilityCount} hidden`
-                            : `${zeroAvailabilityCount} shown`
-                        }
-                        className={`animate-scale-in tabular-nums text-[10px] px-1.5 py-0.5 rounded-full border ${
-                          !hideZeroAvailability
-                            ? "bg-gold/25 border-gold/50 text-gold"
-                            : "bg-muted/40 border-border-soft text-muted-foreground"
-                        }`}
-                      >
-                        {animatedZeroCount.toLocaleString()}
-                      </span>
-                    )}
-                  </button>
-                </div>
-                <div
-                  className="flex flex-wrap items-center gap-2"
-                  role="group"
-                  aria-label="Filter by value grade"
-                >
-                  <span className="text-xs text-muted-foreground mr-1">Grade</span>
-                  {(["exceptional", "great", "fair", "skip"] as const).map((g) => {
-                    const active = gradeFilter?.has(g) ?? false;
-                    return (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs text-muted-foreground mr-1">Sort</span>
+                    {(
+                      [
+                        ["value", "Best value"],
+                        ["sweet", "Sweet spots"],
+                        ["points", "Fewest points"],
+                        ["taxes", "Lowest taxes"],
+                        ["seats", "Most seats"],
+                        ["duration", "Shortest"],
+                        ["stops", "Fewest stops"],
+                        ["depart", "Earliest depart"],
+                        ["fresh", "Freshest data"],
+                      ] as const
+                    ).map(([key, label]) => (
                       <button
-                        key={g}
+                        key={key}
                         type="button"
-                        aria-pressed={active}
-                        onClick={() => toggleGrade(g)}
+                        aria-pressed={sortBy === key}
+                        onClick={() => setSortBy(key)}
                         className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
-                          active
+                          sortBy === key
                             ? "bg-gold/15 text-gold border-gold/50"
                             : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
                         }`}
                       >
-                        {g}
+                        {label}
                       </button>
-                    );
-                  })}
-                </div>
-                {programFacets.size > 1 && (
-                  <div
-                    className="flex gap-2 overflow-x-auto pb-1"
-                    role="group"
-                    aria-label="Filter by program"
-                  >
-                    {[...programFacets.entries()]
-                      .sort((a, b) => b[1].count - a[1].count)
-                      .map(([pid, f]) => {
-                        const active = programFilter?.has(pid) ?? false;
-                        return (
-                          <button
-                            key={pid}
-                            type="button"
-                            aria-pressed={active}
-                            onClick={() => toggleProgram(pid)}
-                            className={`shrink-0 inline-flex items-center gap-2 text-xs px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
-                              active
-                                ? "bg-gold/15 text-gold border-gold/50"
-                                : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
-                            }`}
-                          >
-                            <span
-                              className="size-1.5 rounded-full"
-                              style={{ background: f.accent }}
-                            />
-                            {f.name}
-                            <span className="opacity-60">{f.count}</span>
-                          </button>
-                        );
-                      })}
+                    ))}
+                    <button
+                      type="button"
+                      aria-pressed={nonstopOnly}
+                      onClick={() => setNonstopOnly((v) => !v)}
+                      className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                        nonstopOnly
+                          ? "bg-gold/15 text-gold border-gold/50"
+                          : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                      }`}
+                    >
+                      Nonstop
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={twoPlusSeats}
+                      onClick={() => setTwoPlusSeats((v) => !v)}
+                      className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                        twoPlusSeats
+                          ? "bg-gold/15 text-gold border-gold/50"
+                          : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                      }`}
+                    >
+                      2+ seats
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={!hideZeroAvailability}
+                      onClick={() => setHideZeroAvailability((v) => !v)}
+                      className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition inline-flex items-center gap-2 ${
+                        !hideZeroAvailability
+                          ? "bg-gold/15 text-gold border-gold/50"
+                          : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                      }`}
+                    >
+                      Zero availability
+                      {zeroAvailabilityCount > 0 && (
+                        <span
+                          key={`zero-${hideZeroAvailability ? "hidden" : "shown"}`}
+                          aria-label={
+                            hideZeroAvailability
+                              ? `${zeroAvailabilityCount} hidden`
+                              : `${zeroAvailabilityCount} shown`
+                          }
+                          className={`animate-scale-in tabular-nums text-[10px] px-1.5 py-0.5 rounded-full border ${
+                            !hideZeroAvailability
+                              ? "bg-gold/25 border-gold/50 text-gold"
+                              : "bg-muted/40 border-border-soft text-muted-foreground"
+                          }`}
+                        >
+                          {animatedZeroCount.toLocaleString()}
+                        </span>
+                      )}
+                    </button>
                   </div>
-                )}
-                {carrierFacets.size > 1 && (
                   <div
-                    className="flex gap-2 overflow-x-auto pb-1"
+                    className="flex flex-wrap items-center gap-2"
                     role="group"
-                    aria-label="Filter by airline"
+                    aria-label="Filter by value grade"
                   >
-                    <span className="text-xs text-muted-foreground mr-1 self-center shrink-0">
-                      Airline
-                    </span>
-                    {[...carrierFacets.entries()]
-                      .sort((a, b) => b[1].count - a[1].count)
-                      .map(([carrier, f]) => {
-                        const active = carrierFilter?.has(carrier) ?? false;
-                        return (
-                          <button
-                            key={carrier}
-                            type="button"
-                            aria-pressed={active}
-                            onClick={() => toggleCarrier(carrier)}
-                            className={`shrink-0 inline-flex items-center gap-2 text-xs px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
-                              active
-                                ? "bg-gold/15 text-gold border-gold/50"
-                                : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
-                            }`}
-                          >
-                            {carrier}
-                            <span className="opacity-60">{f.count}</span>
-                          </button>
-                        );
-                      })}
+                    <span className="text-xs text-muted-foreground mr-1">Grade</span>
+                    {(["exceptional", "great", "fair", "skip"] as const).map((g) => {
+                      const active = gradeFilter?.has(g) ?? false;
+                      return (
+                        <button
+                          key={g}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => toggleGrade(g)}
+                          className={`text-xs uppercase tracking-widest px-3.5 py-2.5 min-h-11 rounded-full border transition ${
+                            active
+                              ? "bg-gold/15 text-gold border-gold/50"
+                              : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                          }`}
+                        >
+                          {g}
+                        </button>
+                      );
+                    })}
                   </div>
-                )}
+                  {programFacets.size > 1 && (
+                    <div
+                      className="flex gap-2 overflow-x-auto pb-1"
+                      role="group"
+                      aria-label="Filter by program"
+                    >
+                      {[...programFacets.entries()]
+                        .sort((a, b) => b[1].count - a[1].count)
+                        .map(([pid, f]) => {
+                          const active = programFilter?.has(pid) ?? false;
+                          return (
+                            <button
+                              key={pid}
+                              type="button"
+                              aria-pressed={active}
+                              onClick={() => toggleProgram(pid)}
+                              className={`shrink-0 inline-flex items-center gap-2 text-xs px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
+                                active
+                                  ? "bg-gold/15 text-gold border-gold/50"
+                                  : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                              }`}
+                            >
+                              <span
+                                className="size-1.5 rounded-full"
+                                style={{ background: f.accent }}
+                              />
+                              {f.name}
+                              <span className="opacity-60">{f.count}</span>
+                            </button>
+                          );
+                        })}
+                    </div>
+                  )}
+                  {carrierFacets.size > 1 && (
+                    <div
+                      className="flex gap-2 overflow-x-auto pb-1"
+                      role="group"
+                      aria-label="Filter by airline"
+                    >
+                      <span className="text-xs text-muted-foreground mr-1 self-center shrink-0">
+                        Airline
+                      </span>
+                      {[...carrierFacets.entries()]
+                        .sort((a, b) => b[1].count - a[1].count)
+                        .map(([carrier, f]) => {
+                          const active = carrierFilter?.has(carrier) ?? false;
+                          return (
+                            <button
+                              key={carrier}
+                              type="button"
+                              aria-pressed={active}
+                              onClick={() => toggleCarrier(carrier)}
+                              className={`shrink-0 inline-flex items-center gap-2 text-xs px-3.5 py-2.5 min-h-11 rounded-full border transition whitespace-nowrap tabular-nums ${
+                                active
+                                  ? "bg-gold/15 text-gold border-gold/50"
+                                  : "border-border text-muted-foreground hover:text-foreground hover:border-border-strong"
+                              }`}
+                            >
+                              {carrier}
+                              <span className="opacity-60">{f.count}</span>
+                            </button>
+                          );
+                        })}
+                    </div>
+                  )}
                 </div>
               </details>
             )}
@@ -913,7 +914,8 @@ function Index() {
               />
             ) : itineraries.length === 0 && !error ? (
               <div className="rounded-lg border border-border bg-card p-10 text-center text-muted-foreground">
-                No award space found for this route and date. Try nearby dates or a different city pair.
+                No award space found for this route and date. Try nearby dates or a different city
+                pair.
               </div>
             ) : sorted.length === 0 && !error ? (
               <div className="rounded-lg border border-border bg-card p-10 text-center">
@@ -1011,20 +1013,29 @@ function Index() {
                               <span className="inline-flex items-center gap-2">
                                 <span className="text-gold">Why this ranks first</span>
                                 <span className="text-[10px] text-muted-foreground/70 normal-case tracking-normal">
-                                  {topPick.programName} · {topPick.miles.toLocaleString()} pts · {topPick.cpp.toFixed(2)}¢ / pt
+                                  {topPick.programName} · {topPick.miles.toLocaleString()} pts ·{" "}
+                                  {topPick.cpp.toFixed(2)}¢ / pt
                                 </span>
                               </span>
-                              <span aria-hidden className="text-gold transition group-open:rotate-45">
+                              <span
+                                aria-hidden
+                                className="text-gold transition group-open:rotate-45"
+                              >
                                 +
                               </span>
                             </summary>
                             <ul className="px-4 pb-4 pt-1 space-y-2 border-t border-border-soft">
                               {reasons.map((r, i) => (
                                 <li key={i} className="flex gap-3 text-sm">
-                                  <span className="mt-1.5 size-1.5 rounded-full bg-gold shrink-0" aria-hidden />
+                                  <span
+                                    className="mt-1.5 size-1.5 rounded-full bg-gold shrink-0"
+                                    aria-hidden
+                                  />
                                   <div>
                                     <div className="text-foreground">{r.label}</div>
-                                    <div className="text-muted-foreground text-xs mt-0.5">{r.detail}</div>
+                                    <div className="text-muted-foreground text-xs mt-0.5">
+                                      {r.detail}
+                                    </div>
                                   </div>
                                 </li>
                               ))}
@@ -1116,11 +1127,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Portfolio({
-  balancesHook,
-}: {
-  balancesHook: ReturnType<typeof useUserBalances>;
-}) {
+function Portfolio({ balancesHook }: { balancesHook: ReturnType<typeof useUserBalances> }) {
   const { balances, addBalance, updateBalance, removeBalance, isGuest } = balancesHook;
   const totalPoints = useCountUp(balances.reduce((s, b) => s + b.balance, 0));
 
@@ -1164,11 +1171,7 @@ function Portfolio({
       </div>
 
       {balances.length === 0 ? (
-        <InlineBalanceAdder
-          balances={balances}
-          onAdd={addBalance}
-          emptyState
-        />
+        <InlineBalanceAdder balances={balances} onAdd={addBalance} emptyState />
       ) : (
         <>
           <div className="rounded-lg border border-gold/30 bg-gradient-to-br from-gold/10 via-card to-background p-8 md:p-10 mb-6">
@@ -1347,9 +1350,7 @@ function InlineBalanceAdder({
       )}
       <div className="flex flex-wrap items-end gap-3">
         <div className="flex-1 min-w-[180px]">
-          <label className="text-xs uppercase tracking-widest text-muted-foreground">
-            Program
-          </label>
+          <label className="text-xs uppercase tracking-widest text-muted-foreground">Program</label>
           <select
             value={programId}
             onChange={(e) => setProgramId(e.target.value)}

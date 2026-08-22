@@ -38,6 +38,7 @@ Rewrite `src/routes/index.tsx` results section:
 ## 4. Concierge voice pass
 
 Sweep visible copy in these files:
+
 - `SearchForm.tsx` hero copy
 - `AwardTable.tsx` — remove "CPP", "Y/W/J/F" short codes from row chips; replace with "Economy / Business" etc. Keep short codes only inside the refine drawer for power users.
 - Section blurbs on results

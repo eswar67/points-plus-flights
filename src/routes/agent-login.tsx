@@ -7,7 +7,10 @@ export const Route = createFileRoute("/agent-login")({
   head: () => ({
     meta: [
       { title: "Agent sign in — Miles Expert" },
-      { name: "description", content: "Concierge agent access for Miles Expert award booking queue." },
+      {
+        name: "description",
+        content: "Concierge agent access for Miles Expert award booking queue.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),

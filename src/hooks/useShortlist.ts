@@ -45,10 +45,7 @@ export function useShortlist() {
     };
   }, []);
 
-  const has = useCallback(
-    (id: string) => items.some((it) => it.id === id),
-    [items],
-  );
+  const has = useCallback((id: string) => items.some((it) => it.id === id), [items]);
 
   const toggle = useCallback((award: AwardItinerary) => {
     const current = read();

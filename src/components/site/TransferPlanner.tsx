@@ -32,8 +32,8 @@ export function TransferPlanner() {
         </h2>
         <p className="text-sm text-muted-foreground mt-2 max-w-prose">
           Add an Australian transferable currency above — Amex Membership Rewards (AU) or ANZ
-          Rewards — and we'll show every airline program you can reach, at what ratio, and how
-          long the points take to land.
+          Rewards — and we'll show every airline program you can reach, at what ratio, and how long
+          the points take to land.
         </p>
       </section>
     );

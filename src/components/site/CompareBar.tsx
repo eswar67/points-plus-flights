@@ -24,9 +24,7 @@ export function CompareBar() {
         <div className="flex items-center gap-2 rounded-full border border-gold/50 bg-card/95 backdrop-blur px-3 py-2 shadow-elevated">
           <div className="flex items-center gap-1.5 pl-1">
             <GitCompare className="size-4 text-gold" />
-            <span className="text-xs uppercase tracking-widest text-foreground">
-              Compare
-            </span>
+            <span className="text-xs uppercase tracking-widest text-foreground">Compare</span>
             <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-gold text-gold-foreground text-[10px] font-bold tabular-nums">
               {items.length}/{COMPARE_MAX}
             </span>

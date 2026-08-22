@@ -14,7 +14,17 @@ import {
   effectiveBalances,
   taxesAudFromUsd,
 } from "@/lib/intelligence";
-import { AlertTriangle, Bookmark, BookmarkCheck, Check, GitCompare, Plane, Sparkles, Zap, ArrowRightLeft } from "lucide-react";
+import {
+  AlertTriangle,
+  Bookmark,
+  BookmarkCheck,
+  Check,
+  GitCompare,
+  Plane,
+  Sparkles,
+  Zap,
+  ArrowRightLeft,
+} from "lucide-react";
 import { useShortlist } from "@/hooks/useShortlist";
 import { useCompare } from "@/hooks/useCompare";
 
@@ -365,9 +375,7 @@ export function AwardCard({
         <div className="min-w-0">
           <div className="flex items-center gap-4">
             <div className="text-left">
-              <div
-                className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}
-              >
+              <div className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}>
                 {fmtTime(active.depart)}
               </div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
@@ -377,7 +385,9 @@ export function AwardCard({
             <div className="flex-1 relative">
               <div className="text-[10px] text-center text-muted-foreground/80 uppercase tracking-[0.2em] mb-2">
                 {active.durationMin ? fmtDuration(active.durationMin) : ""}
-                {active.durationMin && (active.direct || active.stops === 0 || active.stops) ? " · " : ""}
+                {active.durationMin && (active.direct || active.stops === 0 || active.stops)
+                  ? " · "
+                  : ""}
                 {active.direct
                   ? "Nonstop"
                   : active.stops === 0
@@ -394,9 +404,7 @@ export function AwardCard({
               </div>
             </div>
             <div className="text-right">
-              <div
-                className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}
-              >
+              <div className={`font-display tabular-nums ${isSweetSpot ? "text-4xl" : "text-2xl"}`}>
                 {fmtTime(active.arrive)}
               </div>
               <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
@@ -407,26 +415,25 @@ export function AwardCard({
 
           {/* Bookability line */}
           <div className="mt-5">
-          {bookable === "direct" && (
-            <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] px-2.5 py-1 border border-emerald-400/40 bg-emerald-500/10 text-emerald-300">
-              <Check className="size-3" /> Book now
-            </div>
-          )}
-          {bookable === "transfer" && fastest && (
-            <div className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 border border-gold/40 bg-gold/5 text-gold tabular-nums">
-              <ArrowRightLeft className="size-3" />
-              Transfer {Math.max(0, active.miles - balance).toLocaleString()} from{" "}
-              {fastest.bank}
-              <span className="opacity-70">
-                · {fastest.etaMin < 60 ? "instant" : `~${Math.round(fastest.etaMin / 60)}h`}
-              </span>
-            </div>
-          )}
-          {bookable === "short" && (
-            <div className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 border border-border-soft bg-muted/30 text-muted-foreground tabular-nums">
-              Short {(active.miles - effective).toLocaleString()} pts
-            </div>
-          )}
+            {bookable === "direct" && (
+              <div className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] px-2.5 py-1 border border-emerald-400/40 bg-emerald-500/10 text-emerald-300">
+                <Check className="size-3" /> Book now
+              </div>
+            )}
+            {bookable === "transfer" && fastest && (
+              <div className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 border border-gold/40 bg-gold/5 text-gold tabular-nums">
+                <ArrowRightLeft className="size-3" />
+                Transfer {Math.max(0, active.miles - balance).toLocaleString()} from {fastest.bank}
+                <span className="opacity-70">
+                  · {fastest.etaMin < 60 ? "instant" : `~${Math.round(fastest.etaMin / 60)}h`}
+                </span>
+              </div>
+            )}
+            {bookable === "short" && (
+              <div className="inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 border border-border-soft bg-muted/30 text-muted-foreground tabular-nums">
+                Short {(active.miles - effective).toLocaleString()} pts
+              </div>
+            )}
           </div>
         </div>
 

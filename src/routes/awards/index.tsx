@@ -35,7 +35,11 @@ export const Route = createFileRoute("/awards/")({
           "Every corridor, every cabin, every airline program. The complete award-flight redemption playbook — from Australia to Europe, India to North America, and everywhere in between.",
       },
       { property: "og:title", content: "Award Flight Redemption Playbook — Miles Expert" },
-      { property: "og:description", content: "Anywhere-to-anywhere award redemption sweet spots across every major loyalty program." },
+      {
+        property: "og:description",
+        content:
+          "Anywhere-to-anywhere award redemption sweet spots across every major loyalty program.",
+      },
     ],
   }),
   component: AwardsIndex,
@@ -46,10 +50,7 @@ function AwardsIndex() {
   const [fromRegion, setFromRegion] = useState<RegionId>("oceania");
   const [toRegion, setToRegion] = useState<RegionId>("europe");
 
-  const corridor = useMemo(
-    () => corridorFor(fromRegion, toRegion),
-    [fromRegion, toRegion],
-  );
+  const corridor = useMemo(() => corridorFor(fromRegion, toRegion), [fromRegion, toRegion]);
 
   // Editorial hero — three genuinely cheapest per-mile picks across all corridors.
   const featured = useMemo(() => {
@@ -73,9 +74,8 @@ function AwardsIndex() {
         {/* ── Hero ─────────────────────────────────────────────────── */}
         <span className="text-xs uppercase tracking-widest text-gold">The Redemption Playbook</span>
         <h1 className="font-display text-5xl md:text-6xl mt-4 max-w-4xl leading-[1.05]">
-          Every route.{" "}
-          <span className="text-gold-gradient">Every program.</span>{" "}
-          Everywhere on Earth.
+          Every route. <span className="text-gold-gradient">Every program.</span> Everywhere on
+          Earth.
         </h1>
         <p className="mt-5 text-muted-foreground max-w-2xl leading-relaxed">
           The complete anywhere-to-anywhere redemption menu. Pick where you're flying from and where
@@ -278,8 +278,8 @@ function AwardsIndex() {
 
         <p className="mt-20 text-[10px] uppercase tracking-widest text-muted-foreground/60 max-w-2xl leading-relaxed">
           Editorial intelligence synthesised from Point Hacks AU, God Save the Points, One Mile at a
-          Time, Frequent Miler, The Points Guy, PointsFly and Australian Frequent Flyer. Confirm live
-          in-program before transferring — award pricing changes constantly.
+          Time, Frequent Miler, The Points Guy, PointsFly and Australian Frequent Flyer. Confirm
+          live in-program before transferring — award pricing changes constantly.
         </p>
       </main>
       <Footer />
@@ -423,9 +423,7 @@ function CorridorPanel({
                 <div
                   key={i}
                   className={`rounded-lg p-5 bg-background/40 border ${
-                    s.cabin === "economy"
-                      ? "border-gold/40"
-                      : "border-border-soft"
+                    s.cabin === "economy" ? "border-gold/40" : "border-border-soft"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">

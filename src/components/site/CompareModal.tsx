@@ -201,9 +201,7 @@ export function CompareModal({
           <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-5 py-4 border-b border-border sm:flex sm:flex-wrap">
             <div className="flex min-w-0 items-center gap-2">
               <Sparkles className="size-4 shrink-0 text-gold" />
-              <h2 className="truncate font-display text-lg md:text-xl">
-                Compare itineraries
-              </h2>
+              <h2 className="truncate font-display text-lg md:text-xl">Compare itineraries</h2>
               <span className="hidden sm:inline text-xs uppercase tracking-widest text-muted-foreground shrink-0">
                 {enriched.length} selected
               </span>
@@ -292,9 +290,7 @@ export function CompareModal({
                           <td
                             key={i}
                             className={`p-3 border-b border-border-soft tabular-nums ${
-                              isWinner
-                                ? "bg-gold/5 text-gold font-medium"
-                                : "text-foreground/90"
+                              isWinner ? "bg-gold/5 text-gold font-medium" : "text-foreground/90"
                             }`}
                           >
                             <span className="inline-flex items-center gap-1.5">
@@ -312,8 +308,8 @@ export function CompareModal({
           </div>
 
           <footer className="px-5 py-3 border-t border-border text-[11px] text-muted-foreground">
-            Gold rows highlight the leader per metric. Cash and savings are indicative
-            AUD estimates based on route benchmark fares.
+            Gold rows highlight the leader per metric. Cash and savings are indicative AUD estimates
+            based on route benchmark fares.
           </footer>
         </div>
       </div>

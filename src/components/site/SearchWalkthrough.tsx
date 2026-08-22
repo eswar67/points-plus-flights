@@ -12,26 +12,22 @@ const STEPS: Step[] = [
   {
     target: "from",
     title: "1. Where are you flying from?",
-    body:
-      "Type a city or 3-letter airport code — SYD, MEL, LAX. Not sure? Just pick your nearest airport, we'll do the heavy lifting.",
+    body: "Type a city or 3-letter airport code — SYD, MEL, LAX. Not sure? Just pick your nearest airport, we'll do the heavy lifting.",
   },
   {
     target: "to",
     title: "2. Where do you dream of going?",
-    body:
-      "Same idea — a city or airport code. Try LHR for London, NRT for Tokyo, JFK for New York. No need to plan the full route; we search every airline.",
+    body: "Same idea — a city or airport code. Try LHR for London, NRT for Tokyo, JFK for New York. No need to plan the full route; we search every airline.",
   },
   {
     target: "when",
     title: "3. Roughly when?",
-    body:
-      "Pick any date in the next year. We automatically search a 7-day window around it, so nearby dates count too — no exact date required.",
+    body: "Pick any date in the next year. We automatically search a 7-day window around it, so nearby dates count too — no exact date required.",
   },
   {
     target: "submit",
     title: "4. That's it — find my trip",
-    body:
-      "We'll scan every frequent-flyer program at once and rank the smartest ways to book with points. Results split by Economy, Business and First — with plain-English advice.",
+    body: "We'll scan every frequent-flyer program at once and rank the smartest ways to book with points. Results split by Economy, Business and First — with plain-English advice.",
   },
 ];
 
@@ -70,13 +66,7 @@ function useTargetRect(selector: string, active: boolean): Rect | null {
   return rect;
 }
 
-export function SearchWalkthrough({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
+export function SearchWalkthrough({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [i, setI] = useState(0);
   const step = STEPS[i];
   const rect = useTargetRect(step.target, open);

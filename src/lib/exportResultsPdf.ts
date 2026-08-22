@@ -73,10 +73,7 @@ export function exportResultsPdf(ctx: ExportContext): void {
 
   // ── Top pick callout ──────────────────────────────────────────────────
   const pick = [...items].sort(
-    (a, b) =>
-      Number(b.isSweetSpot) - Number(a.isSweetSpot) ||
-      b.cpp - a.cpp ||
-      a.miles - b.miles,
+    (a, b) => Number(b.isSweetSpot) - Number(a.isSweetSpot) || b.cpp - a.cpp || a.miles - b.miles,
   )[0];
   const cash = fareEstimateAud(pick.from, pick.to, pick.cabin) * pax;
   const taxesAud = pick.taxesUsd * 1.55;
@@ -117,11 +114,7 @@ export function exportResultsPdf(ctx: ExportContext): void {
     doc.setTextColor(...GOLD);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
-    doc.text(
-      `Save ~${fmtAud(cashSaved)} vs paying cash`,
-      margin + 14,
-      y + 76,
-    );
+    doc.text(`Save ~${fmtAud(cashSaved)} vs paying cash`, margin + 14, y + 76);
   }
 
   // Right-aligned CPP badge
@@ -139,10 +132,7 @@ export function exportResultsPdf(ctx: ExportContext): void {
   // ── Savings summary strip ─────────────────────────────────────────────
   const sweetCount = items.filter((a) => a.isSweetSpot).length;
   const totalSavings = items.reduce((s, a) => s + (a.savingsMiles || 0), 0);
-  const cheapest = items.reduce(
-    (m, a) => (a.miles < m ? a.miles : m),
-    items[0].miles,
-  );
+  const cheapest = items.reduce((m, a) => (a.miles < m ? a.miles : m), items[0].miles);
 
   doc.setDrawColor(...HAIRLINE);
   doc.setLineWidth(0.5);
@@ -170,32 +160,24 @@ export function exportResultsPdf(ctx: ExportContext): void {
   y += 32;
 
   // ── Results table ─────────────────────────────────────────────────────
-  const rows = items.slice(0, 60).map((a) => [
-    (a.depart || "").slice(0, 10),
-    a.programName,
-    a.carrier || "—",
-    a.direct || a.stops === 0 ? "Nonstop" : `${a.stops} stop${a.stops === 1 ? "" : "s"}`,
-    fmtHrs(a.durationMin || 0),
-    `${a.miles.toLocaleString()}`,
-    `A$${Math.round(a.taxesUsd * 1.55)}`,
-    `${a.cpp.toFixed(1)}¢`,
-    a.isSweetSpot ? "★ Sweet" : a.grade,
-  ]);
+  const rows = items
+    .slice(0, 60)
+    .map((a) => [
+      (a.depart || "").slice(0, 10),
+      a.programName,
+      a.carrier || "—",
+      a.direct || a.stops === 0 ? "Nonstop" : `${a.stops} stop${a.stops === 1 ? "" : "s"}`,
+      fmtHrs(a.durationMin || 0),
+      `${a.miles.toLocaleString()}`,
+      `A$${Math.round(a.taxesUsd * 1.55)}`,
+      `${a.cpp.toFixed(1)}¢`,
+      a.isSweetSpot ? "★ Sweet" : a.grade,
+    ]);
 
   autoTable(doc, {
     startY: y,
     head: [
-      [
-        "Depart",
-        "Program",
-        "Carrier",
-        "Stops",
-        "Duration",
-        "Points",
-        "Taxes",
-        "CPP",
-        "Grade",
-      ],
+      ["Depart", "Program", "Carrier", "Stops", "Duration", "Points", "Taxes", "CPP", "Grade"],
     ],
     body: rows,
     styles: {
@@ -225,19 +207,15 @@ export function exportResultsPdf(ctx: ExportContext): void {
       doc.setTextColor(...MUTED);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
-      doc.text(
-        `Generated ${new Date().toLocaleString()} · miles-expert.com`,
-        margin,
-        pageH - 20,
-      );
+      doc.text(`Generated ${new Date().toLocaleString()} · miles-expert.com`, margin, pageH - 20);
       const page = doc.getCurrentPageInfo().pageNumber;
       doc.text(`Page ${page}`, pageW - margin, pageH - 20, { align: "right" });
     },
   });
 
   if (items.length > 60) {
-    const afterY = (doc as unknown as { lastAutoTable?: { finalY: number } })
-      .lastAutoTable?.finalY ?? y;
+    const afterY =
+      (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y;
     doc.setTextColor(...MUTED);
     doc.setFont("helvetica", "italic");
     doc.setFontSize(9);

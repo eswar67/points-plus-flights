@@ -169,10 +169,7 @@ function WatchlistsPage() {
               We re-check seats.aero on a schedule and alert you when a deal beats your CPP target.
             </p>
           </div>
-          <button
-            onClick={() => setShowForm((s) => !s)}
-            className="btn btn-primary"
-          >
+          <button onClick={() => setShowForm((s) => !s)} className="btn btn-primary">
             {showForm ? "Close" : "+ New watchlist"}
           </button>
         </div>
