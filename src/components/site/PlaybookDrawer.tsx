@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, Clock, Download, ExternalLink } from "lucide-react";
 import type { AwardItinerary } from "@/lib/awards/types";
 import { buildPlaybook } from "@/lib/playbook";
+import { exportPlaybookPdf } from "@/lib/exportPlaybookPdf";
 import { useUserBalances } from "@/hooks/useUserBalances";
 
 export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onClose: () => void }) {
@@ -68,29 +69,7 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
           <button
             type="button"
             onClick={() => {
-              const lines = [
-                `MILES EXPERT — REDEMPTION GUIDE`,
-                `${award.from} -> ${award.to} · ${award.cabin} · ${award.depart?.slice(0, 10) ?? ""}`,
-                `${award.miles.toLocaleString()} ${award.programName} points${award.taxesUsd ? ` + ~$${award.taxesUsd} taxes` : ""}`,
-                ``,
-                ...playbook.steps.flatMap((st, i) => [
-                  `${i + 1}. ${st.title}`,
-                  `   ${st.detail}`,
-                  st.href ? `   Link: ${st.href}` : "",
-                  ``,
-                ]),
-                playbook.riskNote ? `Note: ${playbook.riskNote}` : "",
-                ``,
-                `Award space changes fast — confirm availability before transferring points.`,
-                `Generated ${new Date().toLocaleString()} · miles-expert.com`,
-              ].filter(Boolean);
-              const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `miles-expert-${award.from}-${award.to}-${award.cabin}.txt`;
-              a.click();
-              URL.revokeObjectURL(url);
+              exportPlaybookPdf(award, playbook);
               setDownloaded(true);
               setTimeout(() => setDownloaded(false), 2500);
             }}
