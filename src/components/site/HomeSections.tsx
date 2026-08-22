@@ -201,3 +201,85 @@ export function FAQ({ limit }: { limit?: number }) {
 export function ConciergeCTA() {
   return null;
 }
+
+const WORTH_TIERS = [
+  {
+    pts: 19_500,
+    flight: "Economy to Bali or Southeast Asia",
+    flightValue: 550,
+    detail: "one-way sweet spot",
+  },
+  {
+    pts: 60_000,
+    flight: "Business class to Tokyo",
+    flightValue: 3_900,
+    detail: "lie-flat, one-way",
+  },
+  {
+    pts: 87_000,
+    flight: "Business class to Europe",
+    flightValue: 6_500,
+    detail: "lie-flat, one-way",
+  },
+];
+
+const VOUCHER_RATE = 0.005; // ~0.5c/pt, typical bank portal
+
+/** Anti-voucher education: the same points, spent two ways. */
+export function PointsWorth() {
+  return (
+    <section className="mx-auto max-w-7xl px-6 py-20 md:py-28">
+      <div className="max-w-2xl mb-12">
+        <span className="text-xs uppercase tracking-widest text-gold">Points are money</span>
+        <h2 className="font-display text-4xl md:text-5xl mt-3 leading-[1.05]">
+          Don&apos;t burn them on <span className="text-gold-gradient">gift vouchers.</span>
+        </h2>
+        <p className="mt-4 text-muted-foreground">
+          Points aren&apos;t a bonus — they&apos;re a return on spending you already did. The same
+          balance is worth several times more on flights than in a bank portal.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {WORTH_TIERS.map((t) => {
+          const voucher = Math.round(t.pts * VOUCHER_RATE);
+          const mult = t.flightValue / voucher;
+          return (
+            <div key={t.pts} className="rounded-lg border border-border bg-card/60 p-6">
+              <div className="font-mono tabular-nums text-2xl text-foreground">
+                {t.pts.toLocaleString()} <span className="text-sm text-muted-foreground">pts</span>
+              </div>
+              <div className="mt-5 flex items-baseline justify-between text-sm">
+                <span className="text-muted-foreground">Gift voucher</span>
+                <span className="font-mono tabular-nums text-muted-foreground line-through decoration-destructive/60">
+                  A${voucher.toLocaleString()}
+                </span>
+              </div>
+              <div className="mt-2 flex items-baseline justify-between text-sm">
+                <span className="text-foreground">{t.flight}</span>
+                <span className="font-mono tabular-nums text-gold">
+                  ~A${t.flightValue.toLocaleString()}
+                </span>
+              </div>
+              <div className="mt-4 pt-3 border-t border-border-soft flex items-baseline justify-between">
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {t.detail}
+                </span>
+                <span className="text-xs text-gold font-semibold tabular-nums">
+                  {mult.toFixed(0)}× the value
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-8 text-center">
+        <Link
+          to="/calculator"
+          className="inline-block text-xs uppercase tracking-widest px-6 py-3 rounded-full hairline text-gold hover:bg-gold/10 transition"
+        >
+          What are your points worth? →
+        </Link>
+      </div>
+    </section>
+  );
+}

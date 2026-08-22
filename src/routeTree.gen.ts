@@ -15,6 +15,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ConciergeRouteImport } from './routes/concierge'
+import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentLoginRouteImport } from './routes/agent-login'
@@ -54,6 +55,11 @@ const FaqRoute = FaqRouteImport.update({
 const ConciergeRoute = ConciergeRouteImport.update({
   id: '/concierge',
   path: '/concierge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BookRoute = BookRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/agent-login': typeof AgentLoginRoute
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/calculator': typeof CalculatorRoute
   '/concierge': typeof ConciergeRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/agent-login': typeof AgentLoginRoute
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/calculator': typeof CalculatorRoute
   '/concierge': typeof ConciergeRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/agent-login': typeof AgentLoginRoute
   '/auth': typeof AuthRoute
   '/book': typeof BookRoute
+  '/calculator': typeof CalculatorRoute
   '/concierge': typeof ConciergeRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
@@ -172,6 +181,7 @@ export interface FileRouteTypes {
     | '/agent-login'
     | '/auth'
     | '/book'
+    | '/calculator'
     | '/concierge'
     | '/faq'
     | '/how-it-works'
@@ -190,6 +200,7 @@ export interface FileRouteTypes {
     | '/agent-login'
     | '/auth'
     | '/book'
+    | '/calculator'
     | '/concierge'
     | '/faq'
     | '/how-it-works'
@@ -208,6 +219,7 @@ export interface FileRouteTypes {
     | '/agent-login'
     | '/auth'
     | '/book'
+    | '/calculator'
     | '/concierge'
     | '/faq'
     | '/how-it-works'
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   AgentLoginRoute: typeof AgentLoginRoute
   AuthRoute: typeof AuthRoute
   BookRoute: typeof BookRoute
+  CalculatorRoute: typeof CalculatorRoute
   ConciergeRoute: typeof ConciergeRoute
   FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
@@ -282,6 +295,13 @@ declare module '@tanstack/react-router' {
       path: '/concierge'
       fullPath: '/concierge'
       preLoaderRoute: typeof ConciergeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/book': {
@@ -363,6 +383,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentLoginRoute: AgentLoginRoute,
   AuthRoute: AuthRoute,
   BookRoute: BookRoute,
+  CalculatorRoute: CalculatorRoute,
   ConciergeRoute: ConciergeRoute,
   FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,

@@ -17,7 +17,8 @@ import { FlightScene } from "@/components/site/FlightScene";
 import { SearchingState } from "@/components/site/SearchingState";
 import { useCountUp } from "@/hooks/useCountUp";
 import { ProgramRail } from "@/components/site/ProgramRail";
-import { ValueProps, FAQ, HowItWorksStrip } from "@/components/site/HomeSections";
+import { LiveDeals } from "@/components/site/LiveDeals";
+import { ValueProps, FAQ, HowItWorksStrip, PointsWorth } from "@/components/site/HomeSections";
 import { searchAwards } from "@/lib/awards/awards.functions";
 import type { AwardItinerary, Cabin, SearchResult } from "@/lib/awards/types";
 import { PROGRAMS, getProgram } from "@/lib/programs";
@@ -540,6 +541,20 @@ function Index() {
         </div>
       </section>
 
+      {!query && (
+        <LiveDeals
+          onPick={(d) =>
+            runSearch({
+              from: d.from,
+              to: d.to,
+              date: d.date,
+              cabin: "business",
+              pax: 1,
+              mode: "flex1",
+            })
+          }
+        />
+      )}
       <ProgramRail />
 
       <section ref={resultsRef} id="results" className="mx-auto max-w-7xl px-6 py-16 scroll-mt-24">
@@ -1070,6 +1085,7 @@ function Index() {
         <>
           <HowItWorksStrip />
           <ValueProps />
+          <PointsWorth />
           <FAQ limit={4} />
         </>
       )}

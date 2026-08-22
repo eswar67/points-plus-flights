@@ -11,6 +11,9 @@ export function Footer() {
           <span className="opacity-60">— award seat search.</span>
         </div>
         <nav className="flex items-center gap-5 text-xs uppercase tracking-widest">
+          <Link to="/calculator" className="hover:text-gold transition">
+            Calculator
+          </Link>
           <Link to="/awards" className="hover:text-gold transition">
             Route guides
           </Link>
