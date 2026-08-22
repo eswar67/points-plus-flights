@@ -10,6 +10,7 @@ import { SearchForm, type SearchFormQuery } from "@/components/site/SearchForm";
 import { SearchWalkthrough } from "@/components/site/SearchWalkthrough";
 import { AwardCard } from "@/components/site/AwardCard";
 import { AwardTable } from "@/components/site/AwardTable";
+import { PlaybookDrawer } from "@/components/site/PlaybookDrawer";
 import { MonthHeatmap, type DaySummary } from "@/components/site/MonthHeatmap";
 import { CABIN_LONG, CABIN_BLURB, explainTopPick } from "@/lib/concierge";
 import { FlightScene } from "@/components/site/FlightScene";
@@ -118,6 +119,8 @@ function Index() {
   const { items: recent, push: pushRecent, clear: clearRecent } = useRecentSearches();
 
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  // Redemption playbook opened from a results row.
+  const [playbookId, setPlaybookId] = useState<string | null>(null);
   const [tourOpen, setTourOpen] = useState(false);
 
   // Results toolbar (point.me-grade result controls)
@@ -1048,6 +1051,7 @@ function Index() {
                           onSort={setSortBy}
                           pax={query.pax}
                           cabinScope={cabin}
+                          onSelect={setPlaybookId}
                         />
                         {remaining > 0 && (
                           <div className="mt-3 text-center">
@@ -1088,6 +1092,13 @@ function Index() {
 
       <Footer />
       <SearchWalkthrough open={tourOpen} onClose={() => setTourOpen(false)} />
+      {playbookId &&
+        (() => {
+          const award = itineraries.find((a) => a.id === playbookId);
+          return award ? (
+            <PlaybookDrawer award={award} onClose={() => setPlaybookId(null)} />
+          ) : null;
+        })()}
     </div>
   );
 }

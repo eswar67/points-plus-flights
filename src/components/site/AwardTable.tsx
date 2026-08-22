@@ -108,11 +108,14 @@ export function AwardTable({
   onSort,
   pax,
   cabinScope,
+  onSelect,
 }: {
   groups: Group[];
   sortBy: SortKey;
   onSort: (key: SortKey) => void;
   pax: number;
+  /** Opens the redemption playbook for a chosen fare. */
+  onSelect?: (id: string) => void;
   /**
    * When set, the table shows a single Points column for that cabin plus a
    * plain-English "Recommendation" column — used by the split-by-cabin
@@ -257,9 +260,11 @@ export function AwardTable({
                       return (
                         <>
                           <td className="px-3 py-3 text-right align-top">
-                            <a
-                              href={`/book?id=${encodeURIComponent(v.id)}`}
-                              className="block group"
+                            <button
+                              type="button"
+                              onClick={() => onSelect?.(v.id)}
+                              className="block w-full text-right group"
+                              title="View redemption steps"
                             >
                               <div className="inline-flex items-center gap-1 justify-end font-mono tabular-nums text-foreground group-hover:text-gold transition text-base">
                                 {v.isSweetSpot && (
@@ -273,7 +278,7 @@ export function AwardTable({
                                   ? `${v.seats} seat${v.seats > 1 ? "s" : ""}`
                                   : "0 seats"}
                               </div>
-                            </a>
+                            </button>
                           </td>
                           <td className="px-4 py-3 align-top">
                             <div className={`text-xs ${TONE_STYLES[rec.tone]}`}>{rec.headline}</div>
@@ -296,10 +301,11 @@ export function AwardTable({
                       const taxesAud = taxesAudFromUsd(v.taxesUsd);
                       return (
                         <td key={c} className="px-3 py-3 text-right align-top">
-                          <a
-                            href={`/book?id=${encodeURIComponent(v.id)}`}
-                            className="block group"
-                            title={`${CABIN_LABEL[c]} · ${fmtCpp(v.cpp)}`}
+                          <button
+                            type="button"
+                            onClick={() => onSelect?.(v.id)}
+                            className="block w-full text-right group"
+                            title={`${CABIN_LABEL[c]} · ${fmtCpp(v.cpp)} · view redemption steps`}
                           >
                             <div className="inline-flex items-center gap-1 justify-end font-mono tabular-nums text-foreground group-hover:text-gold transition">
                               {v.isSweetSpot && (
@@ -316,7 +322,7 @@ export function AwardTable({
                             >
                               {CABIN_SHORT[c]} · {fmtCpp(v.cpp)}
                             </span>
-                          </a>
+                          </button>
                         </td>
                       );
                     })}

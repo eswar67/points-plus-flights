@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, Clock, ExternalLink } from "lucide-react";
+import { Check, Clock, Download, ExternalLink } from "lucide-react";
 import type { AwardItinerary } from "@/lib/awards/types";
 import { buildPlaybook } from "@/lib/playbook";
 import { useUserBalances } from "@/hooks/useUserBalances";
 
 export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onClose: () => void }) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [downloaded, setDownloaded] = useState(false);
 
   // Dialog semantics: focus on open, Escape closes, Tab cycles inside the
   // panel (hard trap), and focus returns to the opener on close.
@@ -64,6 +65,40 @@ export function PlaybookDrawer({ award, onClose }: { award: AwardItinerary; onCl
               {award.from} → {award.to} · {award.cabin}
             </div>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              const lines = [
+                `MILES EXPERT — REDEMPTION GUIDE`,
+                `${award.from} -> ${award.to} · ${award.cabin} · ${award.depart?.slice(0, 10) ?? ""}`,
+                `${award.miles.toLocaleString()} ${award.programName} points${award.taxesUsd ? ` + ~$${award.taxesUsd} taxes` : ""}`,
+                ``,
+                ...playbook.steps.flatMap((st, i) => [
+                  `${i + 1}. ${st.title}`,
+                  `   ${st.detail}`,
+                  st.href ? `   Link: ${st.href}` : "",
+                  ``,
+                ]),
+                playbook.riskNote ? `Note: ${playbook.riskNote}` : "",
+                ``,
+                `Award space changes fast — confirm availability before transferring points.`,
+                `Generated ${new Date().toLocaleString()} · miles-expert.com`,
+              ].filter(Boolean);
+              const blob = new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `miles-expert-${award.from}-${award.to}-${award.cabin}.txt`;
+              a.click();
+              URL.revokeObjectURL(url);
+              setDownloaded(true);
+              setTimeout(() => setDownloaded(false), 2500);
+            }}
+            className="mr-3 inline-flex items-center gap-1.5 rounded-full border border-gold/40 px-3 py-1.5 text-[10px] uppercase tracking-widest text-gold hover:bg-gold/10 transition"
+          >
+            <Download className="size-3" />
+            {downloaded ? "Saved" : "Download guide"}
+          </button>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-sm">
             Close
           </button>
