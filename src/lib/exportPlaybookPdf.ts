@@ -34,7 +34,9 @@ function pdfSafe(text: string): string {
       .replace(/[\u2022]/g, "-")
       .replace(/\u00A0/g, " ")
       // anything still outside Latin-1 would break metrics
-      .replace(/[^\u0000-\u00FF]/g, "")
+      .split("")
+      .filter((ch) => ch.charCodeAt(0) <= 0xff)
+      .join("")
   );
 }
 
