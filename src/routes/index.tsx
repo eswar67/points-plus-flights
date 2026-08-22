@@ -615,22 +615,6 @@ function Index() {
                     <Download className="size-3.5" /> Export PDF
                   </button>
                 )}
-                {!pending && ranked.length > 0 && (
-                  <Link
-                    to="/watchlists"
-                    search={{
-                      from: query.from,
-                      to: query.to,
-                      dateFrom: rangeFor(query).date,
-                      dateTo: rangeFor(query).dateTo ?? rangeFor(query).date,
-                      cabin: query.cabin,
-                      pax: query.pax,
-                    }}
-                    className="btn btn-ghost whitespace-nowrap"
-                  >
-                    <Bell className="size-3.5" /> Watch this route
-                  </Link>
-                )}
               </div>
             </div>
 

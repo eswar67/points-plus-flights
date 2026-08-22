@@ -186,13 +186,7 @@ export function TopPickBanner({
         <div className="relative mt-3 pt-3 border-t border-gold/20 text-xs text-emerald-300/90 flex items-center gap-2 animate-fade-in">
           <Check className="size-3.5" />
           Alert set — we&apos;ll notify you if a new Top Pick beats {pick.cpp.toFixed(1)}¢/pt on
-          this route.{" "}
-          <Link
-            to="/watchlists"
-            className="underline decoration-dotted underline-offset-2 hover:text-gold"
-          >
-            Manage
-          </Link>
+          this route.
         </div>
       )}
       {alertState === "error" && (
@@ -215,18 +209,8 @@ function AlertButton({
   isAuthed: boolean;
   pickCpp: number;
 }) {
-  if (!isAuthed) {
-    return (
-      <Link
-        to="/watchlists"
-        className="inline-flex items-center gap-1.5 rounded-full border border-gold/50 bg-card/70 backdrop-blur px-3 py-1.5 text-[10px] uppercase tracking-widest text-gold hover:bg-gold/10 transition"
-        title="Create a watchlist for this route"
-      >
-        <Bell className="size-3" />
-        Alert me
-      </Link>
-    );
-  }
+  // Alerts require an account; Miles Expert is login-free for now.
+  if (!isAuthed) return null;
   if (state === "active") {
     return (
       <button

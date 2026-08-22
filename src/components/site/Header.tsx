@@ -1,22 +1,18 @@
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
-import { useAuth, signOut } from "@/hooks/useAuth";
 import { LogoMark } from "./Logo";
 
 const NAV_LINKS = [
   { to: "/", label: "Search", authed: false },
   { to: "/awards", label: "Route guide", authed: false },
-  { to: "/watchlists", label: "Watchlists", authed: true },
   { to: "/how-it-works", label: "How it works", authed: false },
   { to: "/faq", label: "FAQ", authed: false },
 ] as const;
 
 export function Header() {
-  const { user, loading } = useAuth();
-  const nav = useNavigate();
   const [open, setOpen] = useState(false);
-  const links = NAV_LINKS.filter((l) => !l.authed || user);
+  const links = NAV_LINKS;
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/70 border-b border-border-soft">
@@ -33,27 +29,6 @@ export function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          {loading ? (
-            <div className="h-8 w-20" />
-          ) : user ? (
-            <div className="hidden md:flex items-center gap-2">
-              <Link
-                to="/account"
-                className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
-              >
-                Account
-              </Link>
-              <button
-                onClick={async () => {
-                  await signOut();
-                  nav({ to: "/" });
-                }}
-                className="text-xs uppercase tracking-widest px-3 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
-              >
-                Sign out
-              </button>
-            </div>
-          ) : null}
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -80,29 +55,6 @@ export function Header() {
                 {l.label}
               </Link>
             ))}
-          </div>
-          <div className="mt-4 pt-4 border-t border-border-soft flex items-center gap-3">
-            {user ? (
-              <>
-                <Link
-                  to="/account"
-                  onClick={() => setOpen(false)}
-                  className="text-xs uppercase tracking-widest px-4 py-2 rounded-full hairline text-gold hover:bg-gold/10 transition"
-                >
-                  Account
-                </Link>
-                <button
-                  onClick={async () => {
-                    setOpen(false);
-                    await signOut();
-                    nav({ to: "/" });
-                  }}
-                  className="text-xs uppercase tracking-widest px-3 py-2 rounded-full text-muted-foreground hover:text-foreground transition"
-                >
-                  Sign out
-                </button>
-              </>
-            ) : null}
           </div>
         </nav>
       )}
