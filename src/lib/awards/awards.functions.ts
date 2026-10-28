@@ -6,6 +6,16 @@ import type { SearchResult } from "./types";
 
 const MAX_RANGE_DAYS = 31;
 
+function rangeDays(date: string, dateTo?: string): number {
+  if (!dateTo) return 1;
+  return (
+    Math.floor(
+      (new Date(dateTo + "T00:00:00Z").getTime() - new Date(date + "T00:00:00Z").getTime()) /
+        86_400_000,
+    ) + 1
+  );
+}
+
 const SearchSchema = z
   .object({
     from: z
@@ -112,6 +122,12 @@ export const searchAwards = createServerFn({ method: "POST" })
     if (cached) return cached;
 
     const provider = getAwardProvider();
+    const requestedDays = rangeDays(data.date, data.dateTo);
+    if (provider.maxDateRangeDays && requestedDays > provider.maxDateRangeDays) {
+      throw new Error(
+        `AwardTool supports up to ${provider.maxDateRangeDays} dates per real-time search. Choose a shorter date range.`,
+      );
+    }
     try {
       const itineraries = await provider.search(data);
       const result: SearchResult = { itineraries, source: provider.name };

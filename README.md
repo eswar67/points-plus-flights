@@ -15,9 +15,9 @@ gated behind an Aureum Plus subscription.
   gateway; subscription state synced by webhook into `public.subscriptions`
 - **Tailwind v4** — noir & gold design system in `src/styles.css`
   (`--gold`, `--gold-soft`, `bg-noir`, `text-gold-gradient`)
-- **seats.aero Partner API** — cached award availability
-  (`src/lib/awards/seatsAeroProvider.ts`). `SEATS_AERO_API_KEY` is required —
-  search and the watchlist poller error out rather than serve non-live data.
+- **AwardTool real-time API** — on-demand award crawler. Set `AWARDTOOL_API_KEY`
+  to make it the primary live search provider; seats.aero remains an optional
+  live fallback when AwardTool is not configured.
 
 ## Environment variables
 
@@ -27,7 +27,8 @@ Server-side (Lovable Cloud secrets / `wrangler secret put`):
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_PROJECT_ID` | Supabase client (anon key — safe to expose)                                  |
 | `SUPABASE_SERVICE_ROLE_KEY`                                       | Poller + Stripe webhook writes (bypasses RLS — server only)                  |
-| `SEATS_AERO_API_KEY`                                              | Live award availability (required — no fallback)                             |
+| `AWARDTOOL_API_KEY`                                               | AwardTool real-time crawler (preferred live provider)                        |
+| `SEATS_AERO_API_KEY`                                              | seats.aero live availability (optional fallback provider)                    |
 | `CRON_SECRET`                                                     | Bearer token the scheduled poller must present (rotate from Account → Admin) |
 | `STRIPE_SANDBOX_API_KEY`, `STRIPE_LIVE_API_KEY`                   | Stripe via Lovable connector gateway                                         |
 | `PAYMENTS_SANDBOX_WEBHOOK_SECRET`, `PAYMENTS_LIVE_WEBHOOK_SECRET` | Webhook signature verification                                               |

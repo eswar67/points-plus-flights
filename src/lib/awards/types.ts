@@ -42,11 +42,13 @@ export type SearchInput = {
 
 export type SearchResult = {
   itineraries: AwardItinerary[];
-  source: "seats.aero";
+  source: "awardtool" | "seats.aero";
   warning?: string; // surfaced to UI
 };
 
 export interface AwardProvider {
-  name: "seats.aero";
+  name: "awardtool" | "seats.aero";
+  /** Maximum number of consecutive travel dates this provider can search per request. */
+  maxDateRangeDays?: number;
   search(input: SearchInput): Promise<AwardItinerary[]>;
 }

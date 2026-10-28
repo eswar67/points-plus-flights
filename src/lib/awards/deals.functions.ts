@@ -50,7 +50,15 @@ async function scanDeals(): Promise<LiveDeal[]> {
 
   for (const route of PRESET_ROUTES) {
     try {
-      const items = await provider.search({ from: route.from, to: route.to, date, dateTo, pax: 1 });
+      const maxDates = provider.maxDateRangeDays ?? 31;
+      const boundedDateTo = addDays(Math.min(30, maxDates - 1) + 14);
+      const items = await provider.search({
+        from: route.from,
+        to: route.to,
+        date,
+        dateTo: boundedDateTo < dateTo ? boundedDateTo : dateTo,
+        pax: 1,
+      });
       const best = items
         .filter((a) => a.miles > 0 && a.seats > 0)
         .sort((a, b) => a.miles - b.miles)[0];
